@@ -1,10 +1,8 @@
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 1.67.1</title>
+  <title>Sublet 1.68.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -130,7 +128,7 @@
     .special-blook-price{font-size:13px;color:#333}
     .special-blook-expire{font-size:11px;color:#777}
 
-    .pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;overflow-y:auto;max-height:calc(100vh - 220px);}
+    .pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;overflow-y:auto;max-height:calc(100vh - 260px);}
     .pack-card{
       border-radius:16px;height:150px;padding:10px;
       box-shadow:0 3px 8px rgba(0,0,0,.18);
@@ -154,6 +152,15 @@
       display:none;white-space:normal;
     }
     .pack-q:hover .tooltip{display:block}
+
+    .booster-banner{
+      margin-bottom:8px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#fff3cd;
+      font-size:12px;
+      color:#795548;
+    }
 
     .pack-open-overlay{
       position:fixed;inset:0;background:rgba(0,0,0,.6);
@@ -185,11 +192,12 @@
     .confetti-piece{
       position:fixed;width:8px;height:14px;border-radius:2px;
       opacity:0.9;z-index:55;pointer-events:none;
+      top:0;
       animation:confetti-fall 2.4s linear forwards;
     }
     @keyframes confetti-fall{
-      0%{transform:translate3d(var(--x),-10vh,0) rotate(0deg);}
-      100%{transform:translate3d(var(--x),110vh,0) rotate(720deg);}
+      0%{transform:translate3d(var(--x),-20vh,0) rotate(0deg);}
+      100%{transform:translate3d(var(--x),120vh,0) rotate(720deg);}
     }
 
     .bsec{margin-bottom:18px}
@@ -359,12 +367,45 @@
     .blook-modal-meta{font-size:12px;color:#555;text-align:center}
     .blook-modal-sell{background:#ef6c00;font-size:13px;padding:6px 12px;}
     .blook-modal-close{background:#78909c;font-size:13px;padding:6px 12px;}
+
+    /* Stats view */
+    #view-stats{display:none;}
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:10px;
+      margin-top:8px;
+    }
+    .stats-card{
+      background:#f5f5f5;
+      border-radius:10px;
+      padding:10px;
+      font-size:13px;
+    }
+    .stats-label{font-size:11px;color:#666;margin-bottom:2px;}
+    .stats-value{font-size:16px;font-weight:700;color:#0d47a1;}
+    .stats-subrow{margin-top:8px;font-size:12px;color:#555;}
+
+    /* Boosters view */
+    #view-boosters{display:none;}
+    .booster-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#f5f5f5;
+      margin-bottom:8px;
+      font-size:13px;
+    }
+    .booster-row span{display:block;}
+
   </style>
 </head>
 <body>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 1.67</div>
+      <div class="start-title">Sublet 1.68</div>
       <div class="start-sub">
         Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.
       </div>
@@ -391,11 +432,14 @@
     </div>
     <div class="start-right" id="floating-blooks-area"></div>
   </div>
+
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 1.67</div>
+        <div class="sidebar-title">Sublet 1.68</div>
+        <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
+        <button class="nav" data-view="boosters">Boosters</button>
         <button class="nav" data-view="blooks">My Blooks</button>
         <button class="nav" data-view="trading">Trading</button>
         <button class="nav" data-view="chat">Chat</button>
@@ -415,20 +459,99 @@
             <button id="signout-btn" style="background:#ef5350;font-size:12px;padding:6px 10px;">Sign Out</button>
           </div>
         </div>
+
         <div id="view-market" class="card">
           <div class="section-title">Market</div>
           <div class="section-sub">Special shop blooks first, then packs.</div>
+          <div id="booster-market-banner"></div>
           <div id="special-shop" class="special-shop-container" style="display:none;">
             <div class="special-shop-title">Special Shop Blooks</div>
             <div id="special-shop-grid" class="special-shop-grid"></div>
           </div>
           <div id="pack-grid" class="pack-grid"></div>
         </div>
+
+        <div id="view-stats" class="card" style="display:none;">
+          <div class="section-title">Stats</div>
+          <div class="section-sub">Your overall progress and Subscore.</div>
+          <div id="stats-username" style="font-weight:700;font-size:18px;margin-bottom:6px;"></div>
+          <div class="stats-grid">
+            <div class="stats-card">
+              <div class="stats-label">Current Coins</div>
+              <div class="stats-value" id="stats-coins">0</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Total Coins Collected</div>
+              <div class="stats-value" id="stats-total-coins">0</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Total Packs Opened</div>
+              <div class="stats-value" id="stats-packs-opened">0</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Chromas Owned</div>
+              <div class="stats-value" id="stats-chromas">0</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Mysticals Owned</div>
+              <div class="stats-value" id="stats-mysticals">0</div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Best Blook</div>
+              <div class="stats-value" id="stats-best-blook">None</div>
+              <div class="stats-subrow" id="stats-best-blook-rarity"></div>
+            </div>
+            <div class="stats-card">
+              <div class="stats-label">Subscore</div>
+              <div class="stats-value" id="stats-subscore">0</div>
+              <div class="stats-subrow">Common 5 • Rare 10 • Epic 15 • Legendary 30 • Chroma 50 • Supreeme 45 • Mystical 100</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;border-top:1px solid #e0e0e0;padding-top:10px;">
+            <div style="font-size:13px;margin-bottom:4px;">Look at another player's stats</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <input id="stats-lookup-input" placeholder="username" style="flex:1;min-width:140px;">
+              <button id="stats-lookup-btn" style="font-size:12px;padding:6px 10px;">View stats</button>
+            </div>
+            <div id="stats-lookup-result" style="margin-top:8px;font-size:13px;color:#333;"></div>
+          </div>
+        </div>
+
+        <div id="view-boosters" class="card" style="display:none;">
+          <div class="section-title">Boosters</div>
+          <div class="section-sub">
+            Boosters make Epic, Legendary, Supreeme, Chroma, and Mystical blooks more common for 1 hour.
+          </div>
+          <div id="booster-active-info" style="font-size:13px;color:#555;margin-bottom:8px;"></div>
+          <div class="booster-row">
+            <span>2x Booster • 10,000 coins</span>
+            <button data-mult="2" class="booster-buy-btn">Buy 2x</button>
+          </div>
+          <div class="booster-row">
+            <span>3x Booster • 50,000 coins</span>
+            <button data-mult="3" class="booster-buy-btn">Buy 3x</button>
+          </div>
+          <div class="booster-row">
+            <span>4x Booster • 350,000 coins</span>
+            <button data-mult="4" class="booster-buy-btn">Buy 4x</button>
+          </div>
+          <div class="booster-row">
+            <span>5x Booster • 500,000 coins</span>
+            <button data-mult="5" class="booster-buy-btn">Buy 5x</button>
+          </div>
+          <div style="font-size:11px;color:#777;margin-top:6px;">
+            Boosters do not affect Common or Rare blooks. Only one booster can be active at a time.
+          </div>
+        </div>
+
         <div id="view-blooks" class="card" style="display:none;">
           <div class="section-title">My Blooks</div>
           <div class="section-sub">Blooks sorted by pack. “Other Blooks” at the bottom.</div>
+          <button id="sell-duplicates-btn" style="align-self:flex-start;font-size:12px;margin-bottom:8px;">Sell all duplicates</button>
+          <div id="sell-duplicates-status" class="err-small"></div>
           <div id="blooks-container"></div>
         </div>
+
         <div id="view-trading" class="card" style="display:none;">
           <div class="section-title">Trading</div>
           <div class="section-sub">Send trade requests to other players.</div>
@@ -448,6 +571,7 @@
           <div id="trade-request-err" class="err-small"></div>
           <div id="trade-request-status" style="font-size:12px;margin-top:4px;"></div>
         </div>
+
         <div id="view-chat" class="card" style="display:none;">
           <div class="section-title">Global Chat</div>
           <div class="section-sub">Talk with everyone playing Sublet.</div>
@@ -461,6 +585,7 @@
             </div>
           </div>
         </div>
+
         <div id="view-leaderboard" class="card" style="display:none;">
           <div class="section-title">Leaderboard</div>
           <div class="section-sub">
@@ -468,6 +593,7 @@
           </div>
           <div id="leaderboard-list"></div>
         </div>
+
         <div id="owner-panel" class="card" style="display:none;">
           <div class="section-title">Owner Panel</div>
           <div class="section-sub">Toggle packs, manage bans, and configure shop blooks.</div>
@@ -484,6 +610,7 @@
                 <option value="Rare">Rare</option>
                 <option value="Epic">Epic</option>
                 <option value="Legendary">Legendary</option>
+                <option value="Supreeme">Supreeme</option>
                 <option value="Chroma">Chroma</option>
                 <option value="Mystical">Mystical</option>
               </select>
@@ -508,9 +635,10 @@
           </div>
           <button id="owner-back-btn" style="margin-top:10px;">Back to leaderboard</button>
         </div>
+
         <div id="admin-panel" class="card">
           <div class="section-title">Admin Panel</div>
-          <div class="section-sub">Set coins, give blooks, and control next pack open.</div>
+          <div class="section-sub">Set coins, give blooks, control next pack open, and boosters/rarity.</div>
           <div style="margin-bottom:10px;">
             <label style="font-size:12px;">Set coins for current user</label>
             <input id="admin-coins" type="number" min="0" value="0">
@@ -527,11 +655,37 @@
             <input id="admin-next-pack-id" placeholder="space, ice, spooky, ...">
             <button id="admin-set-next-pack">Set</button>
           </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Set next rarity to open</label>
+            <select id="admin-next-rarity">
+              <option value="">None</option>
+              <option value="Common">Common</option>
+              <option value="Rare">Rare</option>
+              <option value="Epic">Epic</option>
+              <option value="Legendary">Legendary</option>
+              <option value="Supreeme">Supreeme</option>
+              <option value="Chroma">Chroma</option>
+              <option value="Mystical">Mystical</option>
+            </select>
+            <button id="admin-set-next-rarity-btn">Set rarity</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Set booster for current user</label>
+            <select id="admin-booster-mult">
+              <option value="">None</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4">4x</option>
+              <option value="5">5x</option>
+            </select>
+            <button id="admin-set-booster-btn">Set booster (1h)</button>
+          </div>
           <div id="admin-status" class="err-small"></div>
         </div>
       </div>
     </div>
   </div>
+
   <div id="wheel-overlay">
     <div class="wheel-card">
       <div class="section-title" style="margin-bottom:0;">Daily Wheel</div>
@@ -545,6 +699,7 @@
       <button id="wheel-close-btn" style="font-size:11px;padding:4px 10px;margin-top:4px;">Close</button>
     </div>
   </div>
+
   <div id="pack-open-overlay" class="pack-open-overlay">
     <div class="pack-open-card">
       <div class="pack-open-title">You got a blook!</div>
@@ -552,6 +707,7 @@
       <div id="pack-open-meta" class="pack-open-meta"></div>
     </div>
   </div>
+
   <div id="blook-modal-overlay">
     <div class="blook-modal">
       <div id="blook-modal-title" class="blook-modal-title"></div>
@@ -564,6 +720,7 @@
       <div id="blook-modal-status" class="err-small" style="text-align:center;"></div>
     </div>
   </div>
+
   <div id="trade-popup">
     <div id="trade-popup-text"></div>
     <div id="trade-popup-buttons">
@@ -622,6 +779,8 @@
 
     const navBtns = document.querySelectorAll(".nav");
     const viewMarket = document.getElementById("view-market");
+    const viewStats = document.getElementById("view-stats");
+    const viewBoosters = document.getElementById("view-boosters");
     const viewBlooks = document.getElementById("view-blooks");
     const viewTrading = document.getElementById("view-trading");
     const viewChat = document.getElementById("view-chat");
@@ -640,6 +799,10 @@
     const adminGiveBlookBtn = document.getElementById("admin-give-blook");
     const adminNextPackIdInput = document.getElementById("admin-next-pack-id");
     const adminSetNextPackBtn = document.getElementById("admin-set-next-pack");
+    const adminNextRaritySelect = document.getElementById("admin-next-rarity");
+    const adminSetNextRarityBtn = document.getElementById("admin-set-next-rarity-btn");
+    const adminBoosterMultSelect = document.getElementById("admin-booster-mult");
+    const adminSetBoosterBtn = document.getElementById("admin-set-booster-btn");
     const adminStatus = document.getElementById("admin-status");
 
     const topUser = document.getElementById("top-user");
@@ -650,7 +813,10 @@
     const packGrid = document.getElementById("pack-grid");
     const specialShopContainer = document.getElementById("special-shop");
     const specialShopGrid = document.getElementById("special-shop-grid");
+    const boosterMarketBanner = document.getElementById("booster-market-banner");
     const blooksContainer = document.getElementById("blooks-container");
+    const sellDuplicatesBtn = document.getElementById("sell-duplicates-btn");
+    const sellDuplicatesStatus = document.getElementById("sell-duplicates-status");
 
     const tradeTargetUser = document.getElementById("trade-target-user");
     const tradeOfferBlook = document.getElementById("trade-offer-blook");
@@ -706,6 +872,22 @@
     const blookModalClose = document.getElementById("blook-modal-close");
     const blookModalStatus = document.getElementById("blook-modal-status");
 
+    const statsUsername = document.getElementById("stats-username");
+    const statsCoins = document.getElementById("stats-coins");
+    const statsTotalCoins = document.getElementById("stats-total-coins");
+    const statsPacksOpened = document.getElementById("stats-packs-opened");
+    const statsChromas = document.getElementById("stats-chromas");
+    const statsMysticals = document.getElementById("stats-mysticals");
+    const statsBestBlook = document.getElementById("stats-best-blook");
+    const statsBestBlookRarity = document.getElementById("stats-best-blook-rarity");
+    const statsSubscore = document.getElementById("stats-subscore");
+    const statsLookupInput = document.getElementById("stats-lookup-input");
+    const statsLookupBtn = document.getElementById("stats-lookup-btn");
+    const statsLookupResult = document.getElementById("stats-lookup-result");
+
+    const boosterActiveInfo = document.getElementById("booster-active-info");
+    const boosterBuyBtns = document.querySelectorAll(".booster-buy-btn");
+
     let currentUser = null;
     let userData = null;
     let ownerMode = false;
@@ -717,10 +899,11 @@
     let BLOOK_INFO = {};
     let currentModalBlook = null;
 
-    // chat reward / anti-spam
     let chatMessageCount = 0;
     let chatBanUntil = 0;
     let lastChatTime = 0;
+
+    let canClosePackOverlay = false;
 
     const userRef = uid => ref(db, "users/" + uid);
     const usersRef = () => ref(db, "users");
@@ -736,7 +919,8 @@
       EPIC: "Epic",
       LEG: "Legendary",
       CHR: "Chroma",
-      MYS: "Mystical"
+      MYS: "Mystical",
+      SUP: "Supreeme"
     };
 
     const RARITY_COLORS = {
@@ -745,7 +929,8 @@
       [R.EPIC]: "#9c27b0",
       [R.LEG]: "#ffb300",
       [R.CHR]: "#81d4fa",
-      [R.MYS]: "#6a1b9a"
+      [R.MYS]: "#6a1b9a",
+      [R.SUP]: "#d50000"
     };
 
     const SELL_VALUES = {
@@ -753,8 +938,38 @@
       [R.RARE]: 20,
       [R.EPIC]: 80,
       [R.LEG]: 250,
+      [R.SUP]: 400,
       [R.CHR]: 400,
       [R.MYS]: 1000
+    };
+
+    const SUBSCORE_VALUES = {
+      [R.COMMON]: 5,
+      [R.RARE]: 10,
+      [R.EPIC]: 15,
+      [R.LEG]: 30,
+      [R.CHR]: 50,
+      [R.SUP]: 45,
+      [R.MYS]: 100
+    };
+
+    const RARITY_BASE_WEIGHTS = {
+      [R.COMMON]: 60,
+      [R.RARE]: 25,
+      [R.EPIC]: 8,
+      [R.LEG]: 4,
+      [R.SUP]: 1.2,
+      [R.CHR]: 1,
+      [R.MYS]: 0.8
+    };
+
+    const BOOSTABLE_RARITIES = new Set([R.EPIC, R.LEG, R.SUP, R.CHR, R.MYS]);
+
+    const BOOSTER_COSTS = {
+      2: 10000,
+      3: 50000,
+      4: 350000,
+      5: 500000
     };
 
     const BASE_PACKS = [
@@ -1190,6 +1405,126 @@
       }
     ];
 
+    const SCIFI_PACK = {
+      id:"scifi",
+      name:"Sci‑Fi Pack",
+      color:"#3b3f99",
+      cost:25,
+      blooks:[
+        {name:"Gravity Switcher",chance:15.2,rarity:R.RARE},
+        {name:"Stealth Disguise Kit",chance:15,rarity:R.RARE},
+        {name:"Object Minimizer",chance:15,rarity:R.RARE},
+        {name:"Object Maxurizer",chance:15,rarity:R.RARE},
+        {name:"Holographic Display",chance:15,rarity:R.RARE},
+        {name:"Flying Car",chance:6.5,rarity:R.EPIC},
+        {name:"Void Pistol",chance:6.5,rarity:R.EPIC},
+        {name:"Red Lightsaber",chance:6.5,rarity:R.EPIC},
+        {name:"Neural Implant",chance:2.5,rarity:R.LEG},
+        {name:"Hijacked Radio",chance:2.5,rarity:R.LEG},
+        {name:"Eternal Prism Blade",chance:0.3,rarity:R.SUP},
+        {name:"Blue Lightsaber",chance:0.03,rarity:R.MYS},
+        {name:"Hijacked Neural Implant",chance:0.02,rarity:R.MYS},
+        {name:"Celestial Oracle Staff",chance:0.0033,rarity:R.MYS}
+      ]
+    };
+
+    const COMBAT_PACK = {
+      id:"combat",
+      name:"Combat Pack",
+      color:"#8b0000",
+      cost:25,
+      blooks:[
+        {name:"Viking Helmet",chance:18.75,rarity:R.RARE},
+        {name:"Iron Chestplate",chance:18.75,rarity:R.RARE},
+        {name:"Spiked Boot",chance:18.75,rarity:R.RARE},
+        {name:"Silver Shuriken",chance:18.75,rarity:R.RARE},
+        {name:"Knight Shield",chance:20,rarity:R.EPIC},
+        {name:"Knight Sword",chance:20,rarity:R.EPIC},
+        {name:"Fragment Grenade",chance:9,rarity:R.LEG},
+        {name:"M12 Shotgun",chance:0.9,rarity:R.CHR},
+        {name:"M67 Grenade",chance:0.1,rarity:R.MYS},
+        {name:"Diamond Sword",chance:0.005,rarity:R.MYS},
+        {name:"Golden Shuriken",chance:0.002,rarity:R.MYS}
+      ]
+    };
+
+    const ELEMENT_PACK = {
+      id:"element",
+      name:"Element Pack",
+      color:"#2e8b57",
+      cost:25,
+      blooks:[
+        {name:"Nature Elemental",chance:18.75,rarity:R.RARE},
+        {name:"Fire Elemental",chance:18.75,rarity:R.RARE},
+        {name:"Water Elemental",chance:18.75,rarity:R.RARE},
+        {name:"Air Elemental",chance:18.75,rarity:R.RARE},
+        {name:"Frost Elemental",chance:20,rarity:R.EPIC},
+        {name:"Lava Elemental",chance:20,rarity:R.EPIC},
+        {name:"Space Elemental",chance:9,rarity:R.LEG},
+        {name:"Electric Elemental",chance:0.9,rarity:R.CHR},
+        {name:"Plasma Elemental",chance:0.1,rarity:R.MYS}
+      ]
+    };
+
+    const CANDY_PACK = {
+      id:"candy",
+      name:"Candy Pack",
+      color:"#ff69b4",
+      cost:25,
+      blooks:[
+        {name:"Candy Corn",chance:19.5,rarity:R.RARE},
+        {name:"Jellybean",chance:19.5,rarity:R.RARE},
+        {name:"Lollipop",chance:19.5,rarity:R.RARE},
+        {name:"Black Licorice",chance:19.5,rarity:R.RARE},
+        {name:"Peppermint",chance:17,rarity:R.EPIC},
+        {name:"Chocolate",chance:17,rarity:R.EPIC},
+        {name:"Gummy Worm",chance:9,rarity:R.LEG},
+        {name:"Rock Candy",chance:0.7,rarity:R.CHR},
+        {name:"White Chocolate",chance:0.16,rarity:R.MYS},
+        {name:"Red Licorice",chance:0.1,rarity:R.MYS},
+        {name:"Blue Gummy Worm",chance:0.04,rarity:R.MYS}
+      ]
+    };
+
+    const DESSERT_PACK = {
+      id:"dessert",
+      name:"Dessert Pack",
+      color:"#d2691e",
+      cost:25,
+      blooks:[
+        {name:"Elderberry Pie",chance:17.5,rarity:R.RARE},
+        {name:"Cherry Pie",chance:17.5,rarity:R.RARE},
+        {name:"Donut",chance:17.5,rarity:R.RARE},
+        {name:"Flan",chance:15,rarity:R.RARE},
+        {name:"Chocolate Ice Cream",chance:18,rarity:R.EPIC},
+        {name:"Strawberry Ice Cream",chance:18,rarity:R.EPIC},
+        {name:"Raspberry Macaroon",chance:8,rarity:R.LEG},
+        {name:"Cake",chance:1,rarity:R.CHR},
+        {name:"Blueberry Macaroon",chance:0.04,rarity:R.MYS},
+        {name:"Birthday Cake",chance:0.02,rarity:R.MYS},
+        {name:"Magic Chocolate",chance:0.005,rarity:R.MYS}
+      ]
+    };
+
+    const MUSIC_PACK = {
+      id:"music",
+      name:"Music Pack",
+      color:"#4169e1",
+      cost:25,
+      blooks:[
+        {name:"Sheet Music",chance:14.5,rarity:R.RARE},
+        {name:"Music Disc",chance:14.5,rarity:R.RARE},
+        {name:"Xylophone",chance:14.5,rarity:R.RARE},
+        {name:"Drums",chance:14.5,rarity:R.RARE},
+        {name:"Metronome",chance:16,rarity:R.EPIC},
+        {name:"Triangle",chance:16,rarity:R.EPIC},
+        {name:"Speaker",chance:6.2,rarity:R.LEG},
+        {name:"Piano",chance:0.8,rarity:R.CHR},
+        {name:"White Piano",chance:0.06,rarity:R.MYS},
+        {name:"Golden Harp",chance:0.0074,rarity:R.MYS}
+      ]
+    };
+
     const LUCKY_PACK = {
       id:"lucky",
       name:"Lucky Pack (March only)",
@@ -1290,7 +1625,20 @@
       ]
     };
 
-    const ALL_PACKS_FOR_OWNER = [...BASE_PACKS, BOT_PACK, PIRATE_PACK, LUCKY_PACK, VALENTINE_PACK, EASTER_PACK];
+    const ALL_PACKS_FOR_OWNER = [
+      ...BASE_PACKS,
+      BOT_PACK,
+      PIRATE_PACK,
+      LUCKY_PACK,
+      VALENTINE_PACK,
+      EASTER_PACK,
+      SCIFI_PACK,
+      COMBAT_PACK,
+      ELEMENT_PACK,
+      CANDY_PACK,
+      DESSERT_PACK,
+      MUSIC_PACK
+    ];
 
     function isMarch() {
       const d = new Date();
@@ -1309,6 +1657,8 @@
 
     function showView(name) {
       viewMarket.style.display = name === "market" ? "flex" : "none";
+      viewStats.style.display = name === "stats" ? "flex" : "none";
+      viewBoosters.style.display = name === "boosters" ? "flex" : "none";
       viewBlooks.style.display = name === "blooks" ? "flex" : "none";
       viewTrading.style.display = name === "trading" ? "flex" : "none";
       viewChat.style.display = name === "chat" ? "flex" : "none";
@@ -1321,6 +1671,8 @@
 
       if (name === "leaderboard") buildLeaderboard();
       if (name === "chat" && !chatLoaded) subscribeChat();
+      if (name === "stats") refreshStatsView();
+      if (name === "boosters") refreshBoosterView();
     }
 
     navBtns.forEach(btn => {
@@ -1360,16 +1712,32 @@
       if (!userData.coins) userData.coins = 0;
       if (!userData.lastWheel) userData.lastWheel = 0;
       if (!userData.nextPackId) userData.nextPackId = null;
+      if (!userData.totalCoinsCollected) userData.totalCoinsCollected = 0;
+      if (!userData.totalPacksOpened) userData.totalPacksOpened = 0;
+      if (!userData.nextForcedRarity) userData.nextForcedRarity = null;
+      if (!userData.activeBooster) userData.activeBooster = null;
+      if (userData.isAdmin) {
+        adminMode = true;
+        adminPanelBtn.style.display = "inline-block";
+      }
+      if (userData.isOwner) {
+        ownerMode = true;
+        ownerPanelBtn.style.display = "inline-block";
+      }
       refreshTop();
       renderBlooks();
       populateTradeOfferSelect();
       updateWheelButtonState();
+      refreshStatsView();
+      refreshBoosterView();
     }
 
     async function saveUserData() {
       if (!currentUser || !userData) return;
       await update(userRef(currentUser.uid), userData);
       refreshTop();
+      refreshStatsView();
+      refreshBoosterView();
     }
 
     function refreshTop() {
@@ -1383,10 +1751,22 @@
     }
 
     function allPacksForMarket() {
-      const arr = [...BASE_PACKS, BOT_PACK, PIRATE_PACK];
+      const arr = [
+        ...BASE_PACKS,
+        BOT_PACK,
+        PIRATE_PACK,
+        SCIFI_PACK,
+        COMBAT_PACK,
+        ELEMENT_PACK,
+        CANDY_PACK,
+        DESSERT_PACK,
+        MUSIC_PACK
+      ];
+
       if (isMarch()) arr.push(LUCKY_PACK);
       if (isValentineWeek()) arr.push(VALENTINE_PACK);
       if (isEasterSeason()) arr.push(EASTER_PACK);
+
       return arr;
     }
 
@@ -1410,14 +1790,53 @@
       }
     }
 
-    function pickFromPack(pack) {
-      const r = Math.random() * 100;
-      let sum = 0;
-      for (const b of pack.blooks) {
-        sum += b.chance;
-        if (r <= sum) return b;
+    function getActiveBooster() {
+      if (!userData || !userData.activeBooster) return null;
+      const { multiplier, expiresAt } = userData.activeBooster;
+      if (!multiplier || !expiresAt) return null;
+      if (Date.now() > expiresAt) {
+        userData.activeBooster = null;
+        return null;
       }
-      return pack.blooks[pack.blooks.length - 1];
+      return userData.activeBooster;
+    }
+
+    function pickFromPack(pack) {
+      const byRarity = {};
+      pack.blooks.forEach(b => {
+        if (!byRarity[b.rarity]) byRarity[b.rarity] = [];
+        byRarity[b.rarity].push(b);
+      });
+
+      const booster = getActiveBooster();
+      const mult = booster ? booster.multiplier : 1;
+
+      const rarityWeights = [];
+      let totalWeight = 0;
+      Object.keys(byRarity).forEach(r => {
+        let base = RARITY_BASE_WEIGHTS[r] || 0;
+        if (BOOSTABLE_RARITIES.has(r)) base *= mult;
+        if (base <= 0) return;
+        rarityWeights.push({ rarity: r, weight: base });
+        totalWeight += base;
+      });
+      if (!rarityWeights.length) {
+        return pack.blooks[Math.floor(Math.random() * pack.blooks.length)];
+      }
+
+      let r = Math.random() * totalWeight;
+      let chosenRarity = rarityWeights[0].rarity;
+      for (const rw of rarityWeights) {
+        if (r <= rw.weight) {
+          chosenRarity = rw.rarity;
+          break;
+        }
+        r -= rw.weight;
+      }
+
+      const list = byRarity[chosenRarity];
+      const chosen = list[Math.floor(Math.random() * list.length)];
+      return chosen;
     }
 
     function groupBlooksByPack() {
@@ -1427,6 +1846,28 @@
           map[b.name] = { packId: pack.id, packName: pack.name, rarity: b.rarity, chance: b.chance };
         });
       });
+      Object.values(singleShopBlooks).forEach(item => {
+        if (!map[item.name]) {
+          map[item.name] = {
+            packId: "other",
+            packName: "Other Blooks",
+            rarity: item.rarity,
+            chance: 0
+          };
+        }
+      });
+      if (userData && userData.blooks) {
+        Object.keys(userData.blooks).forEach(name => {
+          if (!map[name]) {
+            map[name] = {
+              packId: "other",
+              packName: "Other Blooks",
+              rarity: R.COMMON,
+              chance: 0
+            };
+          }
+        });
+      }
       return map;
     }
 
@@ -1443,7 +1884,17 @@
 
     function buildPacks() {
       packGrid.innerHTML = "";
+      boosterMarketBanner.innerHTML = "";
       const packs = allPacksForMarket().filter(p => packAvailability[p.id] !== false);
+      const booster = getActiveBooster();
+      if (booster && userData) {
+        const until = new Date(booster.expiresAt);
+        const div = document.createElement("div");
+        div.className = "booster-banner";
+        div.textContent = `${userData.username} bought a ${booster.multiplier}x booster until ${until.toLocaleTimeString()}.`;
+        boosterMarketBanner.appendChild(div);
+      }
+
       packs.forEach(pack => {
         const card = document.createElement("div");
         card.className = "pack-card";
@@ -1469,7 +1920,7 @@
         const tip = document.createElement("div");
         tip.className = "tooltip";
         tip.textContent = pack.blooks
-          .map(b => `${b.name} (${b.rarity}, ~${b.chance}%)`)
+          .map(b => `${b.name} (${b.rarity})`)
           .join(", ");
         q.appendChild(tip);
 
@@ -1503,25 +1954,39 @@
 
       userData.coins -= actualPack.cost;
       const chosen = pickFromPack(actualPack);
+
+      if (userData.nextForcedRarity) {
+        const list = actualPack.blooks.filter(b => b.rarity === userData.nextForcedRarity);
+        if (list.length) {
+          const forcedB = list[Math.floor(Math.random() * list.length)];
+          chosen.name = forcedB.name;
+          chosen.rarity = forcedB.rarity;
+          chosen.chance = forcedB.chance;
+        }
+        userData.nextForcedRarity = null;
+      }
+
       userData.blooks[chosen.name] = (userData.blooks[chosen.name] || 0) + 1;
       userData.nextPackId = null;
+      userData.totalPacksOpened = (userData.totalPacksOpened || 0) + 1;
       await saveUserData();
 
       packOpenBlook.textContent = chosen.name;
       packOpenBlook.style.background = rarityColor(chosen.rarity);
-      packOpenMeta.textContent = `${chosen.rarity} • ~${chosen.chance}% • from ${actualPack.name}`;
+      packOpenMeta.textContent = `${chosen.rarity} • from ${actualPack.name}`;
       packOpenOverlay.style.display = "flex";
+      canClosePackOverlay = false;
+      setTimeout(() => {
+        canClosePackOverlay = true;
+      }, 500);
 
       spawnConfetti(rarityColor(chosen.rarity));
       renderBlooks();
       populateTradeOfferSelect();
-
-      setTimeout(() => {
-        packOpenOverlay.style.display = "none";
-      }, 1800);
     }
 
     packOpenOverlay.addEventListener("click", () => {
+      if (!canClosePackOverlay) return;
       packOpenOverlay.style.display = "none";
     });
 
@@ -1530,6 +1995,7 @@
         blooksContainer.innerHTML = "";
         return;
       }
+      BLOOK_INFO = groupBlooksByPack();
       const owned = userData.blooks || {};
       const byPack = {};
       Object.keys(BLOOK_INFO).forEach(name => {
@@ -1566,6 +2032,7 @@
         byPack[pid].items.forEach(name => {
           const info = BLOOK_INFO[name];
           const count = owned[name] || 0;
+          if (pid === "other" && !count) return;
           const card = document.createElement("div");
           card.className = "bcard";
           if (!count) card.classList.add("locked");
@@ -1636,10 +2103,40 @@
       userData.blooks[name] = count - 1;
       if (userData.blooks[name] <= 0) delete userData.blooks[name];
       userData.coins += value;
+      userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + value;
       await saveUserData();
       blookModalStatus.textContent = `Sold for ${value} coins.`;
       renderBlooks();
       populateTradeOfferSelect();
+    });
+
+    sellDuplicatesBtn.addEventListener("click", async () => {
+      if (!userData || !userData.blooks) return;
+      sellDuplicatesStatus.textContent = "";
+      let gained = 0;
+      const blooks = userData.blooks;
+      Object.keys(blooks).forEach(name => {
+        const count = blooks[name];
+        if (count > 1) {
+          const info = BLOOK_INFO[name] || { rarity: R.COMMON };
+          const value = SELL_VALUES[info.rarity] || 0;
+          const toSell = count - 1;
+          if (value > 0 && toSell > 0) {
+            gained += value * toSell;
+            blooks[name] = 1;
+          }
+        }
+      });
+      if (gained <= 0) {
+        sellDuplicatesStatus.textContent = "No duplicates that can be sold.";
+        return;
+      }
+      userData.coins += gained;
+      userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + gained;
+      await saveUserData();
+      renderBlooks();
+      populateTradeOfferSelect();
+      sellDuplicatesStatus.textContent = `Sold duplicates for ${gained} coins.`;
     });
 
     function populateTradeOfferSelect() {
@@ -1870,6 +2367,7 @@
       if (chatMessageCount >= 5) {
         chatMessageCount = 0;
         userData.coins = (userData.coins || 0) + 1;
+        userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + 1;
         await saveUserData();
       }
     });
@@ -1916,6 +2414,7 @@
         if (chatMessageCount >= 5) {
           chatMessageCount = 0;
           userData.coins = (userData.coins || 0) + 1;
+          userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + 1;
           await saveUserData();
         }
       };
@@ -2088,6 +2587,7 @@
       const reward = pickWheelReward();
       setTimeout(async () => {
         userData.coins += reward;
+        userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + reward;
         userData.lastWheel = Date.now();
         await saveUserData();
         wheelCenter.textContent = reward.toLocaleString();
@@ -2156,18 +2656,50 @@
       adminStatus.textContent = id ? `Next pack forced to ${id}.` : "Next pack cleared.";
     });
 
+    adminSetNextRarityBtn.addEventListener("click", async () => {
+      if (!currentUser || !userData || !adminMode) return;
+      const r = adminNextRaritySelect.value;
+      if (r && !RARITY_BASE_WEIGHTS[r]) {
+        adminStatus.textContent = "Unknown rarity.";
+        return;
+      }
+      userData.nextForcedRarity = r || null;
+      await saveUserData();
+      adminStatus.textContent = r ? `Next rarity forced to ${r}.` : "Next rarity cleared.";
+    });
+
+    adminSetBoosterBtn.addEventListener("click", async () => {
+      if (!currentUser || !userData || !adminMode) return;
+      const v = adminBoosterMultSelect.value;
+      if (!v) {
+        userData.activeBooster = null;
+        await saveUserData();
+        adminStatus.textContent = "Booster cleared.";
+        return;
+      }
+      const mult = parseInt(v,10);
+      const expiresAt = Date.now() + 60*60*1000;
+      userData.activeBooster = { multiplier: mult, expiresAt };
+      await saveUserData();
+      adminStatus.textContent = `Booster set to ${mult}x for 1 hour.`;
+    });
+
     adminPanelBtn.addEventListener("click", () => {
       if (!adminMode) return;
       showView("market");
       adminPanel.scrollIntoView({behavior:"smooth"});
     });
 
-    document.addEventListener("keydown", e => {
+    document.addEventListener("keydown", async e => {
       if (e.ctrlKey && (e.key === "l" || e.key === "L")) {
         ownerMode = !ownerMode;
         ownerPanelBtn.style.display = ownerMode ? "inline-block" : "none";
         if (!ownerMode && ownerPanel.style.display === "flex") {
           showView("leaderboard");
+        }
+        if (userData && ownerMode) {
+          userData.isOwner = true;
+          await saveUserData();
         }
       }
       if (e.ctrlKey && (e.key === "c" || e.key === "C")) {
@@ -2176,10 +2708,18 @@
         if (code === "adminacces.123.321") {
           adminMode = true;
           adminPanelBtn.style.display = "inline-block";
+          if (userData) {
+            userData.isAdmin = true;
+            await saveUserData();
+          }
           alert("Admin panel unlocked.");
         } else if (code === "subzero.owner.123") {
           ownerMode = true;
           ownerPanelBtn.style.display = "inline-block";
+          if (userData) {
+            userData.isOwner = true;
+            await saveUserData();
+          }
           alert("Owner panel unlocked.");
         } else {
           alert("Invalid code.");
@@ -2327,7 +2867,13 @@
           coins: 0,
           blooks: {},
           lastWheel: 0,
-          nextPackId: null
+          nextPackId: null,
+          totalCoinsCollected: 0,
+          totalPacksOpened: 0,
+          nextForcedRarity: null,
+          activeBooster: null,
+          isAdmin: false,
+          isOwner: false
         });
       } catch (err) {
         suErr.textContent = err.message || "Sign up failed.";
@@ -2370,7 +2916,13 @@
           coins: 0,
           blooks: {},
           lastWheel: 0,
-          nextPackId: null
+          nextPackId: null,
+          totalCoinsCollected: 0,
+          totalPacksOpened: 0,
+          nextForcedRarity: null,
+          activeBooster: null,
+          isAdmin: false,
+          isOwner: false
         });
       }
       BLOOK_INFO = groupBlooksByPack();
@@ -2406,6 +2958,123 @@
       updateWheelButtonState();
     });
 
+    function calcStatsFromData(data) {
+      const blooks = data.blooks || {};
+      let chromas = 0;
+      let mysticals = 0;
+      let best = null;
+      let bestScore = -1;
+      let subscore = 0;
+      Object.entries(blooks).forEach(([name,count]) => {
+        const info = BLOOK_INFO[name] || { rarity: R.COMMON };
+        const rarity = info.rarity;
+        const val = SUBSCORE_VALUES[rarity] || 0;
+        subscore += val * count;
+        if (rarity === R.CHR) chromas += count;
+        if (rarity === R.MYS) mysticals += count;
+        const rarityRank = {
+          [R.COMMON]:1,
+          [R.RARE]:2,
+          [R.EPIC]:3,
+          [R.LEG]:4,
+          [R.SUP]:5,
+          [R.CHR]:6,
+          [R.MYS]:7
+        }[rarity] || 0;
+        if (rarityRank > bestScore) {
+          bestScore = rarityRank;
+          best = { name, rarity };
+        }
+      });
+      return {
+        chromas,
+        mysticals,
+        best,
+        subscore
+      };
+    }
+
+    function refreshStatsView() {
+      if (!userData) {
+        statsUsername.textContent = "";
+        statsCoins.textContent = "0";
+        statsTotalCoins.textContent = "0";
+        statsPacksOpened.textContent = "0";
+        statsChromas.textContent = "0";
+        statsMysticals.textContent = "0";
+        statsBestBlook.textContent = "None";
+        statsBestBlookRarity.textContent = "";
+        statsSubscore.textContent = "0";
+        return;
+      }
+      statsUsername.textContent = userData.username || "user";
+      statsCoins.textContent = userData.coins || 0;
+      statsTotalCoins.textContent = userData.totalCoinsCollected || 0;
+      statsPacksOpened.textContent = userData.totalPacksOpened || 0;
+      const s = calcStatsFromData(userData);
+      statsChromas.textContent = s.chromas;
+      statsMysticals.textContent = s.mysticals;
+      if (s.best) {
+        statsBestBlook.textContent = s.best.name;
+        statsBestBlookRarity.textContent = s.best.rarity;
+      } else {
+        statsBestBlook.textContent = "None";
+        statsBestBlookRarity.textContent = "";
+      }
+      statsSubscore.textContent = s.subscore;
+    }
+
+    statsLookupBtn.addEventListener("click", async () => {
+      statsLookupResult.textContent = "";
+      const uname = statsLookupInput.value.trim();
+      if (!uname) {
+        statsLookupResult.textContent = "Enter a username.";
+        return;
+      }
+      const found = await findUserByUsername(uname);
+      if (!found) {
+        statsLookupResult.textContent = "User not found.";
+        return;
+      }
+      const data = found.data;
+      const s = calcStatsFromData(data);
+      const totalCoinsCollected = data.totalCoinsCollected || 0;
+      const totalPacksOpened = data.totalPacksOpened || 0;
+      const bestText = s.best ? `${s.best.name} (${s.best.rarity})` : "None";
+      statsLookupResult.textContent =
+        `${data.username}'s stats — Coins: ${data.coins || 0}, Total coins collected: ${totalCoinsCollected}, Packs opened: ${totalPacksOpened}, Chromas: ${s.chromas}, Mysticals: ${s.mysticals}, Best blook: ${bestText}, Subscore: ${s.subscore}.`;
+    });
+
+    function refreshBoosterView() {
+      const booster = getActiveBooster();
+      if (!booster) {
+        boosterActiveInfo.textContent = "No booster active.";
+      } else {
+        const until = new Date(booster.expiresAt);
+        boosterActiveInfo.textContent = `Active booster: ${booster.multiplier}x until ${until.toLocaleTimeString()}.`;
+      }
+    }
+
+    boosterBuyBtns.forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!userData || !currentUser) return;
+        const mult = parseInt(btn.dataset.mult,10);
+        const cost = BOOSTER_COSTS[mult];
+        if ((userData.coins || 0) < cost) {
+          alert("Not enough coins.");
+          return;
+        }
+        if (!confirm(`Buy a ${mult}x booster for ${cost} coins?`)) return;
+        userData.coins -= cost;
+        userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + 0;
+        const expiresAt = Date.now() + 60*60*1000;
+        userData.activeBooster = { multiplier: mult, expiresAt };
+        await saveUserData();
+        buildPacks();
+        alert(`Bought a ${mult}x booster for 1 hour.`);
+      });
+    });
+
     const floatColors = ["#4caf50","#2196f3","#9c27b0","#ffb300","#81d4fa","#6a1b9a"];
     for (let i=0;i<6;i++){
       const d=document.createElement("div");
@@ -2420,5 +3089,3 @@
   </script>
 </body>
 </html>
-```
-
