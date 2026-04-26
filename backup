@@ -1,0 +1,2423 @@
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sublet 1.67.1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:linear-gradient(135deg,#b3e5ff,#e0f4ff);
+      min-height:100vh;color:#123;overflow:hidden;
+    }
+    button{
+      cursor:pointer;border:none;border-radius:8px;padding:8px 16px;
+      font-weight:600;background:#2196f3;color:#fff;transition:.1s;
+    }
+    button:hover{background:#1e88e5;box-shadow:0 3px 8px rgba(0,0,0,.2);transform:translateY(-1px)}
+    button:disabled{opacity:.6;cursor:default;box-shadow:none;transform:none}
+    input,select{
+      padding:6px 10px;border-radius:6px;border:1px solid #90caf9;outline:none;
+      font-family:inherit;font-size:14px;
+    }
+    input:focus,select:focus{border-color:#1976d2;box-shadow:0 0 0 2px rgba(25,118,210,.2)}
+
+    #start{display:flex;height:100vh;width:100vw;padding:40px}
+    .start-left{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px}
+    .start-title{
+      font-family:"Titan One",system-ui;
+      font-size:70px;color:#0d47a1;text-shadow:3px 3px 0 #fff;
+    }
+    .start-sub{font-size:16px;max-width:420px;color:#234}
+    .auth-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+    .auth-box{
+      background:rgba(255,255,255,.9);padding:16px;border-radius:16px;
+      width:260px;box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .auth-box h3{font-size:16px;margin-bottom:8px;font-family:"Titan One"}
+    .auth-box label{font-size:12px;display:block;margin-top:6px;margin-bottom:2px}
+    .auth-box .err{color:#c62828;font-size:12px;min-height:16px;margin-top:4px}
+    .start-right{flex:1;position:relative;overflow:hidden}
+
+    .floating-blook{
+      position:absolute;width:90px;height:90px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;
+      box-shadow:0 4px 10px rgba(0,0,0,.25);
+      animation:float 4s ease-in-out infinite;
+    }
+    @keyframes float{
+      0%{transform:translateY(0) rotate(var(--tilt))}
+      50%{transform:translateY(-20px) rotate(var(--tilt))}
+      100%{transform:translateY(0) rotate(var(--tilt))}
+    }
+
+    #app{display:none;min-height:100vh;width:100vw;overflow:hidden}
+    .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    .sidebar{
+      background:rgba(255,255,255,.95);padding:20px 16px;
+      box-shadow:2px 0 10px rgba(0,0,0,.1);
+      display:flex;flex-direction:column;gap:16px;
+    }
+    .sidebar-title{
+      font-family:"Titan One";font-size:26px;color:#0d47a1;
+    }
+    .nav{
+      width:100%;text-align:left;background:transparent;color:#123;
+      border-radius:8px;padding:8px 10px;border:1px solid transparent;
+      font-weight:500;font-size:14px;
+    }
+    .nav:hover{background:rgba(33,150,243,.08);border-color:rgba(33,150,243,.4)}
+    .nav.active{background:#2196f3;color:#fff;border-color:#1976d2}
+    .side-foot{font-size:12px;color:#456}
+    #owner-panel-btn{
+      margin-top:auto;
+      font-size:12px;
+      padding:6px 10px;
+      display:none;
+    }
+
+    .main{padding:16px 24px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+    .top{
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,.95);padding:10px 14px;border-radius:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,.12);
+    }
+    .top-left{display:flex;gap:8px;align-items:center}
+    .pill{
+      padding:4px 10px;border-radius:999px;background:#e3f2fd;
+      color:#0d47a1;font-weight:600;font-size:12px;
+    }
+    .card{
+      background:rgba(255,255,255,.97);border-radius:14px;padding:16px;
+      box-shadow:0 4px 12px rgba(0,0,0,.12);
+      flex:1;overflow:hidden;min-height:0;
+      display:flex;flex-direction:column;
+    }
+    .section-title{font-size:20px;font-weight:700;margin-bottom:4px}
+    .section-sub{font-size:13px;color:#567;margin-bottom:12px}
+
+    .special-shop-container{
+      margin-bottom:12px;
+      padding:10px;
+      border-radius:12px;
+      background:rgba(255,255,255,.9);
+      box-shadow:0 2px 6px rgba(0,0,0,.12);
+    }
+    .special-shop-title{
+      font-size:16px;font-weight:700;margin-bottom:6px;color:#0d47a1;
+    }
+    .special-shop-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;
+    }
+    .special-blook-card{
+      border-radius:16px;height:150px;padding:10px;
+      box-shadow:0 3px 8px rgba(0,0,0,.18);
+      background:#fafafa;
+      display:flex;flex-direction:column;justify-content:space-between;
+      align-items:center;
+    }
+    .special-blook-name{font-weight:700;font-size:15px;text-align:center}
+    .special-blook-img{
+      width:90px;height:90px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;font-size:11px;text-align:center;padding:6px;
+    }
+    .special-blook-price{font-size:13px;color:#333}
+    .special-blook-expire{font-size:11px;color:#777}
+
+    .pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;overflow-y:auto;max-height:calc(100vh - 220px);}
+    .pack-card{
+      border-radius:16px;height:150px;padding:10px;
+      box-shadow:0 3px 8px rgba(0,0,0,.18);
+      display:flex;flex-direction:column;justify-content:space-between;
+      color:#fff;cursor:pointer;position:relative;overflow:visible;
+    }
+    .pack-header{display:flex;justify-content:space-between;align-items:center}
+    .pack-name{font-weight:700;font-size:16px}
+    .pack-price{font-size:13px}
+    .pack-q{
+      width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);
+      display:flex;align-items:center;justify-content:center;font-size:13px;
+      cursor:default;position:relative;
+    }
+    .pack-q span{pointer-events:none}
+    .pack-q:hover{background:rgba(255,255,255,.35)}
+    .tooltip{
+      position:absolute;top:26px;right:0;z-index:20;
+      background:rgba(0,0,0,.9);color:#fff;font-size:10px;
+      padding:6px 8px;border-radius:6px;max-width:240px;
+      display:none;white-space:normal;
+    }
+    .pack-q:hover .tooltip{display:block}
+
+    .pack-open-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.6);
+      display:none;align-items:center;justify-content:center;z-index:60;
+    }
+    .pack-open-card{
+      background:transparent;border-radius:0;padding:0;text-align:center;box-shadow:none;
+    }
+    .pack-open-title{
+      font-family:"Titan One";font-size:22px;color:#ffffff;margin-bottom:8px;
+      text-shadow:0 0 6px #000;
+    }
+    .pack-open-blook{
+      width:140px;height:140px;border-radius:18px;margin:10px auto;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;font-size:14px;padding:8px;
+      transform:scale(0);opacity:0;
+      animation:reveal 0.6s ease-out forwards;
+    }
+    @keyframes reveal{
+      0%{transform:scale(0);opacity:0}
+      60%{transform:scale(1.1);opacity:1}
+      100%{transform:scale(1);opacity:1}
+    }
+    .pack-open-meta{
+      font-size:13px;color:#fff;margin-bottom:8px;text-shadow:0 0 4px #000;
+    }
+
+    .confetti-piece{
+      position:fixed;width:8px;height:14px;border-radius:2px;
+      opacity:0.9;z-index:55;pointer-events:none;
+      animation:confetti-fall 2.4s linear forwards;
+    }
+    @keyframes confetti-fall{
+      0%{transform:translate3d(var(--x),-10vh,0) rotate(0deg);}
+      100%{transform:translate3d(var(--x),110vh,0) rotate(720deg);}
+    }
+
+    .bsec{margin-bottom:18px}
+    .bsec-title{font-weight:700;font-size:16px;margin-bottom:6px;color:#0d47a1}
+    .bsec-line{height:1px;background:#cfd8dc;margin-bottom:8px}
+    .bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px}
+    .bcard{
+      border-radius:10px;padding:4px;background:#eceff1;
+      display:flex;flex-direction:column;gap:2px;align-items:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.12);cursor:pointer;position:relative;
+    }
+    .bimg{
+      width:70px;height:70px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;font-size:10px;text-align:center;padding:4px;
+    }
+    .bname{font-size:11px;font-weight:600;color:#123;text-align:center}
+    .bmeta{font-size:10px;color:#456;display:flex;justify-content:space-between;width:100%;padding:0 2px}
+    .bcard.locked{background:#eceff1;opacity:0.5;cursor:default}
+    .bcard.locked .bimg{background:#b0bec5 !important}
+    .bcard.locked::after{
+      content:"🔒";position:absolute;top:4px;right:4px;font-size:12px;
+    }
+
+    #view-blooks{overflow-y:auto;}
+    #blooks-container{max-height:calc(100vh - 180px);overflow-y:auto;}
+
+    #chat-view-area{display:flex;flex-direction:column;gap:8px;height:100%}
+    #chat-messages{
+      flex:1;border:1px solid #eee;border-radius:8px;padding:8px;
+      overflow-y:auto;font-size:13px;background:#fafafa;
+      max-height:calc(100vh - 260px);
+    }
+    .chat-input-row{
+      display:flex;gap:6px;align-items:center;
+      background:#fff;
+    }
+    .chat-input-row input{
+      flex:1;padding:6px 8px;border-radius:8px;border:1px solid #ccc;
+      font-size:13px;
+    }
+    .chat-upload-btn{
+      padding:6px 10px;font-size:16px;line-height:1;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .chat-image{
+      max-width:160px;max-height:160px;border-radius:8px;margin:4px 0;
+      display:block;
+    }
+
+    #leaderboard-list{
+      display:flex;flex-direction:column;gap:10px;
+      overflow-y:auto;max-height:calc(100vh - 220px);
+    }
+    .lb-entry{
+      padding:8px 10px;border-radius:10px;background:#f5f5f5;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .lb-name{font-weight:700}
+    .lb-stats{font-size:12px;color:#555}
+
+    #owner-panel{display:none;overflow-y:auto;max-height:calc(100vh - 180px);}
+    .owner-pack-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:6px 8px;border-radius:8px;background:#f5f5f5;margin-bottom:6px;
+      font-size:13px;
+    }
+    .owner-ban-box{
+      margin-top:14px;padding:10px;border-radius:10px;background:#fff3e0;
+      font-size:13px;
+    }
+    .owner-ban-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+    .owner-ban-row input[type="text"]{flex:1;min-width:120px}
+    .owner-ban-row input[type="number"]{width:90px}
+
+    .owner-single-box{
+      margin-top:14px;padding:10px;border-radius:10px;background:#e3f2fd;
+      font-size:13px;
+    }
+    .owner-single-row{
+      display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;
+    }
+    .owner-single-row input[type="text"]{flex:1;min-width:120px}
+    .owner-single-row input[type="number"]{width:90px}
+    .owner-single-row select{min-width:120px}
+    .owner-single-list{
+      margin-top:10px;max-height:160px;overflow-y:auto;
+    }
+    .owner-single-item{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:4px 6px;border-radius:8px;background:#fff;margin-bottom:4px;
+      font-size:12px;
+    }
+
+    .err-small{color:#c62828;font-size:12px;margin-top:4px;min-height:16px}
+
+    #wheel-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      display:none;align-items:center;justify-content:center;z-index:40;
+    }
+    .wheel-card{
+      background:#fff;border-radius:16px;padding:20px;
+      width:320px;box-shadow:0 6px 18px rgba(0,0,0,.3);
+      display:flex;flex-direction:column;align-items:center;gap:12px;
+    }
+    .wheel-circle{
+      width:200px;height:200px;border-radius:50%;
+      background:conic-gradient(
+        #ffeb3b 0 70%,
+        #4caf50 70% 85%,
+        #2196f3 85% 93%,
+        #9c27b0 93% 97%,
+        #ff9800 97% 99.9%,
+        #f44336 99.9% 100%
+      );
+      border:6px solid #fff;box-shadow:0 0 0 4px #1976d2;
+      position:relative;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    .wheel-pointer{
+      position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+      width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;
+      border-bottom:20px solid #f44336;
+    }
+    .wheel-spin{
+      animation:spin 2s ease-out;
+    }
+    @keyframes spin{
+      from{transform:rotate(0deg);}
+      to{transform:rotate(1080deg);}
+    }
+    .wheel-center{
+      width:60px;height:60px;border-radius:50%;background:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:700;color:#1976d2;box-shadow:0 0 0 3px #1976d2;
+    }
+    .wheel-status{font-size:12px;color:#555;text-align:center;min-height:18px}
+
+    #trade-popup{
+      position:fixed;right:16px;bottom:16px;z-index:80;
+      background:#ffffff;border-radius:12px;padding:10px 12px;
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      font-size:13px;display:none;max-width:260px;
+    }
+    #trade-popup-buttons{margin-top:8px;display:flex;gap:6px;justify-content:flex-end;}
+
+    #admin-panel{display:none;overflow-y:auto;max-height:calc(100vh - 180px);}
+    #admin-panel-btn{display:none;font-size:12px;padding:6px 10px;}
+
+    #blook-modal-overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      display:none;align-items:center;justify-content:center;z-index:70;
+    }
+    .blook-modal{
+      background:#fff;border-radius:16px;padding:16px;
+      width:260px;box-shadow:0 6px 18px rgba(0,0,0,.3);
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+    }
+    .blook-modal-title{
+      font-weight:700;font-size:18px;
+    }
+    .blook-modal-img{
+      width:100px;height:100px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;font-size:12px;text-align:center;padding:6px;
+    }
+    .blook-modal-meta{font-size:12px;color:#555;text-align:center}
+    .blook-modal-sell{background:#ef6c00;font-size:13px;padding:6px 12px;}
+    .blook-modal-close{background:#78909c;font-size:13px;padding:6px 12px;}
+  </style>
+</head>
+<body>
+  <div id="start">
+    <div class="start-left">
+      <div class="start-title">Sublet 1.67</div>
+      <div class="start-sub">
+        Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.
+      </div>
+      <div class="auth-row">
+        <div class="auth-box">
+          <h3>Log in</h3>
+          <label>Username</label>
+          <input id="li-user" placeholder="username">
+          <label>Password</label>
+          <input id="li-pass" type="password" placeholder="password">
+          <button id="li-btn">Log in</button>
+          <div class="err-small" id="li-err"></div>
+        </div>
+        <div class="auth-box">
+          <h3>Sign up</h3>
+          <label>Username</label>
+          <input id="su-user" placeholder="username">
+          <label>Password</label>
+          <input id="su-pass" type="password" placeholder="password">
+          <button id="su-btn">Sign up</button>
+          <div class="err-small" id="su-err"></div>
+        </div>
+      </div>
+    </div>
+    <div class="start-right" id="floating-blooks-area"></div>
+  </div>
+  <div id="app">
+    <div class="shell">
+      <div class="sidebar">
+        <div class="sidebar-title">Sublet 1.67</div>
+        <button class="nav active" data-view="market">Market</button>
+        <button class="nav" data-view="blooks">My Blooks</button>
+        <button class="nav" data-view="trading">Trading</button>
+        <button class="nav" data-view="chat">Chat</button>
+        <button class="nav" data-view="leaderboard">Leaderboard</button>
+        <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard</div>
+        <button id="owner-panel-btn">Owner panel</button>
+      </div>
+      <div class="main">
+        <div class="top">
+          <div class="top-left">
+            <div class="pill" id="top-user">Logged out</div>
+            <div class="pill" id="top-coins">Coins: 0</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button id="daily-wheel-btn" style="font-size:12px;padding:6px 10px;">Daily Wheel</button>
+            <button id="admin-panel-btn">Admin</button>
+            <button id="signout-btn" style="background:#ef5350;font-size:12px;padding:6px 10px;">Sign Out</button>
+          </div>
+        </div>
+        <div id="view-market" class="card">
+          <div class="section-title">Market</div>
+          <div class="section-sub">Special shop blooks first, then packs.</div>
+          <div id="special-shop" class="special-shop-container" style="display:none;">
+            <div class="special-shop-title">Special Shop Blooks</div>
+            <div id="special-shop-grid" class="special-shop-grid"></div>
+          </div>
+          <div id="pack-grid" class="pack-grid"></div>
+        </div>
+        <div id="view-blooks" class="card" style="display:none;">
+          <div class="section-title">My Blooks</div>
+          <div class="section-sub">Blooks sorted by pack. “Other Blooks” at the bottom.</div>
+          <div id="blooks-container"></div>
+        </div>
+        <div id="view-trading" class="card" style="display:none;">
+          <div class="section-title">Trading</div>
+          <div class="section-sub">Send trade requests to other players.</div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Target username</label>
+            <input id="trade-target-user" placeholder="username">
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Offer blook</label>
+            <select id="trade-offer-blook" disabled></select>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Amount</label>
+            <input id="trade-offer-amount" type="number" min="1" value="1" disabled>
+          </div>
+          <button id="trade-request-btn" disabled>Send trade request</button>
+          <div id="trade-request-err" class="err-small"></div>
+          <div id="trade-request-status" style="font-size:12px;margin-top:4px;"></div>
+        </div>
+        <div id="view-chat" class="card" style="display:none;">
+          <div class="section-title">Global Chat</div>
+          <div class="section-sub">Talk with everyone playing Sublet.</div>
+          <div id="chat-view-area">
+            <div id="chat-messages"></div>
+            <div class="chat-input-row">
+              <input id="chat-input" placeholder="Type a message...">
+              <button id="chat-upload-btn" class="chat-upload-btn" title="Upload image">📷</button>
+              <button id="chat-send">Send</button>
+              <input id="chat-upload-input" type="file" accept="image/*" style="display:none;">
+            </div>
+          </div>
+        </div>
+        <div id="view-leaderboard" class="card" style="display:none;">
+          <div class="section-title">Leaderboard</div>
+          <div class="section-sub">
+            Top players by coins.
+          </div>
+          <div id="leaderboard-list"></div>
+        </div>
+        <div id="owner-panel" class="card" style="display:none;">
+          <div class="section-title">Owner Panel</div>
+          <div class="section-sub">Toggle packs, manage bans, and configure shop blooks.</div>
+          <div id="owner-pack-list"></div>
+          <div class="owner-single-box">
+            <div><strong>Single Blook in Shop</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">
+              Choose a blook name, rarity, price, and expiration date. It will appear at the top of the Market.
+            </div>
+            <div class="owner-single-row">
+              <input id="single-name" type="text" placeholder="Blook name">
+              <select id="single-rarity">
+                <option value="Common">Common</option>
+                <option value="Rare">Rare</option>
+                <option value="Epic">Epic</option>
+                <option value="Legendary">Legendary</option>
+                <option value="Chroma">Chroma</option>
+                <option value="Mystical">Mystical</option>
+              </select>
+              <input id="single-price" type="number" min="1" value="25" placeholder="Price">
+              <input id="single-expire" type="date">
+              <button id="single-add-btn" style="background:#43a047;">Add</button>
+            </div>
+            <div id="single-status" class="err-small"></div>
+            <div class="owner-single-list" id="single-list"></div>
+          </div>
+          <div class="owner-ban-box">
+            <div><strong>Ban player</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">
+              Enter username and optional ban duration in hours (0 = permanent).
+            </div>
+            <div class="owner-ban-row">
+              <input id="ban-username" type="text" placeholder="username">
+              <input id="ban-hours" type="number" min="0" value="0">
+              <button id="ban-btn" style="background:#e53935;">Ban</button>
+            </div>
+            <div id="ban-status" class="err-small" style="min-height:18px;"></div>
+          </div>
+          <button id="owner-back-btn" style="margin-top:10px;">Back to leaderboard</button>
+        </div>
+        <div id="admin-panel" class="card">
+          <div class="section-title">Admin Panel</div>
+          <div class="section-sub">Set coins, give blooks, and control next pack open.</div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Set coins for current user</label>
+            <input id="admin-coins" type="number" min="0" value="0">
+            <button id="admin-set-coins">Set</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Give blook to current user</label>
+            <input id="admin-blook-name" placeholder="Blook name">
+            <input id="admin-blook-amount" type="number" min="1" value="1">
+            <button id="admin-give-blook">Give</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Set next pack to open (id)</label>
+            <input id="admin-next-pack-id" placeholder="space, ice, spooky, ...">
+            <button id="admin-set-next-pack">Set</button>
+          </div>
+          <div id="admin-status" class="err-small"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="wheel-overlay">
+    <div class="wheel-card">
+      <div class="section-title" style="margin-bottom:0;">Daily Wheel</div>
+      <div class="section-sub" style="margin-bottom:6px;">Spin for a chance at huge coin rewards.</div>
+      <div class="wheel-circle" id="wheel-circle">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-center" id="wheel-center">Spin</div>
+      </div>
+      <button id="wheel-spin-btn" style="margin-top:8px;">Spin</button>
+      <div class="wheel-status" id="wheel-status"></div>
+      <button id="wheel-close-btn" style="font-size:11px;padding:4px 10px;margin-top:4px;">Close</button>
+    </div>
+  </div>
+  <div id="pack-open-overlay" class="pack-open-overlay">
+    <div class="pack-open-card">
+      <div class="pack-open-title">You got a blook!</div>
+      <div id="pack-open-blook" class="pack-open-blook"></div>
+      <div id="pack-open-meta" class="pack-open-meta"></div>
+    </div>
+  </div>
+  <div id="blook-modal-overlay">
+    <div class="blook-modal">
+      <div id="blook-modal-title" class="blook-modal-title"></div>
+      <div id="blook-modal-img" class="blook-modal-img"></div>
+      <div id="blook-modal-meta" class="blook-modal-meta"></div>
+      <div id="blook-modal-chance" class="blook-modal-meta"></div>
+      <div id="blook-modal-pack" class="blook-modal-meta"></div>
+      <button id="blook-modal-sell" class="blook-modal-sell">Sell</button>
+      <button id="blook-modal-close" class="blook-modal-close">Close</button>
+      <div id="blook-modal-status" class="err-small" style="text-align:center;"></div>
+    </div>
+  </div>
+  <div id="trade-popup">
+    <div id="trade-popup-text"></div>
+    <div id="trade-popup-buttons">
+      <button id="trade-popup-accept" style="background:#43a047;">Accept</button>
+      <button id="trade-popup-decline" style="background:#e53935;">Decline</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      get,
+      onValue,
+      update,
+      push,
+      remove
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCz_kmkhioWsjYHXEH2a4FOO2IoIR-CoaE",
+      authDomain: "sublet-7d8a7.firebaseapp.com",
+      databaseURL: "https://sublet-7d8a7-default-rtdb.firebaseio.com",
+      projectId: "sublet-7d8a7",
+      storageBucket: "sublet-7d8a7.firebasestorage.app",
+      messagingSenderId: "781961242913",
+      appId: "1:781961242913:web:80518b19184a5f506cb660"
+    };
+
+    const appFB = initializeApp(firebaseConfig);
+    const auth = getAuth(appFB);
+    const db = getDatabase(appFB);
+
+    const start = document.getElementById("start");
+    const appEl = document.getElementById("app");
+    const floatingArea = document.getElementById("floating-blooks-area");
+
+    const suUser = document.getElementById("su-user");
+    const suPass = document.getElementById("su-pass");
+    const suBtn = document.getElementById("su-btn");
+    const suErr = document.getElementById("su-err");
+
+    const liUser = document.getElementById("li-user");
+    const liPass = document.getElementById("li-pass");
+    const liBtn = document.getElementById("li-btn");
+    const liErr = document.getElementById("li-err");
+
+    const navBtns = document.querySelectorAll(".nav");
+    const viewMarket = document.getElementById("view-market");
+    const viewBlooks = document.getElementById("view-blooks");
+    const viewTrading = document.getElementById("view-trading");
+    const viewChat = document.getElementById("view-chat");
+    const viewLeaderboard = document.getElementById("view-leaderboard");
+    const ownerPanel = document.getElementById("owner-panel");
+    const ownerPanelBtn = document.getElementById("owner-panel-btn");
+    const ownerBackBtn = document.getElementById("owner-back-btn");
+    const ownerPackList = document.getElementById("owner-pack-list");
+
+    const adminPanel = document.getElementById("admin-panel");
+    const adminPanelBtn = document.getElementById("admin-panel-btn");
+    const adminCoinsInput = document.getElementById("admin-coins");
+    const adminSetCoinsBtn = document.getElementById("admin-set-coins");
+    const adminBlookNameInput = document.getElementById("admin-blook-name");
+    const adminBlookAmountInput = document.getElementById("admin-blook-amount");
+    const adminGiveBlookBtn = document.getElementById("admin-give-blook");
+    const adminNextPackIdInput = document.getElementById("admin-next-pack-id");
+    const adminSetNextPackBtn = document.getElementById("admin-set-next-pack");
+    const adminStatus = document.getElementById("admin-status");
+
+    const topUser = document.getElementById("top-user");
+    const topCoins = document.getElementById("top-coins");
+    const dailyWheelBtn = document.getElementById("daily-wheel-btn");
+    const signoutBtn = document.getElementById("signout-btn");
+
+    const packGrid = document.getElementById("pack-grid");
+    const specialShopContainer = document.getElementById("special-shop");
+    const specialShopGrid = document.getElementById("special-shop-grid");
+    const blooksContainer = document.getElementById("blooks-container");
+
+    const tradeTargetUser = document.getElementById("trade-target-user");
+    const tradeOfferBlook = document.getElementById("trade-offer-blook");
+    const tradeOfferAmount = document.getElementById("trade-offer-amount");
+    const tradeRequestBtn = document.getElementById("trade-request-btn");
+    const tradeRequestErr = document.getElementById("trade-request-err");
+    const tradeRequestStatus = document.getElementById("trade-request-status");
+
+    const tradePopup = document.getElementById("trade-popup");
+    const tradePopupText = document.getElementById("trade-popup-text");
+    const tradePopupAccept = document.getElementById("trade-popup-accept");
+    const tradePopupDecline = document.getElementById("trade-popup-decline");
+
+    const chatMessages = document.getElementById("chat-messages");
+    const chatInput = document.getElementById("chat-input");
+    const chatSend = document.getElementById("chat-send");
+    const chatUploadBtn = document.getElementById("chat-upload-btn");
+    const chatUploadInput = document.getElementById("chat-upload-input");
+
+    const leaderboardList = document.getElementById("leaderboard-list");
+
+    const wheelOverlay = document.getElementById("wheel-overlay");
+    const wheelCircle = document.getElementById("wheel-circle");
+    const wheelCenter = document.getElementById("wheel-center");
+    const wheelSpinBtn = document.getElementById("wheel-spin-btn");
+    const wheelStatus = document.getElementById("wheel-status");
+    const wheelCloseBtn = document.getElementById("wheel-close-btn");
+
+    const banUsernameInput = document.getElementById("ban-username");
+    const banHoursInput = document.getElementById("ban-hours");
+    const banBtn = document.getElementById("ban-btn");
+    const banStatus = document.getElementById("ban-status");
+
+    const singleNameInput = document.getElementById("single-name");
+    const singleRaritySelect = document.getElementById("single-rarity");
+    const singlePriceInput = document.getElementById("single-price");
+    const singleExpireInput = document.getElementById("single-expire");
+    const singleAddBtn = document.getElementById("single-add-btn");
+    const singleStatus = document.getElementById("single-status");
+    const singleList = document.getElementById("single-list");
+
+    const packOpenOverlay = document.getElementById("pack-open-overlay");
+    const packOpenBlook = document.getElementById("pack-open-blook");
+    const packOpenMeta = document.getElementById("pack-open-meta");
+
+    const blookModalOverlay = document.getElementById("blook-modal-overlay");
+    const blookModalTitle = document.getElementById("blook-modal-title");
+    const blookModalImg = document.getElementById("blook-modal-img");
+    const blookModalMeta = document.getElementById("blook-modal-meta");
+    const blookModalChance = document.getElementById("blook-modal-chance");
+    const blookModalPack = document.getElementById("blook-modal-pack");
+    const blookModalSell = document.getElementById("blook-modal-sell");
+    const blookModalClose = document.getElementById("blook-modal-close");
+    const blookModalStatus = document.getElementById("blook-modal-status");
+
+    let currentUser = null;
+    let userData = null;
+    let ownerMode = false;
+    let adminMode = false;
+    let packAvailability = {};
+    let chatLoaded = false;
+    let currentIncomingTrade = null;
+    let singleShopBlooks = {};
+    let BLOOK_INFO = {};
+    let currentModalBlook = null;
+
+    // chat reward / anti-spam
+    let chatMessageCount = 0;
+    let chatBanUntil = 0;
+    let lastChatTime = 0;
+
+    const userRef = uid => ref(db, "users/" + uid);
+    const usersRef = () => ref(db, "users");
+    const chatRef = () => ref(db, "chat");
+    const tradeRequestsRefFor = uid => ref(db, "tradeRequests/" + uid);
+    const packAvailabilityRef = () => ref(db, "packAvailability");
+    const bansRef = () => ref(db, "bans");
+    const singleShopRef = () => ref(db, "singleShopBlooks");
+
+    const R = {
+      COMMON: "Common",
+      RARE: "Rare",
+      EPIC: "Epic",
+      LEG: "Legendary",
+      CHR: "Chroma",
+      MYS: "Mystical"
+    };
+
+    const RARITY_COLORS = {
+      [R.COMMON]: "#4caf50",
+      [R.RARE]: "#2196f3",
+      [R.EPIC]: "#9c27b0",
+      [R.LEG]: "#ffb300",
+      [R.CHR]: "#81d4fa",
+      [R.MYS]: "#6a1b9a"
+    };
+
+    const SELL_VALUES = {
+      [R.COMMON]: 5,
+      [R.RARE]: 20,
+      [R.EPIC]: 80,
+      [R.LEG]: 250,
+      [R.CHR]: 400,
+      [R.MYS]: 1000
+    };
+
+    const BASE_PACKS = [
+      {
+        id:"space",
+        name:"Space Pack",
+        color:"#4b0082",
+        cost:20,
+        blooks:[
+          {name:"Earth",chance:18.75,rarity:R.COMMON},
+          {name:"Meteor",chance:18.75,rarity:R.COMMON},
+          {name:"Stars",chance:18.75,rarity:R.COMMON},
+          {name:"Alien",chance:18.75,rarity:R.COMMON},
+          {name:"Planet",chance:10,rarity:R.RARE},
+          {name:"UFO",chance:10,rarity:R.RARE},
+          {name:"Spaceship",chance:4.5,rarity:R.EPIC},
+          {name:"Astronaut",chance:.45,rarity:R.LEG},
+          {name:"Pink Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Red Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Orange Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Yellow Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Lime Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Green Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Cyan Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Blue Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Purple Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Brown Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Black Astronaut",chance:.05,rarity:R.CHR},
+          {name:"Space Terminal",chance:.01,rarity:R.MYS},
+          {name:"Space Debugger",chance:.0075,rarity:R.MYS},
+          {name:"Tim the Alien",chance:.005,rarity:R.MYS},
+          {name:"Rainbow Astronaut",chance:.0025,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"ice",
+        name:"Ice Monsters Pack",
+        color:"#0a1a4f",
+        cost:25,
+        blooks:[
+          {name:"Ice Bat",chance:19.5,rarity:R.COMMON},
+          {name:"Ice Bug",chance:19.5,rarity:R.COMMON},
+          {name:"Ice Elemental",chance:19.5,rarity:R.COMMON},
+          {name:"Rock Monster",chance:19.5,rarity:R.COMMON},
+          {name:"Dink",chance:8.5,rarity:R.RARE},
+          {name:"Donk",chance:8.5,rarity:R.RARE},
+          {name:"Bush Monster",chance:4.5,rarity:R.EPIC},
+          {name:"Yeti",chance:.35,rarity:R.LEG},
+          {name:"Ice Slime",chance:.08,rarity:R.CHR},
+          {name:"Frozen Fossil",chance:.05,rarity:R.CHR},
+          {name:"Ice Crab",chance:.02,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"spooky",
+        name:"Spooky Pack",
+        color:"#000000",
+        cost:25,
+        blooks:[
+          {name:"Pumpkin",chance:18.5,rarity:R.COMMON},
+          {name:"Swamp Monster",chance:18.5,rarity:R.COMMON},
+          {name:"Frankenstein",chance:18.5,rarity:R.COMMON},
+          {name:"Vampire",chance:18.5,rarity:R.COMMON},
+          {name:"Zombie",chance:10.15,rarity:R.RARE},
+          {name:"Mummy",chance:10.15,rarity:R.RARE},
+          {name:"Crow",chance:10.15,rarity:R.RARE},
+          {name:"Skeleton",chance:6.7,rarity:R.RARE},
+          {name:"Caramel Apple",chance:6.7,rarity:R.RARE},
+          {name:"Werewolf",chance:5,rarity:R.EPIC},
+          {name:"Ghost",chance:.65,rarity:R.LEG},
+          {name:"Haunted Pumpkin",chance:.05,rarity:R.CHR},
+          {name:"Pumpkin Cookie",chance:.03,rarity:R.CHR},
+          {name:"Mummy Cookie",chance:.025,rarity:R.CHR},
+          {name:"Ghost Cookie",chance:.02,rarity:R.CHR},
+          {name:"Red Gummy Bear",chance:.02,rarity:R.CHR},
+          {name:"Green Gummy Bear",chance:.02,rarity:R.CHR},
+          {name:"Blue Gummy Bear",chance:.02,rarity:R.CHR},
+          {name:"Haunted Cookie",chance:.0175,rarity:R.MYS},
+          {name:"Chick Chicken",chance:.0175,rarity:R.MYS},
+          {name:"Chicken Chick",chance:.0175,rarity:R.MYS},
+          {name:"Raccoon Bandit",chance:.0175,rarity:R.MYS},
+          {name:"Owl Sheriff",chance:.0175,rarity:R.MYS},
+          {name:"Anaconda Wizard",chance:.0175,rarity:R.MYS},
+          {name:"Vampire Frog",chance:.015,rarity:R.MYS},
+          {name:"Pumpkin King",chance:.015,rarity:R.MYS},
+          {name:"Spooky Cookie",chance:.013,rarity:R.MYS},
+          {name:"Spooky Pumpkin",chance:.0125,rarity:R.MYS},
+          {name:"Spooky Mummy",chance:.01,rarity:R.MYS},
+          {name:"Spooky Skeleton",chance:.03,rarity:R.MYS},
+          {name:"Spooky Ghost",chance:.005,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"medieval",
+        name:"Medieval Pack",
+        color:"#757575",
+        cost:25,
+        blooks:[
+          {name:"Elf",chance:13.4,rarity:R.COMMON},
+          {name:"Witch",chance:13.4,rarity:R.COMMON},
+          {name:"Wizard",chance:13.4,rarity:R.COMMON},
+          {name:"Fairy",chance:13.4,rarity:R.COMMON},
+          {name:"Slime Monster",chance:13.4,rarity:R.COMMON},
+          {name:"Jester",chance:9,rarity:R.RARE},
+          {name:"Dragon",chance:9,rarity:R.RARE},
+          {name:"Queen",chance:9,rarity:R.RARE},
+          {name:"Unicorn",chance:5,rarity:R.EPIC},
+          {name:"King",chance:1,rarity:R.LEG},
+          {name:"Agent Owl",chance:.05,rarity:R.CHR},
+          {name:"Wise Owl",chance:.05,rarity:R.CHR},
+          {name:"Master Elf",chance:.05,rarity:R.CHR},
+          {name:"Phantom King",chance:.005,rarity:R.MYS},
+          {name:"Dark Dragon",chance:.003,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"videogame",
+        name:"Video Game Pack",
+        color:"linear-gradient(135deg,#ff9800,#9c27b0)",
+        cost:25,
+        blooks:[
+          {name:"Pac-Man",chance:14,rarity:R.COMMON},
+          {name:"Space Invader",chance:14,rarity:R.COMMON},
+          {name:"Among Us",chance:14,rarity:R.COMMON},
+          {name:"Poke Ball",chance:14,rarity:R.COMMON},
+          {name:"Flappy Bird",chance:14,rarity:R.COMMON},
+          {name:"Goomba",chance:9,rarity:R.RARE},
+          {name:"Big Shield",chance:9,rarity:R.RARE},
+          {name:"Creeper",chance:9,rarity:R.RARE},
+          {name:"Red Bird",chance:1.3,rarity:R.EPIC},
+          {name:"Companion Cube",chance:1.3,rarity:R.EPIC},
+          {name:"Enderman",chance:.5,rarity:R.LEG},
+          {name:"Master Chief",chance:.35,rarity:R.LEG},
+          {name:"Golden Among Us",chance:.05,rarity:R.CHR},
+          {name:"Puffed Pig",chance:.01,rarity:R.MYS},
+          {name:"Gaming Mouse",chance:.003,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"ocean",
+        name:"Ocean Pack",
+        color:"#4fc3f7",
+        cost:25,
+        blooks:[
+          {name:"Old Boot",chance:15,rarity:R.COMMON},
+          {name:"Jellyfish",chance:15,rarity:R.COMMON},
+          {name:"Clownfish",chance:15,rarity:R.COMMON},
+          {name:"Frog",chance:15,rarity:R.COMMON},
+          {name:"Crab",chance:15,rarity:R.COMMON},
+          {name:"Pufferfish",chance:12.2,rarity:R.RARE},
+          {name:"Blobfish",chance:12.2,rarity:R.RARE},
+          {name:"Octopus",chance:12.2,rarity:R.RARE},
+          {name:"Narwhal",chance:6,rarity:R.EPIC},
+          {name:"Dolphin",chance:6,rarity:R.EPIC},
+          {name:"Baby Shark",chance:1,rarity:R.LEG},
+          {name:"Megalodon",chance:0.4,rarity:R.LEG},
+          {name:"Lovely Frog",chance:0.16,rarity:R.CHR},
+          {name:"Lucky Frog",chance:0.14,rarity:R.CHR},
+          {name:"Spring Frog",chance:0.12,rarity:R.CHR},
+          {name:"Rainbow Jellyfish",chance:0.1,rarity:R.CHR},
+          {name:"Blizzard Clownfish",chance:0.1,rarity:R.CHR},
+          {name:"Poison Dart Frog",chance:0.1,rarity:R.CHR},
+          {name:"Lemon Crab",chance:0.1,rarity:R.CHR},
+          {name:"Crimson Octopus",chance:0.1,rarity:R.CHR},
+          {name:"Donut Blobfish",chance:0.1,rarity:R.CHR},
+          {name:"Rainbow Narwhal",chance:0.1,rarity:R.CHR},
+          {name:"Pirahnna",chance:0.1,rarity:R.CHR},
+          {name:"Kraken",chance:0.006,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"science",
+        name:"Science Pack",
+        color:"#2e7d32",
+        cost:25,
+        blooks:[
+          {name:"Magnet",chance:15,rarity:R.COMMON},
+          {name:"DNA",chance:15,rarity:R.COMMON},
+          {name:"Scale",chance:15,rarity:R.COMMON},
+          {name:"Beaker",chance:15,rarity:R.COMMON},
+          {name:"Blood Bag",chance:15,rarity:R.COMMON},
+          {name:"Magnifying Glass",chance:15,rarity:R.COMMON},
+          {name:"Battery",chance:15,rarity:R.COMMON},
+          {name:"Atom",chance:7,rarity:R.RARE},
+          {name:"Test Tubes",chance:7,rarity:R.RARE},
+          {name:"Bunsen Burner",chance:7,rarity:R.RARE},
+          {name:"Bacteria",chance:7,rarity:R.RARE},
+          {name:"Microscope",chance:7,rarity:R.RARE},
+          {name:"Eyeball",chance:7,rarity:R.RARE},
+          {name:"Toxic Waste",chance:4.6,rarity:R.EPIC},
+          {name:"Light Prism",chance:4.6,rarity:R.EPIC},
+          {name:"Telescope",chance:4.6,rarity:R.EPIC},
+          {name:"Skull",chance:1.2,rarity:R.LEG},
+          {name:"Lightbulb",chance:1.2,rarity:R.LEG},
+          {name:"Brain",chance:1.1,rarity:R.LEG},
+          {name:"Flask",chance:0.14,rarity:R.CHR},
+          {name:"Petri Dish",chance:0.14,rarity:R.CHR},
+          {name:"Nikola Tesla",chance:0.14,rarity:R.CHR},
+          {name:"Lava Lamp",chance:0.01,rarity:R.MYS},
+          {name:"Beating Heart",chance:0.005,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"magic",
+        name:"Magic Pack",
+        color:"linear-gradient(135deg,#7b1fa2,#512da8)",
+        cost:25,
+        blooks:[
+          {name:"Magic Spellbook",chance:14,rarity:R.COMMON},
+          {name:"Cursed Ring",chance:14,rarity:R.COMMON},
+          {name:"Bubbling Cauldron",chance:14,rarity:R.COMMON},
+          {name:"Fairy Dust",chance:14,rarity:R.COMMON},
+          {name:"Magic Scroll",chance:13.5,rarity:R.COMMON},
+          {name:"Magician's Wand",chance:16,rarity:R.RARE},
+          {name:"Crystal Ball",chance:16,rarity:R.RARE},
+          {name:"Ancient Runes",chance:16,rarity:R.RARE},
+          {name:"Enchantment Hall",chance:6,rarity:R.EPIC},
+          {name:"Strength Potion",chance:6,rarity:R.EPIC},
+          {name:"Magician's Hat",chance:1,rarity:R.LEG},
+          {name:"Sentient Spellbook",chance:0.04,rarity:R.CHR},
+          {name:"Golden Magician's Wand",chance:0.02,rarity:R.CHR},
+          {name:"Invisibility Cloak",chance:0.004,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"blizzard",
+        name:"Blizzard Pack",
+        color:"#90caf9",
+        cost:25,
+        blooks:[
+          {name:"Snow Globe",chance:14.5,rarity:R.COMMON},
+          {name:"Holiday Gift",chance:14.5,rarity:R.COMMON},
+          {name:"Hot Chocolate",chance:14.5,rarity:R.COMMON},
+          {name:"Holiday Wreath",chance:14.5,rarity:R.COMMON},
+          {name:"Stocking",chance:14.5,rarity:R.COMMON},
+          {name:"Gingerbread Man",chance:14.2,rarity:R.RARE},
+          {name:"Gingerbread House",chance:14.2,rarity:R.RARE},
+          {name:"Reindeer",chance:14.2,rarity:R.RARE},
+          {name:"Snowman",chance:10.3,rarity:R.EPIC},
+          {name:"Santa Claus",chance:2,rarity:R.LEG},
+          {name:"Santa Claws",chance:0.1,rarity:R.CHR},
+          {name:"New York Snow Globe",chance:0.1,rarity:R.CHR},
+          {name:"London Snow Globe",chance:0.1,rarity:R.CHR},
+          {name:"Japan Snow Globe",chance:0.1,rarity:R.CHR},
+          {name:"Egypt Snow Globe",chance:0.1,rarity:R.CHR},
+          {name:"Paris Snow Globe",chance:0.1,rarity:R.CHR},
+          {name:"Cookies Combo",chance:0.08,rarity:R.CHR},
+          {name:"Frost Wreath",chance:0.06,rarity:R.CHR},
+          {name:"Tropical Globe",chance:0.04,rarity:R.CHR},
+          {name:"Chilly Flamingo",chance:0.06,rarity:R.CHR},
+          {name:"Snowy Bush Monster",chance:0.04,rarity:R.CHR},
+          {name:"Red Sweater Snowman",chance:0.04,rarity:R.CHR},
+          {name:"Blue Sweater Snowman",chance:0.04,rarity:R.CHR},
+          {name:"Elf Sweater Snowman",chance:0.02,rarity:R.CHR},
+          {name:"Nutcracker Koala",chance:0.02,rarity:R.CHR},
+          {name:"Golden Gift",chance:0.02,rarity:R.CHR},
+          {name:"Diamond Gift",chance:0.01,rarity:R.CHR},
+          {name:"Hamsta Claus",chance:0.005,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"dino",
+        name:"Dino Pack",
+        color:"linear-gradient(135deg,#2e7d32,#1b5e20)",
+        cost:25,
+        blooks:[
+          {name:"Amber",chance:19.5,rarity:R.COMMON},
+          {name:"Dino Egg",chance:19.5,rarity:R.COMMON},
+          {name:"Dino Fossil",chance:19.5,rarity:R.COMMON},
+          {name:"Stegosaurus",chance:19.5,rarity:R.COMMON},
+          {name:"Velociraptor",chance:9,rarity:R.RARE},
+          {name:"Brontosaurus",chance:9,rarity:R.RARE},
+          {name:"Triceratops",chance:3.7,rarity:R.EPIC},
+          {name:"Tyrannosaurus Rex",chance:0.3,rarity:R.LEG},
+          {name:"Golden Amber",chance:0.05,rarity:R.CHR}
+        ]
+      },
+      {
+        id:"summer",
+        name:"Summer Pack",
+        color:"linear-gradient(135deg,#4fc3f7,#0288d1)",
+        cost:25,
+        blooks:[
+          {name:"Sand Bucket",chance:14.5,rarity:R.COMMON},
+          {name:"Beach Ball",chance:14.5,rarity:R.COMMON},
+          {name:"Plastic Shovel",chance:14.5,rarity:R.COMMON},
+          {name:"Popsicle",chance:14.5,rarity:R.COMMON},
+          {name:"Life Float",chance:8,rarity:R.RARE},
+          {name:"Conch Shell",chance:8,rarity:R.RARE},
+          {name:"Surfboard",chance:3.1,rarity:R.EPIC},
+          {name:"Sand Castle",chance:0.4,rarity:R.LEG},
+          {name:"Coconut Cocktail",chance:0.03,rarity:R.CHR},
+          {name:"Tropical Pig",chance:0.004,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"fruit",
+        name:"Fruit Pack",
+        color:"linear-gradient(135deg,#ef5350,#ffb300,#66bb6a)",
+        cost:25,
+        blooks:[
+          {name:"Apple",chance:15.2,rarity:R.COMMON},
+          {name:"Orange",chance:15,rarity:R.COMMON},
+          {name:"Lemon",chance:15,rarity:R.COMMON},
+          {name:"Lime",chance:15,rarity:R.COMMON},
+          {name:"Grape",chance:15,rarity:R.COMMON},
+          {name:"Strawberry",chance:6.5,rarity:R.RARE},
+          {name:"Raspberry",chance:6.5,rarity:R.RARE},
+          {name:"Cherry",chance:6.5,rarity:R.RARE},
+          {name:"Watermelon",chance:2.5,rarity:R.EPIC},
+          {name:"Dragon Fruit",chance:2.5,rarity:R.EPIC},
+          {name:"Starfruit",chance:0.3,rarity:R.LEG},
+          {name:"Green Apple",chance:0.05,rarity:R.CHR},
+          {name:"Blue Raspberry",chance:0.01,rarity:R.CHR},
+          {name:"Golden Apple",chance:0.0024,rarity:R.MYS},
+          {name:"Enchanted Golden Apple",chance:0.0001,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"bug",
+        name:"Bug Pack",
+        color:"linear-gradient(135deg,#6d4c41,#558b2f)",
+        cost:25,
+        blooks:[
+          {name:"Ant",chance:20,rarity:R.COMMON},
+          {name:"Rhino Beetle",chance:20,rarity:R.COMMON},
+          {name:"Ladybug",chance:20,rarity:R.COMMON},
+          {name:"Fly",chance:20,rarity:R.COMMON},
+          {name:"Worm",chance:9,rarity:R.RARE},
+          {name:"Bee",chance:9,rarity:R.RARE},
+          {name:"Mantis",chance:3,rarity:R.EPIC},
+          {name:"Butterfly",chance:0.5,rarity:R.LEG},
+          {name:"Blue Butterfly",chance:0.02,rarity:R.CHR},
+          {name:"Giant Wolf Spider",chance:0.01,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"autumn",
+        name:"Autumn Pack",
+        color:"linear-gradient(135deg,#ffb74d,#8d6e63)",
+        cost:25,
+        blooks:[
+          {name:"Black Bear",chance:19.5,rarity:R.COMMON},
+          {name:"Pumpkin Pie",chance:19.5,rarity:R.COMMON},
+          {name:"Chipmunk",chance:19.5,rarity:R.COMMON},
+          {name:"Cornucopia",chance:19.5,rarity:R.COMMON},
+          {name:"Autumn Cat",chance:18,rarity:R.RARE},
+          {name:"Pumpkin Puppy",chance:18,rarity:R.RARE},
+          {name:"Autumn Crow",chance:5.9,rarity:R.EPIC},
+          {name:"Turkey",chance:2,rarity:R.LEG},
+          {name:"Autumn Wreath",chance:0.1,rarity:R.CHR},
+          {name:"Golden Pumpkin Pie",chance:0.04,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"sports",
+        name:"Sports Pack",
+        color:"linear-gradient(135deg,#2e7d32,#66bb6a)",
+        cost:25,
+        blooks:[
+          {name:"Basketball",chance:15,rarity:R.COMMON},
+          {name:"Baseball",chance:15,rarity:R.COMMON},
+          {name:"Soccer Ball",chance:15,rarity:R.COMMON},
+          {name:"Tennis Ball",chance:15,rarity:R.COMMON},
+          {name:"Golf Ball",chance:15,rarity:R.COMMON},
+          {name:"Football",chance:14,rarity:R.RARE},
+          {name:"Bowling Ball",chance:14,rarity:R.RARE},
+          {name:"Ping Pong Racket",chance:14,rarity:R.RARE},
+          {name:"Curling Stone",chance:6.96,rarity:R.EPIC},
+          {name:"Football Helmet",chance:1,rarity:R.LEG},
+          {name:"Red Bowling Ball",chance:0.04,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"wonderland",
+        name:"Wonderland Pack",
+        color:"linear-gradient(135deg,#7e57c2,#ce93d8)",
+        cost:25,
+        blooks:[
+          {name:"Two of Spades",chance:15.2,rarity:R.COMMON},
+          {name:"Eat Me",chance:15,rarity:R.COMMON},
+          {name:"Drink Me",chance:15,rarity:R.COMMON},
+          {name:"Alice",chance:15,rarity:R.COMMON},
+          {name:"Queen of Hearts",chance:15,rarity:R.COMMON},
+          {name:"Dormouse",chance:13,rarity:R.RARE},
+          {name:"White Rabbit",chance:13,rarity:R.RARE},
+          {name:"Cheshire Cat",chance:13,rarity:R.RARE},
+          {name:"Caterpillar",chance:5,rarity:R.EPIC},
+          {name:"Mad Hatter",chance:5,rarity:R.EPIC},
+          {name:"King of Hearts",chance:0.6,rarity:R.LEG},
+          {name:"Dinah",chance:0.06,rarity:R.CHR},
+          {name:"March Hare",chance:0.04,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"breakfast",
+        name:"Breakfast Pack",
+        color:"linear-gradient(135deg,#ff9800,#ffb74d)",
+        cost:25,
+        blooks:[
+          {name:"Toast",chance:12.5,rarity:R.COMMON},
+          {name:"Cereal",chance:12.5,rarity:R.COMMON},
+          {name:"Yogurt",chance:12.5,rarity:R.COMMON},
+          {name:"Breakfast Combo",chance:12.5,rarity:R.COMMON},
+          {name:"Orange Juice",chance:12.5,rarity:R.COMMON},
+          {name:"Milk",chance:12.5,rarity:R.COMMON},
+          {name:"Waffle",chance:18,rarity:R.RARE},
+          {name:"Pancakes",chance:18,rarity:R.RARE},
+          {name:"French Toast",chance:10,rarity:R.EPIC},
+          {name:"Pizza",chance:4,rarity:R.LEG},
+          {name:"Sandwich",chance:2,rarity:R.CHR},
+          {name:"Chocolate Milk",chance:0.1,rarity:R.MYS}
+        ]
+      },
+      {
+        id:"outback",
+        name:"Outback Pack",
+        color:"linear-gradient(135deg,#f57c00,#6d4c41)",
+        cost:25,
+        blooks:[
+          {name:"Dingo",chance:18.75,rarity:R.COMMON},
+          {name:"Echidna",chance:18.75,rarity:R.COMMON},
+          {name:"Koala",chance:18.75,rarity:R.COMMON},
+          {name:"Kookaburra",chance:18.75,rarity:R.COMMON},
+          {name:"Platypus",chance:7,rarity:R.RARE},
+          {name:"Joey",chance:7,rarity:R.RARE},
+          {name:"Kangaroo",chance:7,rarity:R.RARE},
+          {name:"Crocodile",chance:3.6,rarity:R.EPIC},
+          {name:"Sugar Glider",chance:0.37,rarity:R.LEG},
+          {name:"Teal Platypus",chance:0.031,rarity:R.CHR},
+          {name:"Golden Crocodile",chance:0.009,rarity:R.MYS}
+        ]
+      }
+    ];
+
+    const LUCKY_PACK = {
+      id:"lucky",
+      name:"Lucky Pack (March only)",
+      color:"linear-gradient(135deg,#1b5e20,#4caf50)",
+      cost:25,
+      blooks:[
+        {name:"Pot of Gold",chance:18.77875,rarity:R.COMMON},
+        {name:"Goblin",chance:18.77875,rarity:R.COMMON},
+        {name:"Lucky Night",chance:18.77875,rarity:R.COMMON},
+        {name:"Green Gem",chance:18.77875,rarity:R.COMMON},
+        {name:"Leprechaun Hat",chance:10,rarity:R.RARE},
+        {name:"Lucky Harp",chance:10,rarity:R.RARE},
+        {name:"4 Leaf Clover",chance:4,rarity:R.EPIC},
+        {name:"Golden Harpy",chance:0.8,rarity:R.LEG},
+        {name:"Lucky Hamster",chance:0.08,rarity:R.CHR},
+        {name:"Golden 5 Leaf Clover",chance:0.005,rarity:R.MYS}
+      ]
+    };
+
+    const VALENTINE_PACK = {
+      id:"valentine",
+      name:"Valentine Pack (Valentine week)",
+      color:"linear-gradient(135deg,#f06292,#ec407a)",
+      cost:25,
+      blooks:[
+        {name:"Valentines Chocolate",chance:22.416666,rarity:R.COMMON},
+        {name:"Valentines Balloon",chance:22.416666,rarity:R.COMMON},
+        {name:"Candy Heart",chance:22.416666,rarity:R.COMMON},
+        {name:"Valentines Cat",chance:12,rarity:R.RARE},
+        {name:"Valentines Card",chance:12,rarity:R.RARE},
+        {name:"Ring",chance:4,rarity:R.EPIC},
+        {name:"White Chocolate",chance:4,rarity:R.EPIC},
+        {name:"Diamond Ring",chance:0.6,rarity:R.LEG},
+        {name:"Valentines Peacock",chance:0.05,rarity:R.MYS}
+      ]
+    };
+
+    const BOT_PACK = {
+      id:"bot",
+      name:"Bot Pack",
+      color:"#1b5e20",
+      cost:25,
+      blooks:[
+        {name:"Lil Bot",chance:19.5,rarity:R.COMMON},
+        {name:"Lovely Bot",chance:19.5,rarity:R.COMMON},
+        {name:"Angry Bot",chance:19.5,rarity:R.COMMON},
+        {name:"Happy Bot",chance:19.5,rarity:R.COMMON},
+        {name:"Watson",chance:9,rarity:R.RARE},
+        {name:"Buddy Bot",chance:9,rarity:R.RARE},
+        {name:"Brainy Bot",chance:3.7,rarity:R.EPIC},
+        {name:"Mega Bot",chance:0.385,rarity:R.LEG},
+        {name:"Catson",chance:0.01,rarity:R.CHR},
+        {name:"Forgotten Bot",chance:0.005,rarity:R.MYS}
+      ]
+    };
+
+    const PIRATE_PACK = {
+      id:"pirate",
+      name:"Pirate Pack",
+      color:"linear-gradient(135deg,#004d40,#00796b)",
+      cost:25,
+      blooks:[
+        {name:"Deckhand",chance:16,rarity:R.COMMON},
+        {name:"Buccaneer",chance:16,rarity:R.COMMON},
+        {name:"Swashbuckler",chance:16,rarity:R.COMMON},
+        {name:"Treasure Map",chance:16,rarity:R.COMMON},
+        {name:"Seagull",chance:16,rarity:R.COMMON},
+        {name:"Jolly Pirate",chance:8,rarity:R.RARE},
+        {name:"Pirate Ship",chance:8,rarity:R.RARE},
+        {name:"Kraken",chance:3.67,rarity:R.EPIC},
+        {name:"Captain Blackbeard",chance:0.3,rarity:R.LEG},
+        {name:"Pirate Pufferfish",chance:0.02,rarity:R.CHR},
+        {name:"Ghost Ship",chance:0.005,rarity:R.MYS},
+        {name:"Ghost Pirate",chance:0.003,rarity:R.MYS},
+        {name:"Buried Treasure",chance:0.002,rarity:R.MYS}
+      ]
+    };
+
+    const EASTER_PACK = {
+      id:"easter",
+      name:"Easter Pack (Easter weeks)",
+      color:"linear-gradient(135deg,#ffeb3b,#ff9800)",
+      cost:25,
+      blooks:[
+        {name:"Yellow Easter Egg",chance:16,rarity:R.COMMON},
+        {name:"Chocolate Egg",chance:16,rarity:R.COMMON},
+        {name:"Pack of Jelly Beans",chance:16,rarity:R.COMMON},
+        {name:"Orange Peep",chance:16,rarity:R.COMMON},
+        {name:"Red Easter Egg",chance:16,rarity:R.COMMON},
+        {name:"Chocolate Rabbit",chance:8,rarity:R.RARE},
+        {name:"Easter Rabbit",chance:8,rarity:R.RARE},
+        {name:"Blue and Green Easter Egg",chance:3.67,rarity:R.EPIC},
+        {name:"Easter Egg Hunt",chance:0.2,rarity:R.LEG},
+        {name:"Red Peep",chance:0.4,rarity:R.CHR},
+        {name:"Golden Easter Egg",chance:0.6,rarity:R.CHR},
+        {name:"Caramel Filled Chocolate Egg",chance:0.037,rarity:R.MYS},
+        {name:"Creme Filled Chocolate Egg",chance:0.003,rarity:R.MYS}
+      ]
+    };
+
+    const ALL_PACKS_FOR_OWNER = [...BASE_PACKS, BOT_PACK, PIRATE_PACK, LUCKY_PACK, VALENTINE_PACK, EASTER_PACK];
+
+    function isMarch() {
+      const d = new Date();
+      return d.getMonth() === 2;
+    }
+    function isValentineWeek() {
+      const d = new Date();
+      return d.getMonth() === 1 && d.getDate() >= 7 && d.getDate() <= 14;
+    }
+    function isEasterSeason() {
+      const d = new Date();
+      const m = d.getMonth();
+      const day = d.getDate();
+      return (m === 2 && day >= 15) || (m === 3 && day <= 7);
+    }
+
+    function showView(name) {
+      viewMarket.style.display = name === "market" ? "flex" : "none";
+      viewBlooks.style.display = name === "blooks" ? "flex" : "none";
+      viewTrading.style.display = name === "trading" ? "flex" : "none";
+      viewChat.style.display = name === "chat" ? "flex" : "none";
+      viewLeaderboard.style.display = name === "leaderboard" ? "flex" : "none";
+      ownerPanel.style.display = name === "owner" ? "flex" : "none";
+
+      navBtns.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === name);
+      });
+
+      if (name === "leaderboard") buildLeaderboard();
+      if (name === "chat" && !chatLoaded) subscribeChat();
+    }
+
+    navBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const v = btn.dataset.view;
+        if (v === "leaderboard" && ownerPanel.style.display === "flex") return;
+        showView(v);
+      });
+    });
+
+    signoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    function userKey(username) {
+      return username.toLowerCase();
+    }
+
+    async function checkBan(username) {
+      const snap = await get(ref(db, "bans/" + userKey(username)));
+      if (!snap.exists()) return null;
+      const data = snap.val();
+      if (data.permanent) return "You are permanently banned.";
+      if (data.until && Date.now() < data.until) {
+        const mins = Math.ceil((data.until - Date.now()) / 60000);
+        return "You are banned for another " + mins + " minute(s).";
+      }
+      await remove(ref(db, "bans/" + userKey(username)));
+      return null;
+    }
+
+    async function loadUserData(uid) {
+      const snap = await get(userRef(uid));
+      if (!snap.exists()) return;
+      userData = snap.val();
+      if (!userData.blooks) userData.blooks = {};
+      if (!userData.coins) userData.coins = 0;
+      if (!userData.lastWheel) userData.lastWheel = 0;
+      if (!userData.nextPackId) userData.nextPackId = null;
+      refreshTop();
+      renderBlooks();
+      populateTradeOfferSelect();
+      updateWheelButtonState();
+    }
+
+    async function saveUserData() {
+      if (!currentUser || !userData) return;
+      await update(userRef(currentUser.uid), userData);
+      refreshTop();
+    }
+
+    function refreshTop() {
+      if (!userData) {
+        topUser.textContent = "Logged out";
+        topCoins.textContent = "Coins: 0";
+      } else {
+        topUser.textContent = userData.username || "user";
+        topCoins.textContent = "Coins: " + (userData.coins || 0);
+      }
+    }
+
+    function allPacksForMarket() {
+      const arr = [...BASE_PACKS, BOT_PACK, PIRATE_PACK];
+      if (isMarch()) arr.push(LUCKY_PACK);
+      if (isValentineWeek()) arr.push(VALENTINE_PACK);
+      if (isEasterSeason()) arr.push(EASTER_PACK);
+      return arr;
+    }
+
+    function getPackById(id) {
+      return ALL_PACKS_FOR_OWNER.find(p => p.id === id) || null;
+    }
+
+    function rarityColor(r) {
+      return RARITY_COLORS[r] || "#78909c";
+    }
+
+    function spawnConfetti(color) {
+      for (let i = 0; i < 40; i++) {
+        const div = document.createElement("div");
+        div.className = "confetti-piece";
+        div.style.background = color;
+        div.style.setProperty("--x", (Math.random() * 200 - 100) + "px");
+        div.style.left = (Math.random() * 100) + "vw";
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2500);
+      }
+    }
+
+    function pickFromPack(pack) {
+      const r = Math.random() * 100;
+      let sum = 0;
+      for (const b of pack.blooks) {
+        sum += b.chance;
+        if (r <= sum) return b;
+      }
+      return pack.blooks[pack.blooks.length - 1];
+    }
+
+    function groupBlooksByPack() {
+      const map = {};
+      ALL_PACKS_FOR_OWNER.forEach(pack => {
+        pack.blooks.forEach(b => {
+          map[b.name] = { packId: pack.id, packName: pack.name, rarity: b.rarity, chance: b.chance };
+        });
+      });
+      return map;
+    }
+
+    function registerSingleBlook(name, rarity) {
+      if (!BLOOK_INFO[name]) {
+        BLOOK_INFO[name] = {
+          packId: "other",
+          packName: "Other Blooks",
+          rarity,
+          chance: 0
+        };
+      }
+    }
+
+    function buildPacks() {
+      packGrid.innerHTML = "";
+      const packs = allPacksForMarket().filter(p => packAvailability[p.id] !== false);
+      packs.forEach(pack => {
+        const card = document.createElement("div");
+        card.className = "pack-card";
+        card.style.background = pack.color;
+
+        const header = document.createElement("div");
+        header.className = "pack-header";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "pack-name";
+        nameEl.textContent = pack.name;
+
+        const priceEl = document.createElement("div");
+        priceEl.className = "pack-price";
+        priceEl.textContent = pack.cost + " coins";
+
+        const q = document.createElement("div");
+        q.className = "pack-q";
+        const qSpan = document.createElement("span");
+        qSpan.textContent = "?";
+        q.appendChild(qSpan);
+
+        const tip = document.createElement("div");
+        tip.className = "tooltip";
+        tip.textContent = pack.blooks
+          .map(b => `${b.name} (${b.rarity}, ~${b.chance}%)`)
+          .join(", ");
+        q.appendChild(tip);
+
+        header.appendChild(nameEl);
+        header.appendChild(priceEl);
+        header.appendChild(q);
+
+        const openBtn = document.createElement("button");
+        openBtn.textContent = "Open";
+        openBtn.style.fontSize = "13px";
+        openBtn.style.alignSelf = "flex-end";
+        openBtn.addEventListener("click", () => {
+          openPack(pack.id);
+        });
+
+        card.appendChild(header);
+        card.appendChild(openBtn);
+        packGrid.appendChild(card);
+      });
+    }
+
+    async function openPack(packId) {
+      if (!userData || !currentUser) return;
+      const pack = getPackById(packId);
+      if (!pack) return;
+
+      const forced = userData.nextPackId ? getPackById(userData.nextPackId) : null;
+      const actualPack = forced || pack;
+
+      if ((userData.coins || 0) < actualPack.cost) return;
+
+      userData.coins -= actualPack.cost;
+      const chosen = pickFromPack(actualPack);
+      userData.blooks[chosen.name] = (userData.blooks[chosen.name] || 0) + 1;
+      userData.nextPackId = null;
+      await saveUserData();
+
+      packOpenBlook.textContent = chosen.name;
+      packOpenBlook.style.background = rarityColor(chosen.rarity);
+      packOpenMeta.textContent = `${chosen.rarity} • ~${chosen.chance}% • from ${actualPack.name}`;
+      packOpenOverlay.style.display = "flex";
+
+      spawnConfetti(rarityColor(chosen.rarity));
+      renderBlooks();
+      populateTradeOfferSelect();
+
+      setTimeout(() => {
+        packOpenOverlay.style.display = "none";
+      }, 1800);
+    }
+
+    packOpenOverlay.addEventListener("click", () => {
+      packOpenOverlay.style.display = "none";
+    });
+
+    function renderBlooks() {
+      if (!userData) {
+        blooksContainer.innerHTML = "";
+        return;
+      }
+      const owned = userData.blooks || {};
+      const byPack = {};
+      Object.keys(BLOOK_INFO).forEach(name => {
+        const info = BLOOK_INFO[name];
+        if (!byPack[info.packId]) {
+          byPack[info.packId] = { packName: info.packName, items: [] };
+        }
+        byPack[info.packId].items.push(name);
+      });
+
+      const packOrder = [];
+      ALL_PACKS_FOR_OWNER.forEach(p => {
+        if (byPack[p.id]) packOrder.push(p.id);
+      });
+      if (byPack["other"]) packOrder.push("other");
+
+      blooksContainer.innerHTML = "";
+      packOrder.forEach(pid => {
+        const sec = document.createElement("div");
+        sec.className = "bsec";
+
+        const title = document.createElement("div");
+        title.className = "bsec-title";
+        title.textContent = byPack[pid].packName;
+        sec.appendChild(title);
+
+        const line = document.createElement("div");
+        line.className = "bsec-line";
+        sec.appendChild(line);
+
+        const grid = document.createElement("div");
+        grid.className = "bgrid";
+
+        byPack[pid].items.forEach(name => {
+          const info = BLOOK_INFO[name];
+          const count = owned[name] || 0;
+          const card = document.createElement("div");
+          card.className = "bcard";
+          if (!count) card.classList.add("locked");
+
+          const img = document.createElement("div");
+          img.className = "bimg";
+          img.style.background = rarityColor(info.rarity);
+          img.textContent = name;
+
+          const n = document.createElement("div");
+          n.className = "bname";
+          n.textContent = name;
+
+          const meta = document.createElement("div");
+          meta.className = "bmeta";
+          meta.innerHTML = `<span>${info.rarity}</span><span>x${count}</span>`;
+
+          card.appendChild(img);
+          card.appendChild(n);
+          card.appendChild(meta);
+
+          card.addEventListener("click", () => {
+            if (!count) return;
+            openBlookModal(name, info, count);
+          });
+
+          grid.appendChild(card);
+        });
+
+        sec.appendChild(grid);
+        blooksContainer.appendChild(sec);
+      });
+    }
+
+    function openBlookModal(name, info, count) {
+      currentModalBlook = { name, info, count };
+      blookModalTitle.textContent = name;
+      blookModalImg.textContent = name;
+      blookModalImg.style.background = rarityColor(info.rarity);
+      blookModalMeta.textContent = `${info.rarity} • You own x${count}`;
+      blookModalChance.textContent = info.chance ? `Approx chance: ${info.chance}%` : "Approx chance: N/A";
+      blookModalPack.textContent = `From: ${info.packName}`;
+      blookModalStatus.textContent = "";
+      blookModalOverlay.style.display = "flex";
+    }
+
+    blookModalClose.addEventListener("click", () => {
+      blookModalOverlay.style.display = "none";
+    });
+    blookModalOverlay.addEventListener("click", e => {
+      if (e.target === blookModalOverlay) blookModalOverlay.style.display = "none";
+    });
+
+    blookModalSell.addEventListener("click", async () => {
+      if (!currentModalBlook || !userData) return;
+      const { name, info } = currentModalBlook;
+      const count = userData.blooks[name] || 0;
+      if (!count) {
+        blookModalStatus.textContent = "You don't own this blook.";
+        return;
+      }
+      const value = SELL_VALUES[info.rarity] || 0;
+      if (!value) {
+        blookModalStatus.textContent = "This blook cannot be sold.";
+        return;
+      }
+      if (!confirm(`Sell 1 ${name} for ${value} coins?`)) return;
+      userData.blooks[name] = count - 1;
+      if (userData.blooks[name] <= 0) delete userData.blooks[name];
+      userData.coins += value;
+      await saveUserData();
+      blookModalStatus.textContent = `Sold for ${value} coins.`;
+      renderBlooks();
+      populateTradeOfferSelect();
+    });
+
+    function populateTradeOfferSelect() {
+      tradeOfferBlook.innerHTML = "";
+      tradeOfferAmount.value = "1";
+      if (!userData || !userData.blooks || Object.keys(userData.blooks).length === 0) {
+        tradeOfferBlook.disabled = true;
+        tradeOfferAmount.disabled = true;
+        tradeRequestBtn.disabled = true;
+        return;
+      }
+      Object.entries(userData.blooks).forEach(([name, count]) => {
+        if (count > 0) {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = `${name} (x${count})`;
+          opt.dataset.count = count;
+          tradeOfferBlook.appendChild(opt);
+        }
+      });
+      tradeOfferBlook.disabled = false;
+      tradeOfferAmount.disabled = false;
+      tradeRequestBtn.disabled = false;
+      updateTradeAmountMax();
+    }
+
+    function updateTradeAmountMax() {
+      const selected = tradeOfferBlook.value;
+      if (!selected || !userData || !userData.blooks) return;
+      const max = userData.blooks[selected] || 1;
+      tradeOfferAmount.max = max;
+      if (!tradeOfferAmount.value || tradeOfferAmount.value < 1) tradeOfferAmount.value = 1;
+      if (parseInt(tradeOfferAmount.value,10) > max) tradeOfferAmount.value = max;
+    }
+
+    tradeOfferBlook.addEventListener("change", () => {
+      tradeOfferAmount.value = "1";
+      updateTradeAmountMax();
+    });
+
+    tradeOfferAmount.addEventListener("input", () => {
+      updateTradeAmountMax();
+    });
+
+    async function findUserByUsername(username) {
+      const snap = await get(usersRef());
+      if (!snap.exists()) return null;
+      const all = snap.val();
+      for (const [uid, data] of Object.entries(all)) {
+        if ((data.username || "").toLowerCase() === username.toLowerCase()) {
+          return { uid, data };
+        }
+      }
+      return null;
+    }
+
+    tradeRequestBtn.addEventListener("click", async () => {
+      tradeRequestErr.textContent = "";
+      tradeRequestStatus.textContent = "";
+      if (!currentUser || !userData) return;
+      const targetName = tradeTargetUser.value.trim();
+      if (!targetName) {
+        tradeRequestErr.textContent = "Enter a username.";
+        return;
+      }
+      const offerBlook = tradeOfferBlook.value;
+      const amount = parseInt(tradeOfferAmount.value || "1", 10);
+      if (!offerBlook || !amount || amount <= 0) {
+        tradeRequestErr.textContent = "Choose a blook and amount.";
+        return;
+      }
+      const myCount = userData.blooks[offerBlook] || 0;
+      if (myCount < amount) {
+        tradeRequestErr.textContent = "You don't have enough of that blook.";
+        return;
+      }
+
+      const target = await findUserByUsername(targetName);
+      if (!target) {
+        tradeRequestErr.textContent = "User not found.";
+        return;
+      }
+      if (target.uid === currentUser.uid) {
+        tradeRequestErr.textContent = "You can't trade with yourself.";
+        return;
+      }
+
+      const reqRef = push(tradeRequestsRefFor(target.uid));
+      const req = {
+        id: reqRef.key,
+        fromUid: currentUser.uid,
+        fromName: userData.username || "user",
+        offerBlook,
+        offerAmount: amount,
+        coins: 0,
+        createdAt: Date.now()
+      };
+      await set(reqRef, req);
+      tradeRequestStatus.textContent = "Trade request sent to " + targetName + ".";
+    });
+
+    function subscribeIncomingTrades(uid) {
+      onValue(tradeRequestsRefFor(uid), snap => {
+        if (!snap.exists()) {
+          if (currentIncomingTrade && tradePopup.style.display === "block") {
+            tradePopup.style.display = "none";
+          }
+          currentIncomingTrade = null;
+          return;
+        }
+        const all = snap.val();
+        const list = Object.values(all);
+        list.sort((a, b) => b.createdAt - a.createdAt);
+        const latest = list[0];
+        currentIncomingTrade = latest;
+        tradePopupText.textContent = `${latest.fromName || "Someone"} wants to trade: ${latest.offerAmount}x ${latest.offerBlook}.`;
+        tradePopup.style.display = "block";
+      });
+    }
+
+    tradePopupDecline.addEventListener("click", async () => {
+      if (!currentUser || !currentIncomingTrade) return;
+      await remove(ref(db, "tradeRequests/" + currentUser.uid + "/" + currentIncomingTrade.id));
+      currentIncomingTrade = null;
+      tradePopup.style.display = "none";
+    });
+
+    tradePopupAccept.addEventListener("click", async () => {
+      if (!currentUser || !currentIncomingTrade) return;
+      const req = currentIncomingTrade;
+      const giverUid = req.fromUid;
+      const receiverUid = currentUser.uid;
+
+      const giverSnap = await get(userRef(giverUid));
+      if (!giverSnap.exists()) {
+        alert("Trade failed: sender missing.");
+        return;
+      }
+      const giverData = giverSnap.val();
+      const giverBlooks = giverData.blooks || {};
+      const have = giverBlooks[req.offerBlook] || 0;
+      if (have < req.offerAmount) {
+        alert("Trade failed: sender no longer has enough of that blook.");
+        await remove(ref(db, "tradeRequests/" + receiverUid + "/" + req.id));
+        return;
+      }
+
+      giverBlooks[req.offerBlook] -= req.offerAmount;
+      if (giverBlooks[req.offerBlook] <= 0) delete giverBlooks[req.offerBlook];
+
+      const myBlooks = userData.blooks;
+      myBlooks[req.offerBlook] = (myBlooks[req.offerBlook] || 0) + req.offerAmount;
+
+      await update(userRef(giverUid), { blooks: giverBlooks });
+      await saveUserData();
+      renderBlooks();
+      populateTradeOfferSelect();
+
+      await remove(ref(db, "tradeRequests/" + receiverUid + "/" + req.id));
+      currentIncomingTrade = null;
+      tradePopup.style.display = "none";
+      alert("Trade completed!");
+    });
+
+    function subscribeChat() {
+      chatLoaded = true;
+      onValue(chatRef(), snap => {
+        chatMessages.innerHTML = "";
+        if (!snap.exists()) return;
+        const all = snap.val();
+        const arr = Object.values(all).sort((a, b) => a.createdAt - b.createdAt);
+        arr.forEach(msg => {
+          const div = document.createElement("div");
+          div.style.marginBottom = "4px";
+          const name = document.createElement("span");
+          name.style.fontWeight = "700";
+          name.textContent = (msg.username || "user") + ": ";
+          div.appendChild(name);
+          if (msg.text) {
+            const t = document.createElement("span");
+            t.textContent = msg.text;
+            div.appendChild(t);
+          }
+          if (msg.imageUrl) {
+            const img = document.createElement("img");
+            img.src = msg.imageUrl;
+            img.className = "chat-image";
+            div.appendChild(document.createElement("br"));
+            div.appendChild(img);
+          }
+          chatMessages.appendChild(div);
+        });
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+    }
+
+    chatSend.addEventListener("click", async () => {
+      if (!currentUser || !userData) return;
+
+      const now = Date.now();
+
+      if (now < chatBanUntil) {
+        alert("You are banned from chat for a bit. Please wait.");
+        return;
+      }
+
+      if (now - lastChatTime < 2000) {
+        chatBanUntil = now + 30000;
+        alert("You chatted too fast. Chat banned for 30 seconds.");
+        return;
+      }
+
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      lastChatTime = now;
+
+      const msgRef = push(chatRef());
+      await set(msgRef, {
+        username: userData.username || "user",
+        text,
+        imageUrl: "",
+        createdAt: Date.now()
+      });
+      chatInput.value = "";
+
+      chatMessageCount++;
+      if (chatMessageCount >= 5) {
+        chatMessageCount = 0;
+        userData.coins = (userData.coins || 0) + 1;
+        await saveUserData();
+      }
+    });
+
+    chatInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") chatSend.click();
+    });
+
+    chatUploadBtn.addEventListener("click", () => {
+      chatUploadInput.click();
+    });
+
+    chatUploadInput.addEventListener("change", async () => {
+      const file = chatUploadInput.files[0];
+      if (!file || !currentUser || !userData) return;
+
+      const now = Date.now();
+
+      if (now < chatBanUntil) {
+        alert("You are banned from chat for a bit. Please wait.");
+        return;
+      }
+
+      if (now - lastChatTime < 2000) {
+        chatBanUntil = now + 30000;
+        alert("You chatted too fast. Chat banned for 30 seconds.");
+        return;
+      }
+
+      lastChatTime = now;
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = reader.result;
+        const msgRef = push(chatRef());
+        await set(msgRef, {
+          username: userData.username || "user",
+          text: "",
+          imageUrl: dataUrl,
+          createdAt: Date.now()
+        });
+
+        chatMessageCount++;
+        if (chatMessageCount >= 5) {
+          chatMessageCount = 0;
+          userData.coins = (userData.coins || 0) + 1;
+          await saveUserData();
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    async function buildLeaderboard() {
+      leaderboardList.innerHTML = "Loading...";
+      const snap = await get(usersRef());
+      if (!snap.exists()) {
+        leaderboardList.innerHTML = "No players yet.";
+        return;
+      }
+      const all = snap.val();
+      const players = Object.values(all).map(u => {
+        const blooks = u.blooks || {};
+        let totalBlooks = 0;
+        Object.values(blooks).forEach(count => {
+          totalBlooks += count;
+        });
+        return {
+          username: u.username || "?",
+          coins: u.coins || 0,
+          totalBlooks
+        };
+      });
+
+      const byCoins = [...players].sort((a,b)=>b.coins-a.coins).slice(0,20);
+
+      leaderboardList.innerHTML = "";
+
+      byCoins.forEach((p,i)=>{
+        const row = document.createElement("div");
+        row.className = "lb-entry";
+        const left = document.createElement("div");
+        left.className = "lb-name";
+        left.textContent = `${i+1}. ${p.username}`;
+        const right = document.createElement("div");
+        right.className = "lb-stats";
+        right.textContent = `Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
+        row.appendChild(left);
+        row.appendChild(right);
+        leaderboardList.appendChild(row);
+      });
+
+      ownerPanelBtn.style.display = ownerMode ? "inline-block" : "none";
+    }
+
+    function buildOwnerPanel() {
+      ownerPackList.innerHTML = "";
+      ALL_PACKS_FOR_OWNER.forEach(pack => {
+        const row = document.createElement("div");
+        row.className = "owner-pack-row";
+        const left = document.createElement("div");
+        left.textContent = pack.name + (pack.id === "lucky" ? " (March only)" : pack.id === "valentine" ? " (Valentine week)" : pack.id === "easter" ? " (Easter weeks)" : "");
+        const right = document.createElement("input");
+        right.type = "checkbox";
+        right.checked = packAvailability[pack.id] !== false;
+        right.addEventListener("change", async () => {
+          packAvailability[pack.id] = right.checked;
+          await update(packAvailabilityRef(), { [pack.id]: right.checked });
+          buildPacks();
+        });
+        row.appendChild(left);
+        row.appendChild(right);
+        ownerPackList.appendChild(row);
+      });
+      buildSingleShopList();
+    }
+
+    banBtn.addEventListener("click", async () => {
+      banStatus.textContent = "";
+      const username = banUsernameInput.value.trim();
+      const hours = parseFloat(banHoursInput.value || "0");
+      if (!username) {
+        banStatus.textContent = "Enter a username.";
+        return;
+      }
+      if (!confirm(`Ban ${username}? OK to confirm.`)) return;
+      const data = {};
+      if (hours > 0) {
+        data.permanent = false;
+        data.until = Date.now() + hours * 60 * 60 * 1000;
+      } else {
+        data.permanent = true;
+        data.until = 0;
+      }
+      await set(ref(db, "bans/" + userKey(username)), data);
+      banStatus.textContent = `Banned ${username}${hours>0 ? " for "+hours+" hour(s)" : " permanently"}.`;
+    });
+
+    const WHEEL_REWARDS = [
+      { amount: 500, weight: 70 },
+      { amount: 1000, weight: 15 },
+      { amount: 1500, weight: 8 },
+      { amount: 5000, weight: 4 },
+      { amount: 10000, weight: 2.9 },
+      { amount: 100000, weight: 1 },
+      { amount: 1000000, weight: 0.1 }
+    ];
+
+    function pickWheelReward() {
+      const total = WHEEL_REWARDS.reduce((s,r)=>s+r.weight,0);
+      let r = Math.random() * total;
+      for (const w of WHEEL_REWARDS) {
+        if (r < w.weight) return w.amount;
+        r -= w.weight;
+      }
+      return WHEEL_REWARDS[0].amount;
+    }
+
+    function canSpinWheel() {
+      if (!userData) return false;
+      const last = userData.lastWheel || 0;
+      const diff = Date.now() - last;
+      return diff >= 12 * 60 * 60 * 1000;
+    }
+
+    function getWheelRemaining() {
+      if (!userData) return 0;
+      const last = userData.lastWheel || 0;
+      const diff = Date.now() - last;
+      const remaining = 12 * 60 * 60 * 1000 - diff;
+      return remaining > 0 ? remaining : 0;
+    }
+
+    function formatRemaining(ms) {
+      const totalSec = Math.floor(ms / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      return `${h}h ${m}m`;
+    }
+
+    function updateWheelButtonState() {
+      if (!userData) {
+        dailyWheelBtn.disabled = true;
+        return;
+      }
+      dailyWheelBtn.disabled = !canSpinWheel();
+    }
+
+    dailyWheelBtn.addEventListener("click", () => {
+      if (!currentUser || !userData) return;
+      wheelOverlay.style.display = "flex";
+      wheelCircle.classList.remove("wheel-spin");
+      wheelCenter.textContent = "Spin";
+      wheelStatus.textContent = "";
+      if (canSpinWheel()) {
+        wheelSpinBtn.style.display = "inline-block";
+        wheelSpinBtn.disabled = false;
+        wheelStatus.textContent = "Tap spin to roll the wheel.";
+      } else {
+        wheelSpinBtn.style.display = "none";
+        const rem = getWheelRemaining();
+        wheelStatus.textContent = "Next spin in " + formatRemaining(rem);
+      }
+    });
+
+    wheelCloseBtn.addEventListener("click", () => {
+      wheelOverlay.style.display = "none";
+    });
+
+    wheelSpinBtn.addEventListener("click", async () => {
+      if (!canSpinWheel()) return;
+      wheelSpinBtn.disabled = true;
+      wheelCircle.classList.remove("wheel-spin");
+      void wheelCircle.offsetWidth;
+      wheelCircle.classList.add("wheel-spin");
+      wheelStatus.textContent = "Spinning...";
+      const reward = pickWheelReward();
+      setTimeout(async () => {
+        userData.coins += reward;
+        userData.lastWheel = Date.now();
+        await saveUserData();
+        wheelCenter.textContent = reward.toLocaleString();
+        wheelStatus.textContent = "You won " + reward.toLocaleString() + " coins!";
+        wheelSpinBtn.style.display = "none";
+        updateWheelButtonState();
+      }, 2000);
+    });
+
+    ownerPanelBtn.addEventListener("click", () => {
+      if (!ownerMode) return;
+      buildOwnerPanel();
+      ownerPanel.style.display = "flex";
+      viewLeaderboard.style.display = "none";
+    });
+
+    ownerBackBtn.addEventListener("click", () => {
+      ownerPanel.style.display = "none";
+      showView("leaderboard");
+    });
+
+    adminSetCoinsBtn.addEventListener("click", async () => {
+      if (!currentUser || !userData || !adminMode) return;
+      const v = parseInt(adminCoinsInput.value || "0", 10);
+      if (isNaN(v) || v < 0) {
+        adminStatus.textContent = "Invalid coin amount.";
+        return;
+      }
+      userData.coins = v;
+      await saveUserData();
+      adminStatus.textContent = "Coins set.";
+    });
+
+    adminGiveBlookBtn.addEventListener("click", async () => {
+      if (!currentUser || !userData || !adminMode) return;
+      const name = adminBlookNameInput.value.trim();
+      const amt = parseInt(adminBlookAmountInput.value || "1", 10);
+      if (!name) {
+        adminStatus.textContent = "Enter a blook name.";
+        return;
+      }
+      if (!BLOOK_INFO[name]) {
+        adminStatus.textContent = "Unknown blook name.";
+        return;
+      }
+      if (!amt || amt <= 0) {
+        adminStatus.textContent = "Invalid amount.";
+        return;
+      }
+      userData.blooks[name] = (userData.blooks[name] || 0) + amt;
+      await saveUserData();
+      renderBlooks();
+      populateTradeOfferSelect();
+      adminStatus.textContent = `Gave ${amt}x ${name}.`;
+    });
+
+    adminSetNextPackBtn.addEventListener("click", async () => {
+      if (!currentUser || !userData || !adminMode) return;
+      const id = adminNextPackIdInput.value.trim();
+      if (id && !getPackById(id)) {
+        adminStatus.textContent = "Unknown pack id.";
+        return;
+      }
+      userData.nextPackId = id || null;
+      await saveUserData();
+      adminStatus.textContent = id ? `Next pack forced to ${id}.` : "Next pack cleared.";
+    });
+
+    adminPanelBtn.addEventListener("click", () => {
+      if (!adminMode) return;
+      showView("market");
+      adminPanel.scrollIntoView({behavior:"smooth"});
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.ctrlKey && (e.key === "l" || e.key === "L")) {
+        ownerMode = !ownerMode;
+        ownerPanelBtn.style.display = ownerMode ? "inline-block" : "none";
+        if (!ownerMode && ownerPanel.style.display === "flex") {
+          showView("leaderboard");
+        }
+      }
+      if (e.ctrlKey && (e.key === "c" || e.key === "C")) {
+        const code = prompt("Broadcast code:");
+        if (!code) return;
+        if (code === "adminacces.123.321") {
+          adminMode = true;
+          adminPanelBtn.style.display = "inline-block";
+          alert("Admin panel unlocked.");
+        } else if (code === "subzero.owner.123") {
+          ownerMode = true;
+          ownerPanelBtn.style.display = "inline-block";
+          alert("Owner panel unlocked.");
+        } else {
+          alert("Invalid code.");
+        }
+      }
+    });
+
+    singleAddBtn.addEventListener("click", async () => {
+      singleStatus.textContent = "";
+      const name = singleNameInput.value.trim();
+      const rarity = singleRaritySelect.value;
+      const price = parseInt(singlePriceInput.value || "0", 10);
+      const expireStr = singleExpireInput.value;
+      if (!name || !rarity || !price || price <= 0 || !expireStr) {
+        singleStatus.textContent = "Fill name, rarity, price, and expiration date.";
+        return;
+      }
+      const expireTime = new Date(expireStr + "T23:59:59").getTime();
+      if (isNaN(expireTime)) {
+        singleStatus.textContent = "Invalid expiration date.";
+        return;
+      }
+      const id = name.toLowerCase().replace(/\s+/g,"_") + "_" + Date.now();
+      const data = {
+        id,
+        name,
+        rarity,
+        price,
+        expiresAt: expireTime,
+        createdAt: Date.now()
+      };
+      await set(ref(db, "singleShopBlooks/" + id), data);
+      singleStatus.textContent = "Added to shop.";
+      singleNameInput.value = "";
+      singlePriceInput.value = "25";
+      singleExpireInput.value = "";
+    });
+
+    function buildSingleShopList() {
+      singleList.innerHTML = "";
+      const entries = Object.values(singleShopBlooks).sort((a,b)=>a.createdAt-b.createdAt);
+      if (!entries.length) {
+        singleList.textContent = "No special blooks configured.";
+        return;
+      }
+      entries.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "owner-single-item";
+        const left = document.createElement("div");
+        const exp = new Date(item.expiresAt);
+        left.textContent = `${item.name} (${item.rarity}) - ${item.price} coins - until ${exp.toLocaleDateString()}`;
+        const right = document.createElement("button");
+        right.textContent = "Remove";
+        right.style.background = "#e53935";
+        right.style.fontSize = "11px";
+        right.addEventListener("click", async () => {
+          if (!confirm("Remove this shop blook?")) return;
+          await remove(ref(db, "singleShopBlooks/" + item.id));
+        });
+        row.appendChild(left);
+        row.appendChild(right);
+        singleList.appendChild(row);
+      });
+    }
+
+    function buildSpecialShop() {
+      specialShopGrid.innerHTML = "";
+      const now = Date.now();
+      const active = Object.values(singleShopBlooks)
+        .filter(b => b.expiresAt > now)
+        .sort((a,b)=>a.createdAt-b.createdAt);
+      if (!active.length) {
+        specialShopContainer.style.display = "none";
+        return;
+      }
+      specialShopContainer.style.display = "block";
+      active.forEach(item => {
+        registerSingleBlook(item.name, item.rarity);
+        const card = document.createElement("div");
+        card.className = "special-blook-card";
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "special-blook-name";
+        nameEl.textContent = item.name;
+
+        const img = document.createElement("div");
+        img.className = "special-blook-img";
+        img.style.background = rarityColor(item.rarity);
+        img.textContent = item.name;
+
+        const priceEl = document.createElement("div");
+        priceEl.className = "special-blook-price";
+        priceEl.textContent = `${item.price} coins`;
+
+        const exp = new Date(item.expiresAt);
+        const expEl = document.createElement("div");
+        expEl.className = "special-blook-expire";
+        expEl.textContent = `Leaves shop: ${exp.toLocaleDateString()}`;
+
+        const buyBtn = document.createElement("button");
+        buyBtn.textContent = "Buy";
+        buyBtn.style.fontSize = "13px";
+        buyBtn.addEventListener("click", async () => {
+          if (!currentUser || !userData) return;
+          if (Date.now() > item.expiresAt) {
+            alert("This blook has left the shop.");
+            return;
+          }
+          if ((userData.coins || 0) < item.price) {
+            alert("Not enough coins.");
+            return;
+          }
+          userData.coins -= item.price;
+          userData.blooks[item.name] = (userData.blooks[item.name] || 0) + 1;
+          await saveUserData();
+          renderBlooks();
+          populateTradeOfferSelect();
+          alert("Purchased " + item.name + "!");
+        });
+
+        card.appendChild(nameEl);
+        card.appendChild(img);
+        card.appendChild(priceEl);
+        card.appendChild(expEl);
+        card.appendChild(buyBtn);
+        specialShopGrid.appendChild(card);
+      });
+    }
+
+    const WHEEL_INTERVAL = 12 * 60 * 60 * 1000;
+
+    suBtn.addEventListener("click", async () => {
+      suErr.textContent = "";
+      const username = suUser.value.trim();
+      const pass = suPass.value;
+      if (!username || !pass) {
+        suErr.textContent = "Enter username and password.";
+        return;
+      }
+      try {
+        const email = username + "@sublet.fake";
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        await set(userRef(cred.user.uid), {
+          username,
+          coins: 0,
+          blooks: {},
+          lastWheel: 0,
+          nextPackId: null
+        });
+      } catch (err) {
+        suErr.textContent = err.message || "Sign up failed.";
+      }
+    });
+
+    liBtn.addEventListener("click", async () => {
+      liErr.textContent = "";
+      const username = liUser.value.trim();
+      const pass = liPass.value;
+      if (!username || !pass) {
+        liErr.textContent = "Enter username and password.";
+        return;
+      }
+      try {
+        const email = username + "@sublet.fake";
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        liErr.textContent = err.message || "Login failed.";
+      }
+    });
+
+    onAuthStateChanged(auth, async user => {
+      currentUser = user;
+      if (!user) {
+        appEl.style.display = "none";
+        start.style.display = "flex";
+        userData = null;
+        return;
+      }
+      start.style.display = "none";
+      appEl.style.display = "block";
+
+      const snap = await get(userRef(user.uid));
+      if (!snap.exists()) {
+        const email = user.email || "";
+        const uname = (email.split("@")[0] || "user");
+        await set(userRef(user.uid), {
+          username: uname,
+          coins: 0,
+          blooks: {},
+          lastWheel: 0,
+          nextPackId: null
+        });
+      }
+      BLOOK_INFO = groupBlooksByPack();
+      await loadUserData(user.uid);
+
+      const banMsg = await checkBan(userData.username);
+      if (banMsg) {
+        alert(banMsg);
+        await signOut(auth);
+        return;
+      }
+
+      const availSnap = await get(packAvailabilityRef());
+      if (availSnap.exists()) {
+        packAvailability = availSnap.val();
+      } else {
+        packAvailability = {};
+        ALL_PACKS_FOR_OWNER.forEach(p => packAvailability[p.id] = true);
+        await set(packAvailabilityRef(), packAvailability);
+      }
+
+      onValue(singleShopRef(), snap2 => {
+        singleShopBlooks = snap2.exists() ? snap2.val() : {};
+        buildSingleShopList();
+        buildSpecialShop();
+        renderBlooks();
+      });
+
+      buildPacks();
+      buildSpecialShop();
+      showView("market");
+      subscribeIncomingTrades(user.uid);
+      updateWheelButtonState();
+    });
+
+    const floatColors = ["#4caf50","#2196f3","#9c27b0","#ffb300","#81d4fa","#6a1b9a"];
+    for (let i=0;i<6;i++){
+      const d=document.createElement("div");
+      d.className="floating-blook";
+      d.style.background=floatColors[i%floatColors.length];
+      d.style.left=Math.random()*70+15+"%";
+      d.style.top=Math.random()*70+15+"%";
+      d.style.setProperty("--tilt",(Math.random()*10-5)+"deg");
+      d.textContent="Sublet";
+      floatingArea.appendChild(d);
+    }
+  </script>
+</body>
+</html>
+```
