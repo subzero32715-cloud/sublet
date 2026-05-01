@@ -1486,6 +1486,41 @@
       ]
     };
 
+    const ITALIAN_BRAINROT_PACK = {
+      id: "italianbrainrot",
+      name: "Italian Brainrot Pack",
+      color: "linear-gradient(135deg,#009246,#ce2b37)",
+      cost: 25,
+      blooks: [
+        // ── Commons (13–100%) ──
+        { name: "Noobini Pizzanoni",       chance: 18,    rarity: R.COMMON },
+        { name: "Holy Arepa",              chance: 16,    rarity: R.COMMON },
+        { name: "Lirali Larila",           chance: 14,    rarity: R.COMMON },
+        // ── Rares (6–12%) ──
+        { name: "Tim Cheese",              chance: 12,    rarity: R.RARE   },
+        { name: "Trippi Troppi",           chance: 8,     rarity: R.RARE   },
+        { name: "Boneca Ambalabu",         chance: 7,     rarity: R.RARE   },
+        { name: "Cappucino Assassino",     chance: 6,     rarity: R.RARE   },
+        // ── Epics (2–5%) ──
+        { name: "Ta Ta Ta Sahur",          chance: 5,     rarity: R.EPIC   },
+        { name: "Bambini Crossauntini",    chance: 4,     rarity: R.EPIC   },
+        // ── Legendary (0.5–1%) ──
+        { name: "Chimpanzini Bananini",    chance: 1,     rarity: R.LEG    },
+        // ── Chroma (0.01–0.09%) ──
+        { name: "Dragon Cannoli",          chance: 0.07,  rarity: R.CHR    },
+        { name: "67",                      chance: 0.06,  rarity: R.CHR    },
+        { name: "Le Seceret Combanation",  chance: 0.05,  rarity: R.CHR    },
+        { name: "Tung Tung Tung Sahur",    chance: 0.04,  rarity: R.CHR    },
+        { name: "Sammyini Spyerini",       chance: 0.03,  rarity: R.CHR    },
+        // ── Mystical (<0.01%) ──
+        { name: "Hydro Dragon",            chance: 0.009, rarity: R.MYS    },
+        { name: "Strawberry Elephant",     chance: 0.008, rarity: R.MYS    },
+        { name: "Meowl",                   chance: 0.007, rarity: R.MYS    },
+        { name: "Headless Horseman",       chance: 0.006, rarity: R.MYS    },
+        { name: "Skibidi Toilet",          chance: 0.005, rarity: R.MYS    },
+      ]
+    };
+
     const DESSERT_PACK = {
       id:"dessert",
       name:"Dessert Pack",
@@ -1603,6 +1638,8 @@
       ]
     };
 
+    
+
     const EASTER_PACK = {
       id:"easter",
       name:"Easter Pack (Easter weeks)",
@@ -1637,7 +1674,8 @@
       ELEMENT_PACK,
       CANDY_PACK,
       DESSERT_PACK,
-      MUSIC_PACK
+      MUSIC_PACK,
+      ITALIAN_BRAINROT_PACK
     ];
 
     function isMarch() {
@@ -1760,7 +1798,8 @@
         ELEMENT_PACK,
         CANDY_PACK,
         DESSERT_PACK,
-        MUSIC_PACK
+        MUSIC_PACK,
+        ITALIAN_BRAINROT_PACK
       ];
 
       if (isMarch()) arr.push(LUCKY_PACK);
