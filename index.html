@@ -767,8 +767,25 @@
 
         <div id="owner-panel" class="card" style="display:none;">
           <div class="section-title">Owner Panel</div>
-          <div class="section-sub">Toggle packs, manage bans, and configure shop blooks.</div>
+          <div class="section-sub">Full control. Only Subzero32715 has access to this panel.</div>
+
+          <!-- All Players List -->
+          <div class="owner-single-box" style="background:#f3e5f5;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>👥 All Players</strong>
+              <button id="owner-refresh-players" style="font-size:11px;padding:4px 10px;background:#7b1fa2;">↻ Refresh</button>
+            </div>
+            <div style="font-size:11px;color:#666;margin:4px 0 4px;">Green = online (last 2 min) • Red = banned • Grey = offline</div>
+            <div style="font-size:10px;color:#999;margin-bottom:8px;">⚠️ Note: passwords are cryptographically hashed by Firebase — they cannot be read by anyone, including admins or owners. This is standard security.</div>
+            <div id="owner-player-list" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
+              <span style="color:#888;font-size:12px;">Click Refresh to load players.</span>
+            </div>
+          </div>
+
+          <!-- Pack toggles -->
           <div id="owner-pack-list"></div>
+
+          <!-- Single blook shop -->
           <div class="owner-single-box">
             <div><strong>Single Blook in Shop</strong></div>
             <div style="font-size:12px;color:#555;margin-top:2px;">Choose a blook name, rarity, price, and expiration date.</div>
@@ -787,6 +804,8 @@
             <div id="single-status" class="err-small"></div>
             <div class="owner-single-list" id="single-list"></div>
           </div>
+
+          <!-- Ban -->
           <div class="owner-ban-box">
             <div><strong>Ban player</strong></div>
             <div style="font-size:12px;color:#555;margin-top:2px;">Enter username and optional ban duration in hours (0 = permanent).</div>
@@ -797,9 +816,11 @@
             </div>
             <div id="ban-status" class="err-small" style="min-height:18px;"></div>
           </div>
+
+          <!-- Give/Remove Admin -->
           <div class="owner-single-box" style="background:#e8f5e9;margin-top:14px;">
             <div><strong>Give / Remove Admin</strong></div>
-            <div style="font-size:12px;color:#555;margin-top:2px;">Grant or revoke admin access for a player. They must re-login to receive changes.</div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Grant or revoke admin access. Admins do NOT get owner powers. Player must re-login to receive changes.</div>
             <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
               <input id="give-admin-username" type="text" placeholder="username" style="flex:1;min-width:120px;">
               <button id="give-admin-btn" style="background:#43a047;font-size:12px;padding:6px 10px;">Give Admin</button>
@@ -807,16 +828,73 @@
             </div>
             <div id="give-admin-status" class="err-small"></div>
           </div>
+
+          <!-- Global Booster (moved from admin) -->
+          <div class="owner-single-box" style="background:#fff8e1;margin-top:14px;">
+            <div><strong>⚡ Set Global Booster</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Activates a booster for all players for 1 hour.</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+              <select id="owner-booster-mult">
+                <option value="">None / Clear</option>
+                <option value="2">2x</option><option value="3">3x</option>
+                <option value="4">4x</option><option value="5">5x</option>
+              </select>
+              <button id="owner-set-booster-btn" style="background:#f9a825;color:#000;font-size:12px;padding:6px 10px;">Set Booster (1h)</button>
+            </div>
+            <div id="owner-booster-status" class="err-small"></div>
+          </div>
+
+          <!-- Force Live Event (moved from admin) -->
+          <div class="owner-single-box" style="background:#e3f2fd;margin-top:14px;">
+            <div><strong>🎪 Force Live Event</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Override the scheduled event dates.</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+              <select id="owner-force-event">
+                <option value="">None (use real dates)</option>
+                <option value="spring">Spring Egg Hunt</option>
+                <option value="summer">Summer Shell Dive</option>
+                <option value="halloween">Halloween - Contest of Candy</option>
+                <option value="christmas">Christmas - Present Fest</option>
+              </select>
+              <button id="owner-set-event-btn" style="background:#1976d2;font-size:12px;padding:6px 10px;">Set Event</button>
+            </div>
+            <div id="owner-event-status" class="err-small"></div>
+          </div>
+
           <button id="owner-create-news-btn" style="background:#0d47a1;margin-top:10px;">📰 Create News Post</button>
-          <button id="owner-back-btn" style="margin-top:10px;">Back to leaderboard</button>
+
+          <!-- Set coins for any user -->
+          <div class="owner-single-box" style="background:#e3f2fd;margin-top:14px;">
+            <div><strong>💰 Set Coins for Any User</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Set the coin balance of any player (no cap for owner).</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+              <input id="owner-setcoins-username" type="text" placeholder="username" style="flex:1;min-width:120px;">
+              <input id="owner-setcoins-amount" type="number" min="0" value="0" style="width:120px;">
+              <button id="owner-setcoins-btn" style="background:#1976d2;font-size:12px;padding:6px 10px;">Set Coins</button>
+            </div>
+            <div id="owner-setcoins-status" class="err-small"></div>
+          </div>
+
+          <!-- Reset Account -->
+          <div class="owner-single-box" style="background:#ffebee;margin-top:14px;">
+            <div><strong>💀 Reset Player Account</strong></div>
+            <div style="font-size:12px;color:#c62828;margin-top:2px;">⚠️ This permanently wipes all coins, blooks, stats, and progress. Requires 3 confirmations.</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+              <input id="owner-reset-username" type="text" placeholder="username" style="flex:1;min-width:140px;">
+              <button id="owner-reset-btn" style="background:#b71c1c;font-size:12px;padding:6px 10px;">Reset Account</button>
+            </div>
+            <div id="owner-reset-status" class="err-small"></div>
+          </div>
+
+          <button id="owner-back-btn" style="margin-top:14px;">← Back to Leaderboard</button>
         </div>
 
         <div id="admin-panel" class="card">
           <div class="section-title">Admin Panel</div>
-          <div class="section-sub">Set coins, give blooks, control next pack open, and boosters/rarity.</div>
+          <div class="section-sub">Set coins (max 1,000,000 at a time), give blooks, and control next pack open.</div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:12px;">Set coins for current user</label>
-            <input id="admin-coins" type="number" min="0" value="0">
+            <label style="font-size:12px;">Set coins for current user (max 1,000,000)</label>
+            <input id="admin-coins" type="number" min="0" max="1000000" value="0">
             <button id="admin-set-coins">Set</button>
           </div>
           <div style="margin-bottom:10px;">
@@ -840,26 +918,8 @@
             </select>
             <button id="admin-set-next-rarity-btn">Set rarity</button>
           </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:12px;">Set booster for current user</label>
-            <select id="admin-booster-mult">
-              <option value="">None</option><option value="2">2x</option>
-              <option value="3">3x</option><option value="4">4x</option><option value="5">5x</option>
-            </select>
-            <button id="admin-set-booster-btn">Set booster (1h)</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:12px;">Force-activate a live event</label><br>
-            <select id="admin-force-event" style="margin-top:4px;">
-              <option value="">None (use real dates)</option>
-              <option value="spring">Spring Egg Hunt</option>
-              <option value="summer">Summer Shell Dive</option>
-              <option value="halloween">Halloween - Contest of Candy</option>
-              <option value="christmas">Christmas - Present Fest</option>
-            </select>
-            <button id="admin-set-event-btn" style="margin-left:6px;">Set Event</button>
-          </div>
           <button id="admin-create-news-btn" style="background:#0d47a1;margin-bottom:8px;">📰 Create News Post</button>
+          <button id="admin-clear-news-btn" style="background:#b71c1c;margin-bottom:8px;font-size:12px;padding:6px 12px;">🗑 Clear All News</button>
           <div style="margin-top:10px;padding:10px;border-radius:10px;background:#e8f5e9;">
             <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:#1b5e20;">👥 Online Players</div>
             <div style="font-size:11px;color:#555;margin-bottom:6px;">Players active in the last 2 minutes and what area they're in.</div>
@@ -1661,12 +1721,12 @@
       if(name==="chat"&&!chatLoaded) subscribeChat();
       if(name==="stats") refreshStatsView();
       if(name==="boosters") refreshBoosterView();
+      if(name==="owner") buildOwnerPanel();
     }
 
     navBtns.forEach(btn=>{
       btn.addEventListener("click",()=>{
         const v=btn.dataset.view;
-        if(v==="leaderboard"&&ownerPanel.style.display==="flex") return;
         showView(v);
       });
     });
@@ -2060,12 +2120,29 @@
       });
     }
 
+    // ── Profanity filter ──
+    const BAD_WORDS = ["fuck","shit","bitch","asshole","ass","cunt","dick","pussy","nigger","nigga","fag","faggot","retard","bastard","damn","crap","piss","cock","whore","slut","motherfucker","fucker","bullshit"];
+    function containsBadWord(text){
+      const lower = text.toLowerCase().replace(/[^a-z0-9\s]/g,"");
+      return BAD_WORDS.some(w => {
+        const re = new RegExp("\\b"+w+"\\b");
+        return re.test(lower);
+      });
+    }
+
     chatSend.addEventListener("click",async()=>{
       if(!currentUser||!userData) return;
       const now=Date.now();
       if(now<chatBanUntil){alert("You are banned from chat for a bit. Please wait.");return;}
       if(now-lastChatTime<2000){chatBanUntil=now+30000;alert("You chatted too fast. Chat banned for 30 seconds.");return;}
       const text=chatInput.value.trim(); if(!text) return;
+      // Profanity check — permanent account ban
+      if(containsBadWord(text)){
+        await set(ref(db,"bans/"+userKey(userData.username||"")),{permanent:true,until:0,reason:"Profanity in chat"});
+        alert("You have been permanently banned for using profanity in chat.");
+        await signOut(auth);
+        return;
+      }
       lastChatTime=now;
       const msgRef=push(chatRef());
       await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now()});
@@ -2113,7 +2190,6 @@
       const bans=bansSnap.exists()?bansSnap.val():{};
       const players=Object.values(all)
         .filter(u=>{
-          // Filter out permanently banned users from leaderboard
           const key=userKey(u.username||"");
           const ban=bans[key];
           if(!ban) return true;
@@ -2121,14 +2197,79 @@
           if(ban.until&&Date.now()<ban.until) return false;
           return true;
         })
-        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); return{username:u.username||"?",coins:u.coins||0,totalBlooks}; });
+        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); return{username:u.username||"?",coins:u.coins||0,totalBlooks,isOwner:!!u.isOwner,isAdmin:!!u.isAdmin}; });
       const byCoins=[...players].sort((a,b)=>b.coins-a.coins).slice(0,20);
       leaderboardList.innerHTML="";
-      byCoins.forEach((p,i)=>{ const row=document.createElement("div"); row.className="lb-entry"; const left=document.createElement("div"); left.className="lb-name"; left.textContent=`${i+1}. ${p.username}`; const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`; row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row); });
+      byCoins.forEach((p,i)=>{
+        const row=document.createElement("div"); row.className="lb-entry";
+        const left=document.createElement("div"); left.className="lb-name";
+        let tag="";
+        if(p.isOwner) tag=` <span style="background:#7b1fa2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">👑 owner</span>`;
+        else if(p.isAdmin) tag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">⚡ admin</span>`;
+        left.innerHTML=`${i+1}. ${p.username}${tag}`;
+        const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
+        row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row);
+      });
       ownerPanelBtn.style.display=ownerMode?"inline-block":"none";
     }
 
+    async function loadOwnerPlayerList(){
+      const listEl=document.getElementById("owner-player-list"); if(!listEl) return;
+      listEl.innerHTML="<span style='color:#888;font-size:12px;'>Loading...</span>";
+      const [usersSnap,bansSnap,presenceSnap]=await Promise.all([get(usersRef()),get(bansRef()),get(ref(db,"presence"))]);
+      if(!usersSnap.exists()){listEl.innerHTML="<span style='color:#888;font-size:12px;'>No players found.</span>";return;}
+      const allUsers=usersSnap.val();
+      const bans=bansSnap.exists()?bansSnap.val():{};
+      const presence=presenceSnap.exists()?presenceSnap.val():{};
+      const now=Date.now();
+      listEl.innerHTML="";
+      const players=Object.values(allUsers).sort((a,b)=>(a.username||"").localeCompare(b.username||""));
+      players.forEach(u=>{
+        const uname=u.username||"?";
+        const key=userKey(uname);
+        const ban=bans[key];
+        const isBanned=ban&&(ban.permanent||(ban.until&&now<ban.until));
+        const pres=Object.values(presence).find(p=>p.username&&p.username.toLowerCase()===uname.toLowerCase());
+        const isOnline=pres&&(now-pres.lastSeen<120000);
+        const row=document.createElement("div");
+        row.style.cssText="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:#fff;font-size:12px;";
+        // Status dot
+        const dot=document.createElement("span");
+        dot.style.cssText=`width:9px;height:9px;border-radius:50%;flex-shrink:0;background:${isBanned?"#e53935":isOnline?"#43a047":"#bdbdbd"};`;
+        // Name + role tags
+        const nameSpan=document.createElement("span");
+        nameSpan.style.flex="1";
+        let roleTag="";
+        if(u.isOwner) roleTag=` <span style="background:#7b1fa2;color:#fff;border-radius:999px;font-size:9px;padding:1px 5px;">👑</span>`;
+        else if(u.isAdmin) roleTag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:9px;padding:1px 5px;">⚡</span>`;
+        nameSpan.innerHTML=uname+roleTag;
+        // Status label
+        const statusSpan=document.createElement("span");
+        statusSpan.style.cssText="font-size:10px;color:#888;";
+        if(isBanned) statusSpan.textContent=ban.permanent?"Perm ban":"Temp ban";
+        else if(isOnline) statusSpan.textContent="Online";
+        else statusSpan.textContent="Offline";
+        row.appendChild(dot); row.appendChild(nameSpan); row.appendChild(statusSpan);
+        // Unban button
+        if(isBanned){
+          const unbanBtn=document.createElement("button");
+          unbanBtn.textContent="Unban"; unbanBtn.style.cssText="background:#43a047;font-size:10px;padding:2px 8px;";
+          unbanBtn.addEventListener("click",async()=>{
+            if(!confirm("Unban "+uname+"?")) return;
+            await remove(ref(db,"bans/"+key));
+            unbanBtn.textContent="✓ Unbanned"; unbanBtn.disabled=true;
+            dot.style.background="#bdbdbd"; statusSpan.textContent="Offline";
+          });
+          row.appendChild(unbanBtn);
+        }
+        listEl.appendChild(row);
+      });
+    }
+
+    document.getElementById("owner-refresh-players").addEventListener("click",loadOwnerPlayerList);
+
     function buildOwnerPanel(){
+      loadOwnerPlayerList();
       ownerPackList.innerHTML="";
       ALL_PACKS_FOR_OWNER.forEach(pack=>{
         const row=document.createElement("div"); row.className="owner-pack-row";
@@ -2182,7 +2323,7 @@
 
     // ── Check pending reports (for admins/owners) ──
     async function checkPendingReports(){
-      if(!ownerMode&&!adminMode) return;
+      if(!ownerMode) return;  // Only owners see reports
       const snap=await get(reportsRef());
       if(!snap.exists()) return;
       const all=snap.val();
@@ -2246,16 +2387,42 @@
       setTimeout(async()=>{ userData.coins=(parseInt(userData.coins,10)||0)+reward; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+reward; userData.lastWheel=Date.now(); await saveUserData(); wheelCenter.textContent=reward.toLocaleString(); wheelStatus.textContent="You won "+reward.toLocaleString()+" coins!"; wheelSpinBtn.style.display="none"; updateWheelButtonState(); },2000);
     });
 
-    ownerPanelBtn.addEventListener("click",()=>{ if(!ownerMode) return; buildOwnerPanel(); ownerPanel.style.display="flex"; viewLeaderboard.style.display="none"; });
-    ownerBackBtn.addEventListener("click",()=>{ ownerPanel.style.display="none"; showView("leaderboard"); });
+    ownerPanelBtn.addEventListener("click",()=>{ if(!ownerMode) return; showView("owner"); });
+    ownerBackBtn.addEventListener("click",()=>{ showView("leaderboard"); });
 
-    adminSetCoinsBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const v=parseInt(adminCoinsInput.value||"0",10); if(isNaN(v)||v<0){adminStatus.textContent="Invalid coin amount.";return;} userData.coins=v; await saveUserData(); adminStatus.textContent="Coins set."; });
+    adminSetCoinsBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; let v=parseInt(adminCoinsInput.value||"0",10); if(isNaN(v)||v<0){adminStatus.textContent="Invalid coin amount.";return;} if(v>1000000){adminStatus.textContent="Max 1,000,000 coins at a time.";adminCoinsInput.value=1000000;return;} userData.coins=v; await saveUserData(); adminStatus.textContent="Coins set to "+v.toLocaleString()+"."; });
     adminGiveBlookBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const name=adminBlookNameInput.value.trim(); const amt=parseInt(adminBlookAmountInput.value||"1",10); if(!name){adminStatus.textContent="Enter a blook name.";return;} if(!BLOOK_INFO[name]){adminStatus.textContent="Unknown blook name.";return;} if(!amt||amt<=0){adminStatus.textContent="Invalid amount.";return;} userData.blooks[name]=(userData.blooks[name]||0)+amt; await saveUserData(); renderBlooks(); populateTradeOfferSelect(); adminStatus.textContent=`Gave ${amt}x ${name}.`; });
     adminSetNextPackBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const id=adminNextPackIdInput.value.trim(); if(id&&!getPackById(id)){adminStatus.textContent="Unknown pack id.";return;} userData.nextPackId=id||null; await saveUserData(); adminStatus.textContent=id?`Next pack forced to ${id}.`:"Next pack cleared."; });
     adminSetNextRarityBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const r=adminNextRaritySelect.value; if(r&&!RARITY_BASE_WEIGHTS[r]){adminStatus.textContent="Unknown rarity.";return;} userData.nextForcedRarity=r||null; await saveUserData(); adminStatus.textContent=r?`Next rarity forced to ${r}.`:"Next rarity cleared."; });
-    adminSetBoosterBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const v=adminBoosterMultSelect.value; if(!v){userData.activeBooster=null;await saveUserData();adminStatus.textContent="Booster cleared.";return;} const mult=parseInt(v,10); const expiresAt=Date.now()+60*60*1000;
-      await set(ref(db,"globalBooster"),{multiplier:mult,expiresAt,buyerName:userData.username||"admin"});
-      adminStatus.textContent=`Global booster set to ${mult}x for 1 hour.`; });
+    adminSetBoosterBtn?.addEventListener("click",async()=>{ adminStatus.textContent="Booster controls moved to Owner Panel."; });
+
+    document.getElementById("admin-set-event-btn")?.addEventListener("click",()=>{ adminStatus.textContent="Event controls moved to Owner Panel."; });
+
+    // ── Owner booster control ──
+    document.getElementById("owner-set-booster-btn").addEventListener("click",async()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("owner-booster-status"); statusEl.textContent="";
+      const v=document.getElementById("owner-booster-mult").value;
+      if(!v){
+        await remove(ref(db,"globalBooster"));
+        statusEl.textContent="Global booster cleared."; return;
+      }
+      const mult=parseInt(v,10); const expiresAt=Date.now()+60*60*1000;
+      await set(ref(db,"globalBooster"),{multiplier:mult,expiresAt,buyerName:userData.username||"owner"});
+      statusEl.textContent=`Global ${mult}x booster set for 1 hour!`;
+    });
+
+    // ── Owner force event control ──
+    document.getElementById("owner-set-event-btn").addEventListener("click",()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("owner-event-status"); statusEl.textContent="";
+      const val=document.getElementById("owner-force-event").value;
+      adminForcedEventId=val||null;
+      statusEl.textContent=val?"Event forced to: "+val:"Event force cleared.";
+      const activeEv=getActiveEvent(); const nb=document.getElementById("event-nav-btn");
+      if(nb){ if(activeEv){nb.style.display="";nb.textContent=activeEv.emoji+" "+activeEv.name;}else{nb.style.display="none";} }
+    });
+
     adminPanelBtn.addEventListener("click",()=>{ if(!adminMode) return; showView("admin"); });
 
     document.addEventListener("keydown",async e=>{
@@ -2422,7 +2589,7 @@
       // Show welcome broadcast for new users
       if(isNewUser) setTimeout(()=>showWelcomeBroadcast(userData.username||"new player"),800);
       // Check pending reports for admins/owners (with a short delay)
-      if(adminMode||ownerMode) setTimeout(()=>checkPendingReports(),1500);
+      if(ownerMode) setTimeout(()=>checkPendingReports(),1500);
     });
 
     function calcStatsFromData(data){
@@ -2607,14 +2774,7 @@
       modal.style.display="flex"; document.getElementById("erm-close").onclick=()=>{modal.style.display="none";renderBlooks();};
     }
 
-    document.getElementById("admin-set-event-btn").addEventListener("click",()=>{
-      if(!adminMode) return;
-      const val=document.getElementById("admin-force-event").value;
-      adminForcedEventId=val||null;
-      document.getElementById("admin-status").textContent=val?"Event forced to: "+val:"Event force cleared.";
-      const activeEv=getActiveEvent(); const nb=document.getElementById("event-nav-btn");
-      if(nb){ if(activeEv){nb.style.display="";nb.textContent=activeEv.emoji+" "+activeEv.name;}else{nb.style.display="none";} }
-    });
+    // (event control moved to owner panel)
 
     // ══════════════════════════════════════════════════════════════
     // NEWS SYSTEM
@@ -2699,6 +2859,77 @@
     function wireCreateNewsBtn(id){ const btn=document.getElementById(id); if(btn) btn.addEventListener("click",openNewsEditor); }
     wireCreateNewsBtn("owner-create-news-btn");
     wireCreateNewsBtn("admin-create-news-btn");
+
+    // ── Admin: Clear All News ──
+    document.getElementById("admin-clear-news-btn").addEventListener("click",async()=>{
+      if(!adminMode&&!ownerMode) return;
+      if(!confirm("Clear ALL news posts? This cannot be undone.")) return;
+      await remove(newsRef());
+      adminStatus.textContent="All news cleared.";
+      if(document.getElementById("view-news").style.display!=="none") loadNews();
+    });
+
+    // ── Owner: Set coins for any user ──
+    document.getElementById("owner-setcoins-btn").addEventListener("click",async()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("owner-setcoins-status"); statusEl.textContent=""; statusEl.style.color="#c62828";
+      const uname=document.getElementById("owner-setcoins-username").value.trim();
+      const amount=parseInt(document.getElementById("owner-setcoins-amount").value||"0",10);
+      if(!uname){statusEl.textContent="Enter a username.";return;}
+      if(isNaN(amount)||amount<0){statusEl.textContent="Enter a valid coin amount.";return;}
+      const found=await findUserByUsername(uname);
+      if(!found){statusEl.textContent="User not found.";return;}
+      await update(userRef(found.uid),{coins:amount});
+      statusEl.style.color="#2e7d32";
+      statusEl.textContent=`Set ${uname}'s coins to ${amount.toLocaleString()}.`;
+    });
+
+    // ── Owner: Reset account (3 confirmations) ──
+    document.getElementById("owner-reset-btn").addEventListener("click",async()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("owner-reset-status"); statusEl.textContent=""; statusEl.style.color="#c62828";
+      const uname=document.getElementById("owner-reset-username").value.trim();
+      if(!uname){statusEl.textContent="Enter a username.";return;}
+      const found=await findUserByUsername(uname);
+      if(!found){statusEl.textContent="User not found.";return;}
+      // 3 confirmations
+      if(!confirm(`⚠️ RESET ACCOUNT: Are you sure you want to reset "${uname}"?\n\nThis will delete ALL their blooks, coins, stats, and progress. This CANNOT be undone.\n\nClick OK to continue.`)) return;
+      if(!confirm(`⚠️ SECOND CONFIRMATION: You are about to permanently wipe all data for "${uname}".\n\nAre you absolutely sure?`)) return;
+      if(!confirm(`⚠️ FINAL CONFIRMATION: Type this in your head: "I am permanently resetting ${uname}'s account."\n\nClick OK only if you are 100% sure.`)) return;
+      // Perform reset
+      await set(userRef(found.uid),{
+        username:found.data.username,
+        coins:0,
+        blooks:{},
+        lastWheel:0,
+        nextPackId:null,
+        totalCoinsCollected:0,
+        totalPacksOpened:0,
+        nextForcedRarity:null,
+        activeBooster:null,
+        isAdmin:false,
+        isOwner:false,
+        checkedEventResults:{}
+      });
+      // Also clear their event data
+      try{ await remove(ref(db,"liveEvents/spring/players/"+found.uid)); }catch(e){}
+      try{ await remove(ref(db,"liveEvents/summer/players/"+found.uid)); }catch(e){}
+      try{ await remove(ref(db,"liveEvents/halloween/players/"+found.uid)); }catch(e){}
+      try{ await remove(ref(db,"liveEvents/christmas/players/"+found.uid)); }catch(e){}
+      // Also remove their bazaar listings
+      try{
+        const bzSnap=await get(bazaarRef());
+        if(bzSnap.exists()){
+          const listings=Object.values(bzSnap.val()).filter(l=>l.sellerUid===found.uid);
+          for(const l of listings) await remove(ref(db,"bazaar/"+l.id));
+        }
+      }catch(e){}
+      statusEl.style.color="#2e7d32";
+      statusEl.textContent=`"${uname}"'s account has been fully reset.`;
+      document.getElementById("owner-reset-username").value="";
+      // Refresh player list
+      loadOwnerPlayerList();
+    });
 
     // Monthly chat reset
     async function checkMonthlyChatReset(){
