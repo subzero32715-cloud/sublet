@@ -558,6 +558,7 @@
         <button class="nav" data-view="bazaar">🛒 Bazaar</button>
         <button class="nav" data-view="news">📰 News</button>
         <button class="nav" data-view="giveaway">🎉 Giveaways</button>
+        <button class="nav" data-view="joingame">🕹️ Join Game</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
         <button id="owner-panel-btn">Owner panel</button>
@@ -570,6 +571,7 @@
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <button id="daily-wheel-btn" style="font-size:12px;padding:6px 10px;">Daily Wheel</button>
+            <button id="host-game-btn" style="font-size:12px;padding:6px 10px;background:#e65100;">🎮 Host Game</button>
             <button id="admin-panel-btn" style="display:none;font-size:12px;padding:6px 10px;">Admin</button>
             <button id="signout-btn" style="background:#ef5350;font-size:12px;padding:6px 10px;">Sign Out</button>
           </div>
@@ -682,6 +684,16 @@
         </div>
 
         <!-- Settings View -->
+        <div id="view-joingame" class="card" style="display:none;">
+          <div class="section-title">🕹️ Join Game</div>
+          <div class="section-sub">Enter a 6-digit code to join an active game.</div>
+          <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+            <input id="join-game-code" placeholder="000000" maxlength="6" style="font-size:28px;font-weight:700;width:160px;text-align:center;letter-spacing:4px;border:2px solid #1976d2;border-radius:10px;padding:8px;">
+            <button id="join-game-btn" style="background:#e65100;font-size:15px;padding:10px 24px;">Join →</button>
+          </div>
+          <div id="join-game-err" class="err-small"></div>
+        </div>
+
         <div id="view-settings" class="card" style="display:none;">
           <div class="section-title">⚙️ Settings</div>
           <div class="section-sub">Manage your account settings.</div>
@@ -898,10 +910,9 @@
             <button id="admin-set-coins">Set</button>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:12px;">Give blook to current user</label>
+            <label style="font-size:12px;">Give blook to current user (gives 1 only)</label>
             <input id="admin-blook-name" placeholder="Blook name">
-            <input id="admin-blook-amount" type="number" min="1" value="1">
-            <button id="admin-give-blook">Give</button>
+            <button id="admin-give-blook">Give 1</button>
           </div>
           <div style="margin-bottom:10px;">
             <label style="font-size:12px;">Set next pack to open (id)</label>
@@ -997,6 +1008,97 @@
     <div id="trade-popup-buttons">
       <button id="trade-popup-accept" style="background:#43a047;">Accept</button>
       <button id="trade-popup-decline" style="background:#e53935;">Decline</button>
+    </div>
+  </div>
+
+  <!-- ══════════ GAME SYSTEM OVERLAYS ══════════ -->
+
+  <!-- Host: Choose Gamemode -->
+  <div id="game-mode-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;">
+    <div style="background:#fff;border-radius:20px;padding:28px;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.4);">
+      <div style="font-family:'Titan One',system-ui;font-size:22px;color:#e65100;margin-bottom:6px;">🎮 Host a Game</div>
+      <div style="font-size:13px;color:#666;margin-bottom:18px;">Choose a gamemode to host.</div>
+      <div id="gamemode-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <button id="gamemode-cancel-btn" style="background:#78909c;margin-top:14px;width:100%;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Host: Game Settings -->
+  <div id="game-settings-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;">
+    <div style="background:#fff;border-radius:20px;padding:28px;width:380px;box-shadow:0 8px 30px rgba(0,0,0,.4);">
+      <div style="font-family:'Titan One',system-ui;font-size:20px;color:#e65100;margin-bottom:4px;" id="gs-title">Gold Rush Settings</div>
+      <div style="font-size:12px;color:#666;margin-bottom:16px;">Configure your game.</div>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Max Duration (1–30 minutes)</label>
+      <input id="gs-duration" type="number" min="1" max="30" value="10" style="width:100%;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <input id="gs-random-names" type="checkbox">
+        <label for="gs-random-names" style="font-size:13px;">Use random usernames (hide real names)</label>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="gs-back-btn" style="background:#78909c;flex:1;">← Back</button>
+        <button id="gs-host-btn" style="background:#e65100;flex:2;">Host Game →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-screen Game UI (host + player) -->
+  <div id="game-screen" style="position:fixed;inset:0;background:#e0f4ff;display:none;flex-direction:column;z-index:300;color:#123;font-family:system-ui,sans-serif;">
+    <!-- Game top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:#b3e5ff;border-bottom:3px solid #0d47a1;box-shadow:0 2px 10px rgba(0,0,0,.1);">
+      <div style="display:flex;align-items:center;gap:18px;">
+        <span id="gs-gamemode-label" style="font-family:'Titan One',system-ui;font-size:26px;color:#0d47a1;"></span>
+        <span id="gs-code-label" style="font-size:16px;background:rgba(13,71,161,.12);border-radius:10px;padding:6px 16px;letter-spacing:4px;font-weight:700;color:#0d47a1;border:2px solid rgba(13,71,161,.25);"></span>
+        <span id="gs-timer-label" style="font-size:16px;color:#c62828;font-weight:700;"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="gs-player-count" style="font-size:13px;color:#456;"></span>
+        <button id="gs-start-btn" style="background:#43a047;color:#fff;font-size:18px;font-weight:700;padding:12px 36px;border-radius:12px;display:none;box-shadow:0 4px 12px rgba(67,160,71,.4);">▶ Start Game</button>
+        <div id="gs-status-pill" style="font-size:13px;background:rgba(13,71,161,.12);border-radius:999px;padding:5px 16px;color:#0d47a1;font-weight:600;border:1px solid rgba(13,71,161,.2);"></div>
+      </div>
+    </div>
+
+    <!-- Game body: leaderboard left (hidden until started), action right -->
+    <div style="display:flex;flex:1;min-height:0;gap:0;">
+      <!-- Leaderboard — hidden in lobby, shown when playing -->
+      <div id="game-lb-panel" style="width:320px;background:#cce8ff;border-right:2px solid rgba(13,71,161,.2);display:none;flex-direction:column;padding:16px;">
+        <div style="font-family:'Titan One',system-ui;font-size:18px;color:#0d47a1;margin-bottom:12px;">🏆 Leaderboard</div>
+        <div id="game-leaderboard" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <!-- Main interaction area -->
+      <div id="game-action-area" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#e0f4ff;"></div>
+    </div>
+  </div>
+
+  <!-- Player: Blook picker (shown after joining, before game starts) -->
+  <div id="blook-picker-screen" style="position:fixed;inset:0;background:#e0f4ff;display:none;flex-direction:column;z-index:300;color:#123;">
+    <div style="padding:18px 24px;background:#b3e5ff;border-bottom:3px solid #0d47a1;">
+      <div style="font-family:'Titan One',system-ui;font-size:22px;color:#0d47a1;">Choose Your Blook</div>
+      <div style="font-size:13px;color:#456;margin-top:2px;">Pick the blook that will represent you. Grayed out = already taken.</div>
+      <div id="blook-picker-game-info" style="font-size:14px;color:#0d47a1;font-weight:700;margin-top:4px;"></div>
+    </div>
+    <div id="blook-picker-grid" style="flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(10,1fr);gap:8px;align-content:start;"></div>
+    <div style="padding:14px 24px;background:#b3e5ff;border-top:2px solid rgba(13,71,161,.2);display:flex;align-items:center;justify-content:space-between;">
+      <span id="blook-picker-selected" style="font-size:14px;color:#0d47a1;font-weight:600;">No blook selected</span>
+      <button id="blook-picker-confirm-btn" disabled style="background:#43a047;color:#fff;font-size:15px;padding:10px 28px;border-radius:10px;">Confirm →</button>
+    </div>
+  </div>
+
+  <!-- End screen -->
+  <div id="game-end-screen" style="position:fixed;inset:0;background:#e0f4ff;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:400;color:#123;">
+    <div style="font-family:'Titan One',system-ui;font-size:42px;color:#0d47a1;margin-bottom:6px;text-shadow:2px 2px 0 #fff;" id="ges-title">Game Over!</div>
+    <div style="font-size:16px;color:#456;margin-bottom:28px;" id="ges-game-name"></div>
+    <!-- Big Podium -->
+    <div id="ges-podium" style="display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:28px;"></div>
+    <div id="ges-your-place" style="font-size:18px;color:#0d47a1;font-weight:700;margin-bottom:28px;background:rgba(13,71,161,.1);border-radius:12px;padding:10px 28px;"></div>
+    <button id="ges-leave-btn" style="background:#0d47a1;color:#fff;font-size:16px;font-weight:700;padding:12px 40px;border-radius:12px;box-shadow:0 4px 14px rgba(13,71,161,.3);">Leave Game</button>
+  </div>
+
+  <!-- Steal target picker (Gold Rush) -->
+  <div id="steal-picker-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:500;">
+    <div style="background:#e0f4ff;border-radius:16px;padding:20px;width:340px;border:3px solid #0d47a1;box-shadow:0 8px 24px rgba(0,0,0,.25);">
+      <div style="font-family:'Titan One',system-ui;font-size:18px;color:#0d47a1;margin-bottom:12px;" id="steal-title">Choose a player to steal from</div>
+      <div id="steal-player-list" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;"></div>
+      <button id="steal-cancel-btn" style="background:#78909c;margin-top:12px;width:100%;font-size:13px;">Cancel</button>
     </div>
   </div>
 
@@ -2391,7 +2493,7 @@
     ownerBackBtn.addEventListener("click",()=>{ showView("leaderboard"); });
 
     adminSetCoinsBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; let v=parseInt(adminCoinsInput.value||"0",10); if(isNaN(v)||v<0){adminStatus.textContent="Invalid coin amount.";return;} if(v>1000000){adminStatus.textContent="Max 1,000,000 coins at a time.";adminCoinsInput.value=1000000;return;} userData.coins=v; await saveUserData(); adminStatus.textContent="Coins set to "+v.toLocaleString()+"."; });
-    adminGiveBlookBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const name=adminBlookNameInput.value.trim(); const amt=parseInt(adminBlookAmountInput.value||"1",10); if(!name){adminStatus.textContent="Enter a blook name.";return;} if(!BLOOK_INFO[name]){adminStatus.textContent="Unknown blook name.";return;} if(!amt||amt<=0){adminStatus.textContent="Invalid amount.";return;} userData.blooks[name]=(userData.blooks[name]||0)+amt; await saveUserData(); renderBlooks(); populateTradeOfferSelect(); adminStatus.textContent=`Gave ${amt}x ${name}.`; });
+    adminGiveBlookBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const name=adminBlookNameInput.value.trim(); if(!name){adminStatus.textContent="Enter a blook name.";return;} if(!BLOOK_INFO[name]){adminStatus.textContent="Unknown blook name.";return;} userData.blooks[name]=(userData.blooks[name]||0)+1; await saveUserData(); renderBlooks(); populateTradeOfferSelect(); adminStatus.textContent=`Gave 1x ${name}.`; });
     adminSetNextPackBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const id=adminNextPackIdInput.value.trim(); if(id&&!getPackById(id)){adminStatus.textContent="Unknown pack id.";return;} userData.nextPackId=id||null; await saveUserData(); adminStatus.textContent=id?`Next pack forced to ${id}.`:"Next pack cleared."; });
     adminSetNextRarityBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const r=adminNextRaritySelect.value; if(r&&!RARITY_BASE_WEIGHTS[r]){adminStatus.textContent="Unknown rarity.";return;} userData.nextForcedRarity=r||null; await saveUserData(); adminStatus.textContent=r?`Next rarity forced to ${r}.`:"Next rarity cleared."; });
     adminSetBoosterBtn?.addEventListener("click",async()=>{ adminStatus.textContent="Booster controls moved to Owner Panel."; });
@@ -2956,9 +3058,15 @@
       const statusEl=document.getElementById("give-admin-status");
       if(!uname){statusEl.textContent="Enter a username.";return;}
       const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
-      if(!confirm("Remove admin from "+uname+"?")) return;
+      if(!confirm("Remove admin from "+uname+"? They will lose all admin access immediately on their next login.")) return;
       await update(userRef(found.uid),{isAdmin:false});
-      statusEl.textContent="Admin removed from "+uname+".";
+      // If this user is currently logged in on this session, revoke immediately
+      if(currentUser&&found.uid===currentUser.uid){
+        adminMode=false;
+        adminPanelBtn.style.display="none";
+        if(adminPanel.style.display!=="none") showView("market");
+      }
+      statusEl.textContent="Admin removed from "+uname+". Their Ctrl+A access is revoked on re-login.";
     });
 
     async function sendWelcomeMessage(username){
@@ -3090,10 +3198,13 @@
 
     document.getElementById("admin-refresh-online").addEventListener("click",loadAdminOnlinePlayers);
 
-    // Patch showView to update presence
+    // Patch showView to update presence and handle joingame
     const _origShowView = showView;
     showView = function(name){
       _origShowView(name);
+      // Show/hide joingame view
+      const vJoin=document.getElementById("view-joingame");
+      if(vJoin) vJoin.style.display=name==="joingame"?"flex":"none";
       updatePresence(name);
       if(name==="admin") loadAdminOnlinePlayers();
     };
@@ -3336,6 +3447,500 @@
     // ══════════════════════════════════════════════════════════════
     // END GIVEAWAY SYSTEM
     // ══════════════════════════════════════════════════════════════
+
+    // ══════════════════════════════════════════════════════════════
+    // GAME SYSTEM
+    // ══════════════════════════════════════════════════════════════
+    const gamesDbRef = () => ref(db, "games");
+    const gameCounterRef = () => ref(db, "gameCounter");
+
+    // Gamemodes definition
+    const GAMEMODES = [
+      {
+        id: "goldrush",
+        name: "Gold Rush",
+        emoji: "⛏️",
+        color: "#f9a825",
+        desc: "Click chests to earn gold. Watch out for traps!"
+      }
+    ];
+
+    // Random name pool for anonymous mode
+    const RANDOM_NAMES = ["Shadow Fox","Neon Tiger","Blaze Wolf","Storm Hawk","Iron Bear","Pixel Cat","Void Shark","Frost Eagle","Dark Panda","Lime Gecko","Ruby Drake","Cobalt Elk","Ghost Lynx","Solar Crow","Ember Mole"];
+
+    let currentGame = null;     // { id, code, mode, hostUid, players, status, startedAt, endsAt, ... }
+    let gameRole = null;        // "host" | "player"
+    let myGameData = null;      // local player state (gold etc.)
+    let gameTimerInterval = null;
+    let gameLbInterval = null;
+    let selectedBlook = null;
+    let stealCallback = null;
+    let gameDbUnsubscribe = null;
+
+    // ── Format game code ──
+    function formatCode(n){ return String(n).padStart(6,"0"); }
+
+    // ── Get next game code from Firebase counter ──
+    async function getNextGameCode(){
+      const snap = await get(gameCounterRef());
+      const next = (snap.exists() ? snap.val() : 0) + 1;
+      await set(gameCounterRef(), next);
+      return formatCode(next);
+    }
+
+    // ── Hide sidebar + topbar ──
+    function hideShell(){ document.querySelector(".shell").style.display="none"; }
+    function showShell(){ document.querySelector(".shell").style.display="grid"; }
+
+    // ── Update showView to handle joingame ──
+    // (patched below in _origShowView wrapper)
+
+    // ── Build gamemode picker ──
+    document.getElementById("host-game-btn").addEventListener("click",()=>{
+      if(!currentUser||!userData){alert("Log in first.");return;}
+      const list = document.getElementById("gamemode-list");
+      list.innerHTML = "";
+      GAMEMODES.forEach(gm=>{
+        const btn = document.createElement("button");
+        btn.style.cssText=`background:${gm.color};color:#000;font-size:15px;font-weight:700;padding:14px 18px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:10px;`;
+        btn.innerHTML=`<span style="font-size:24px">${gm.emoji}</span><div><div style="font-size:16px">${gm.name}</div><div style="font-size:12px;font-weight:400;opacity:.75">${gm.desc}</div></div>`;
+        btn.addEventListener("click",()=>{
+          document.getElementById("game-mode-overlay").style.display="none";
+          document.getElementById("gs-title").textContent=gm.name+" Settings";
+          document.getElementById("game-settings-overlay").style.display="flex";
+          document.getElementById("game-settings-overlay").dataset.mode=gm.id;
+        });
+        list.appendChild(btn);
+      });
+      document.getElementById("game-mode-overlay").style.display="flex";
+    });
+
+    document.getElementById("gamemode-cancel-btn").addEventListener("click",()=>{ document.getElementById("game-mode-overlay").style.display="none"; });
+    document.getElementById("gs-back-btn").addEventListener("click",()=>{
+      document.getElementById("game-settings-overlay").style.display="none";
+      document.getElementById("game-mode-overlay").style.display="flex";
+    });
+
+    document.getElementById("gs-host-btn").addEventListener("click",async()=>{
+      const modeId = document.getElementById("game-settings-overlay").dataset.mode;
+      const duration = Math.max(1,Math.min(30,parseInt(document.getElementById("gs-duration").value||"10",10)));
+      const randomNames = document.getElementById("gs-random-names").checked;
+      document.getElementById("game-settings-overlay").style.display="none";
+      await hostGame(modeId, duration, randomNames);
+    });
+
+    async function hostGame(modeId, durationMins, randomNames){
+      const code = await getNextGameCode();
+      const gm = GAMEMODES.find(g=>g.id===modeId);
+      const gameRef = ref(db,"games/"+code);
+      const gameData = {
+        code, modeId, modeName:gm.name, modeEmoji:gm.emoji,
+        hostUid:currentUser.uid, hostName:userData.username||"Host",
+        durationMins, randomNames,
+        status:"lobby",  // lobby → playing → ended
+        startedAt:0, endsAt:0, createdAt:Date.now(),
+        players:{}
+      };
+      await set(gameRef, gameData);
+      currentGame = gameData;
+      gameRole = "host";
+      myGameData = { gold:0, uid:currentUser.uid, username:userData.username||"Host", displayName:userData.username||"Host", blook:"" };
+      // Add host as player
+      await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{
+        uid:currentUser.uid, username:userData.username||"Host",
+        displayName:randomNames?pickRandomName():userData.username||"Host",
+        blook:"", gold:0, joinedAt:Date.now()
+      });
+      openGameScreen(code);
+    }
+
+    function pickRandomName(){ return RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)]; }
+
+    // ── Join game flow ──
+    document.getElementById("join-game-btn").addEventListener("click",async()=>{
+      const code = document.getElementById("join-game-code").value.trim().padStart(6,"0");
+      const errEl = document.getElementById("join-game-err");
+      errEl.textContent="";
+      if(code.length!==6||isNaN(code)){errEl.textContent="Enter a valid 6-digit code.";return;}
+      const snap = await get(ref(db,"games/"+code));
+      if(!snap.exists()){errEl.textContent="Game not found. Check the code.";return;}
+      const gData = snap.val();
+      if(gData.status==="ended"){errEl.textContent="That game has already ended.";return;}
+      if(gData.status==="playing"){errEl.textContent="That game has already started.";return;}
+      if(gData.players&&gData.players[currentUser.uid]){errEl.textContent="You already joined this game.";return;}
+      currentGame = gData;
+      gameRole = "player";
+      openBlookPicker(code, gData);
+    });
+
+    // ── Blook picker ──
+    function openBlookPicker(code, gData){
+      hideShell();
+      selectedBlook = null;
+      document.getElementById("blook-picker-confirm-btn").disabled=true;
+      document.getElementById("blook-picker-selected").textContent="No blook selected";
+      document.getElementById("blook-picker-game-info").textContent=gData.modeEmoji+" "+gData.modeName+" • Code: "+code;
+      const grid = document.getElementById("blook-picker-grid");
+      grid.innerHTML="";
+      // Get taken blooks
+      const takenBlooks = new Set(Object.values(gData.players||{}).map(p=>p.blook).filter(Boolean));
+      // Build blook list from user's owned blooks
+      const owned = userData.blooks||{};
+      const allBlooks = Object.keys(owned).filter(n=>owned[n]>0);
+      if(!allBlooks.length){
+        // Give a default if user has no blooks
+        allBlooks.push("Sublet Player");
+      }
+      allBlooks.forEach(name=>{
+        const info = BLOOK_INFO[name]||{rarity:"Common"};
+        const taken = takenBlooks.has(name);
+        const cell = document.createElement("div");
+        cell.style.cssText=`border-radius:10px;padding:4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:${taken?"not-allowed":"pointer"};opacity:${taken?0.4:1};position:relative;background:rgba(255,255,255,.08);`;
+        const img = document.createElement("div");
+        img.style.cssText=`width:52px;height:52px;border-radius:10px;background:${rarityColor(info.rarity)};display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;text-align:center;padding:3px;`;
+        img.textContent=name;
+        const lbl = document.createElement("div");
+        lbl.style.cssText="font-size:9px;color:#fff;text-align:center;word-break:break-word;max-width:60px;";
+        lbl.textContent=name;
+        if(taken){
+          const x=document.createElement("div");
+          x.style.cssText="position:absolute;top:2px;right:2px;color:#e53935;font-weight:900;font-size:16px;";
+          x.textContent="✕";
+          cell.appendChild(x);
+        }
+        cell.appendChild(img); cell.appendChild(lbl);
+        if(!taken){
+          cell.addEventListener("click",()=>{
+            document.querySelectorAll("#blook-picker-grid>div").forEach(c=>c.style.outline="none");
+            cell.style.outline="3px solid #ff9800";
+            selectedBlook=name;
+            document.getElementById("blook-picker-selected").textContent="Selected: "+name;
+            document.getElementById("blook-picker-confirm-btn").disabled=false;
+          });
+        }
+        grid.appendChild(cell);
+      });
+      document.getElementById("blook-picker-screen").style.display="flex";
+    }
+
+    document.getElementById("blook-picker-confirm-btn").addEventListener("click",async()=>{
+      if(!selectedBlook||!currentGame) return;
+      const code = currentGame.code;
+      const gData = currentGame;
+      const displayName = gData.randomNames?pickRandomName():userData.username||"Player";
+      await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{
+        uid:currentUser.uid, username:userData.username||"Player",
+        displayName, blook:selectedBlook, gold:0, joinedAt:Date.now()
+      });
+      myGameData = { uid:currentUser.uid, username:userData.username||"Player", displayName, blook:selectedBlook, gold:0 };
+      document.getElementById("blook-picker-screen").style.display="none";
+      openGameScreen(code);
+    });
+
+    // ── Open game screen ──
+    function openGameScreen(code){
+      hideShell();
+      document.getElementById("blook-picker-screen").style.display="none";
+      const screen = document.getElementById("game-screen");
+      screen.style.display="flex";
+      const gm = GAMEMODES.find(g=>g.id===currentGame.modeId)||GAMEMODES[0];
+      document.getElementById("gs-gamemode-label").textContent=currentGame.modeEmoji+" "+currentGame.modeName;
+      document.getElementById("gs-code-label").textContent=code;
+      document.getElementById("gs-status-pill").textContent="Lobby";
+      // Hide leaderboard panel until game starts
+      const lbPanel=document.getElementById("game-lb-panel");
+      if(lbPanel) lbPanel.style.display="none";
+      if(gameRole==="host"){
+        document.getElementById("gs-start-btn").style.display="inline-block";
+        document.getElementById("gs-start-btn").onclick=()=>startGame(code);
+      } else {
+        document.getElementById("gs-start-btn").style.display="none";
+      }
+      // Subscribe to game state
+      if(gameDbUnsubscribe) gameDbUnsubscribe();
+      gameDbUnsubscribe = onValue(ref(db,"games/"+code), snap=>{
+        if(!snap.exists()) return;
+        currentGame = snap.val();
+        renderGameLeaderboard();
+        if(currentGame.status==="playing"&&!gameTimerInterval){
+          document.getElementById("gs-status-pill").textContent="Playing";
+          document.getElementById("gs-start-btn").style.display="none";
+          // Show leaderboard panel now that game has started
+          const lbPanel=document.getElementById("game-lb-panel");
+          if(lbPanel) lbPanel.style.display="flex";
+          renderGameActionArea(code);
+          startGameTimer(code);
+        }
+        if(currentGame.status==="ended") endGame();
+      });
+      renderGameLobby();
+    }
+
+    function renderGameLobby(){
+      const area = document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="text-align:center;max-width:500px;">
+          <div style="font-family:'Titan One',system-ui;font-size:38px;color:#0d47a1;margin-bottom:16px;text-shadow:2px 2px 0 rgba(13,71,161,.15);">Waiting for host to start...</div>
+          <div style="font-size:16px;color:#456;margin-bottom:20px;">Share this code with friends:</div>
+          <div style="font-size:52px;font-weight:700;color:#0d47a1;letter-spacing:10px;background:rgba(13,71,161,.1);border-radius:16px;padding:18px 32px;border:3px solid rgba(13,71,161,.25);margin-bottom:20px;">${currentGame.code}</div>
+          <div style="font-size:14px;color:#567;">Game: ${currentGame.modeEmoji} ${currentGame.modeName}</div>
+        </div>`;
+    }
+
+    function renderGameLeaderboard(){
+      const lb = document.getElementById("game-leaderboard");
+      if(!lb||!currentGame) return;
+      const players = Object.values(currentGame.players||{}).sort((a,b)=>(b.gold||0)-(a.gold||0));
+      document.getElementById("gs-player-count").textContent=players.length+" players";
+      lb.innerHTML="";
+      players.forEach((p,i)=>{
+        const row = document.createElement("div");
+        row.style.cssText=`display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:${p.uid===currentUser.uid?"rgba(13,71,161,.15)":"rgba(255,255,255,.6)"};border:1px solid ${p.uid===currentUser.uid?"rgba(13,71,161,.3)":"rgba(13,71,161,.1)"};`;
+        const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`<span style="font-size:12px;color:#789;min-width:18px;">${i+1}.</span>`;
+        const blookEl = p.blook?`<div style="width:32px;height:32px;border-radius:8px;background:${rarityColor((BLOOK_INFO[p.blook]||{rarity:"Common"}).rarity)};font-size:7px;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;flex-shrink:0;">${p.blook}</div>`:"<div style='width:32px;height:32px;border-radius:8px;background:#ccc;flex-shrink:0;'></div>";
+        row.innerHTML=`${medal}${blookEl}<span style="flex:1;font-size:13px;color:#123;font-weight:600;">${p.displayName||p.username}</span><span style="font-size:13px;color:#0d47a1;font-weight:700;">${(p.gold||0)} ⛏️</span>`;
+        lb.appendChild(row);
+      });
+    }
+
+    async function startGame(code){
+      const durationMs = (currentGame.durationMins||10)*60*1000;
+      await update(ref(db,"games/"+code),{ status:"playing", startedAt:Date.now(), endsAt:Date.now()+durationMs });
+    }
+
+    function startGameTimer(code){
+      if(gameTimerInterval) clearInterval(gameTimerInterval);
+      gameTimerInterval = setInterval(async()=>{
+        if(!currentGame||!currentGame.endsAt) return;
+        const remaining = currentGame.endsAt - Date.now();
+        if(remaining<=0){
+          clearInterval(gameTimerInterval);
+          document.getElementById("gs-timer-label").textContent="⏰ 0:00";
+          if(gameRole==="host") await update(ref(db,"games/"+code),{status:"ended"});
+        } else {
+          const m=Math.floor(remaining/60000), s=Math.floor((remaining%60000)/1000);
+          document.getElementById("gs-timer-label").textContent=`⏰ ${m}:${String(s).padStart(2,"0")}`;
+        }
+      },1000);
+    }
+
+    // ── GOLD RUSH game action area ──
+    const CHEST_OUTCOMES = [
+      {label:"+10 Gold",    emoji:"💰",weight:28,apply:(p)=>{p.gold=(p.gold||0)+10;  return"+10 gold!"},          color:"#f9a825"},
+      {label:"+25 Gold",    emoji:"💰",weight:22,apply:(p)=>{p.gold=(p.gold||0)+25;  return"+25 gold!"},          color:"#f9a825"},
+      {label:"+100 Gold",   emoji:"💰",weight:8, apply:(p)=>{p.gold=(p.gold||0)+100; return"+100 gold!"},         color:"#e65100"},
+      {label:"Lose 25%",    emoji:"💸",weight:14,apply:(p)=>{const l=Math.floor((p.gold||0)*.25);p.gold=Math.max(0,(p.gold||0)-l);return`Lost ${l} gold!`}, color:"#e53935"},
+      {label:"Lose 50%",    emoji:"💸",weight:10,apply:(p)=>{const l=Math.floor((p.gold||0)*.5); p.gold=Math.max(0,(p.gold||0)-l);return`Lost ${l} gold!`}, color:"#c62828"},
+      {label:"Steal 10%",   emoji:"🦊",weight:8, apply:null,steal:10,                color:"#7b1fa2"},
+      {label:"Steal 25%",   emoji:"🦊",weight:5, apply:null,steal:25,                color:"#4a148c"},
+      {label:"Double Gold", emoji:"✨",weight:4, apply:(p)=>{p.gold=(p.gold||0)*2;  return"Gold DOUBLED!"},       color:"#43a047"},
+      {label:"SWAP",        emoji:"🔀",weight:1, apply:null,swap:true,               color:"#0d47a1"},
+    ];
+
+    let chestCooldown = false;
+    let lastChestResult = "";
+
+    function renderGameActionArea(code){
+      if(currentGame.modeId==="goldrush") renderGoldRush(code);
+    }
+
+    function renderGoldRush(code){
+      // Host cannot play — show spectator view
+      if(gameRole==="host"){
+        const area = document.getElementById("game-action-area");
+        area.innerHTML=`<div style="text-align:center;max-width:420px;"><div style="font-size:60px;margin-bottom:16px;">👑</div><div style="font-family:'Titan One',system-ui;font-size:28px;color:#0d47a1;margin-bottom:10px;">You are the Host</div><div style="font-size:15px;color:#567;">You can watch the leaderboard but cannot play. The game ends automatically when time runs out.</div></div>`;
+        return;
+      }
+      const area = document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="text-align:center;width:100%;">
+          <div style="font-size:15px;color:#0d47a1;font-weight:600;margin-bottom:8px;">Your Gold: <span id="my-gold-display" style="font-size:28px;font-weight:700;color:#e65100;">${myGameData.gold||0}</span> ⛏️</div>
+          <div id="chest-result-msg" style="min-height:32px;font-size:18px;font-weight:700;margin-bottom:16px;color:#0d47a1;">${lastChestResult}</div>
+          <div style="display:flex;gap:28px;justify-content:center;flex-wrap:wrap;">
+            ${[1,2,3].map(i=>`
+              <div class="chest-btn" data-chest="${i}" style="width:140px;height:140px;border-radius:20px;background:linear-gradient(135deg,#c8860a,#8b5e00);border:4px solid #f9a825;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:68px;transition:.15s;user-select:none;box-shadow:0 6px 18px rgba(200,134,10,.4);">
+                🎁
+              </div>`).join("")}
+          </div>
+          <div style="font-size:13px;color:#789;margin-top:18px;">Click a chest to open it!</div>
+        </div>`;
+      area.querySelectorAll(".chest-btn").forEach(btn=>{
+        btn.addEventListener("mouseenter",()=>{if(!chestCooldown)btn.style.transform="scale(1.08) translateY(-4px)";});
+        btn.addEventListener("mouseleave",()=>{btn.style.transform="scale(1)";});
+        btn.addEventListener("click",()=>openChest(code, btn));
+      });
+    }
+
+    async function openChest(code, btn){
+      if(chestCooldown||currentGame.status!=="playing") return;
+      chestCooldown=true;
+      btn.style.transform="scale(0.9)";
+      btn.style.opacity="0.5";
+      // Pick outcome
+      const total=CHEST_OUTCOMES.reduce((s,o)=>s+o.weight,0);
+      let r=Math.random()*total;
+      let outcome=CHEST_OUTCOMES[0];
+      for(const o of CHEST_OUTCOMES){if(r<=o.weight){outcome=o;break;}r-=o.weight;}
+
+      if(outcome.swap){
+        // SWAP — pick a player and swap gold totals
+        const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid);
+        if(!players.length){showChestResult(code,"No one to swap with! 😅",btn);return;}
+        openStealPicker("SWAP gold with", players, async(targetUid)=>{
+          const tPlayer=currentGame.players[targetUid];
+          if(!tPlayer){showChestResult(code,"Target not found!",btn);return;}
+          const myGold=myGameData.gold||0;
+          const theirGold=tPlayer.gold||0;
+          myGameData.gold=theirGold;
+          await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{gold:theirGold});
+          await update(ref(db,"games/"+code+"/players/"+targetUid),{gold:myGold});
+          showChestResult(code,`🔀 Swapped gold with ${tPlayer.displayName||tPlayer.username}!`,btn);
+        });
+      } else if(outcome.steal){
+        const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid&&(p.gold||0)>0);
+        if(!players.length){showChestResult(code,"No one to steal from! 😅",btn);return;}
+        openStealPicker(outcome.steal+"%", players, async(targetUid)=>{
+          const tPlayer=currentGame.players[targetUid];
+          if(!tPlayer){showChestResult(code,"Target not found!",btn);return;}
+          const stolen=Math.floor((tPlayer.gold||0)*(outcome.steal/100));
+          await update(ref(db,"games/"+code+"/players/"+targetUid),{gold:Math.max(0,(tPlayer.gold||0)-stolen)});
+          myGameData.gold=(myGameData.gold||0)+stolen;
+          await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{gold:myGameData.gold});
+          showChestResult(code,`${outcome.emoji} Stole ${stolen} gold from ${tPlayer.displayName||tPlayer.username}!`,btn);
+        });
+      } else {
+        const msg=outcome.apply(myGameData);
+        await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{gold:myGameData.gold});
+        showChestResult(code,`${outcome.emoji} ${msg}`,btn);
+      }
+    }
+
+    function showChestResult(code, msg, btn){
+      const resultEl=document.getElementById("chest-result-msg");
+      const goldEl=document.getElementById("my-gold-display");
+      if(resultEl) resultEl.textContent=msg;
+      if(goldEl) goldEl.textContent=myGameData.gold||0;
+      lastChestResult=msg;
+      if(btn){btn.style.transform="scale(1)";btn.style.opacity="1";}
+      setTimeout(()=>{
+        chestCooldown=false;
+        if(resultEl) resultEl.textContent="";
+      },2000);
+    }
+
+    function openStealPicker(labelText, players, callback){
+      stealCallback=callback;
+      document.getElementById("steal-title").textContent=`${labelText} — choose a player`;
+      const list=document.getElementById("steal-player-list");
+      list.innerHTML="";
+      players.forEach(p=>{
+        const btn=document.createElement("button");
+        btn.style.cssText=`background:rgba(13,71,161,.1);border:1px solid rgba(13,71,161,.3);color:#123;padding:10px 14px;border-radius:10px;text-align:left;font-size:13px;width:100%;`;
+        btn.innerHTML=`<span style="font-weight:700">${p.displayName||p.username}</span> — ${p.gold||0} ⛏️`;
+        btn.addEventListener("click",()=>{
+          document.getElementById("steal-picker-overlay").style.display="none";
+          stealCallback(p.uid);
+          stealCallback=null;
+        });
+        list.appendChild(btn);
+      });
+      document.getElementById("steal-picker-overlay").style.display="flex";
+    }
+
+    document.getElementById("steal-cancel-btn").addEventListener("click",()=>{
+      document.getElementById("steal-picker-overlay").style.display="none";
+      chestCooldown=false;
+      stealCallback=null;
+    });
+
+    // ── End game with big podium ──
+    function endGame(){
+      if(gameTimerInterval){clearInterval(gameTimerInterval);gameTimerInterval=null;}
+      if(gameDbUnsubscribe){gameDbUnsubscribe();gameDbUnsubscribe=null;}
+      document.getElementById("game-screen").style.display="none";
+      const players=Object.values(currentGame.players||{}).sort((a,b)=>(b.gold||0)-(a.gold||0));
+      const endScreen=document.getElementById("game-end-screen");
+      document.getElementById("ges-title").textContent="Game Over!";
+      document.getElementById("ges-game-name").textContent=currentGame.modeEmoji+" "+currentGame.modeName;
+
+      // Build podium
+      const podium=document.getElementById("ges-podium");
+      podium.innerHTML="";
+
+      // Podium heights: 1st tallest in middle, 2nd left, 3rd right
+      const podiumOrder=[1,0,2]; // index into top3: show 2nd, 1st, 3rd
+      const top3=players.slice(0,3);
+      const heights=["160px","220px","120px"]; // 2nd, 1st, 3rd
+      const medals=["🥇","🥈","🥉"];
+      const bgColors=["#ffd54f","#ffe57b","#ffcc02"];
+      const placeLabels=["1st","2nd","3rd"];
+
+      const podiumWrapper=document.createElement("div");
+      podiumWrapper.style.cssText="display:flex;align-items:flex-end;gap:12px;justify-content:center;";
+
+      podiumOrder.forEach((topIdx,colIdx)=>{
+        const p=top3[topIdx];
+        if(!p) return;
+        const col=document.createElement("div");
+        col.style.cssText="display:flex;flex-direction:column;align-items:center;gap:0;";
+
+        // Name + blook above pedestal
+        const nameEl=document.createElement("div");
+        nameEl.style.cssText="text-align:center;margin-bottom:8px;";
+        const blookDiv=document.createElement("div");
+        blookDiv.style.cssText=`width:52px;height:52px;border-radius:12px;background:${p.blook?rarityColor((BLOOK_INFO[p.blook]||{rarity:"Common"}).rarity):"#aaa"};font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;margin:0 auto 6px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.2);`;
+        blookDiv.textContent=p.blook||"?";
+        const nameText=document.createElement("div");
+        nameText.style.cssText=`font-family:'Titan One',system-ui;font-size:${topIdx===0?"18px":"15px"};color:#0d47a1;`;
+        nameText.textContent=p.displayName||p.username;
+        const goldText=document.createElement("div");
+        goldText.style.cssText="font-size:13px;color:#e65100;font-weight:700;margin-top:2px;";
+        goldText.textContent=`${p.gold||0} ⛏️`;
+        nameEl.appendChild(blookDiv); nameEl.appendChild(nameText); nameEl.appendChild(goldText);
+
+        // Pedestal
+        const pedestal=document.createElement("div");
+        pedestal.style.cssText=`width:${topIdx===0?"110px":"90px"};height:${heights[colIdx]};background:linear-gradient(180deg,${bgColors[colIdx]},${bgColors[colIdx]}cc);border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;box-shadow:0 4px 12px rgba(0,0,0,.15);border:2px solid rgba(255,255,255,.6);`;
+        const medalEl=document.createElement("div");
+        medalEl.style.cssText=`font-size:${topIdx===0?"42px":"32px"};`;
+        medalEl.textContent=medals[topIdx];
+        const placeEl=document.createElement("div");
+        placeEl.style.cssText="font-family:'Titan One',system-ui;font-size:14px;color:#5d4037;margin-top:4px;";
+        placeEl.textContent=placeLabels[topIdx];
+        pedestal.appendChild(medalEl); pedestal.appendChild(placeEl);
+
+        col.appendChild(nameEl); col.appendChild(pedestal);
+        podiumWrapper.appendChild(col);
+      });
+      podium.appendChild(podiumWrapper);
+
+      // My place
+      const myPlace=players.findIndex(p=>p.uid===currentUser.uid)+1;
+      if(myPlace>0){
+        const placeText=myPlace===1?"🥇 1st":myPlace===2?"🥈 2nd":myPlace===3?"🥉 3rd":myPlace+"th";
+        document.getElementById("ges-your-place").textContent=`Your finish: ${placeText} out of ${players.length} players`;
+      } else {
+        document.getElementById("ges-your-place").textContent="";
+      }
+      endScreen.style.display="flex";
+    }
+
+    document.getElementById("ges-leave-btn").addEventListener("click",()=>{
+      document.getElementById("game-end-screen").style.display="none";
+      showShell();
+      currentGame=null;
+      gameRole=null;
+      myGameData=null;
+      selectedBlook=null;
+      chestCooldown=false;
+      lastChestResult="";
+      showView("market");
+    });
+
+    // ── Ctrl+A fix: check isAdmin live from Firebase before granting ──
+    // Already handled — Ctrl+A checks adminMode which is set from DB on login
+
+    // ── Wire join game view to showView (handled by patched showView below) ──
 
     // ── Floating blooks on start screen ──
     const floatColors=["#4caf50","#2196f3","#9c27b0","#ffb300","#81d4fa","#6a1b9a"];
