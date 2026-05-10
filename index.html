@@ -1303,6 +1303,48 @@
     const SUBSCORE_VALUES = {
       [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100
     };
+
+    // ══════════════════════════════════════════════════════════════
+    // RANK SYSTEM
+    // ══════════════════════════════════════════════════════════════
+    const RANKS = [
+      { name:"Wood",    color:"#8d6e63", bg:"#efebe9", thresholds:[0,   30,  60]  },
+      { name:"Bronze",  color:"#a1887f", bg:"#fbe9e7", thresholds:[100, 180, 280] },
+      { name:"Silver",  color:"#78909c", bg:"#eceff1", thresholds:[400, 560, 750] },
+      { name:"Gold",    color:"#f9a825", bg:"#fffde7", thresholds:[1000,1400,1900]},
+      { name:"Diamond", color:"#29b6f6", bg:"#e1f5fe", thresholds:[2500,3300,4300]},
+      { name:"Quartz",  color:"#ce93d8", bg:"#f3e5f5", thresholds:[5500,7000,9000]},
+      { name:"Ruby",    color:"#e53935", bg:"#ffebee", thresholds:[11000,14000,18000]},
+      { name:"Emerald", color:"#43a047", bg:"#e8f5e9", thresholds:[22000,28000,35000]},
+      { name:"Super",   color:"#ff7043", bg:"#fbe9e7", thresholds:[43000,53000,65000]},
+      { name:"Omega",   color:"#7e57c2", bg:"#ede7f6", thresholds:[80000,100000,125000]},
+      { name:"Shiny",   color:"#00acc1", bg:"#e0f7fa", thresholds:[155000,190000,230000]},
+      { name:"Unreal",  color:"#f06292", bg:"#fce4ec", thresholds:[280000,340000,410000]},
+      { name:"Rainbow", color:"linear-gradient(90deg,#e53935,#ff9800,#fdd835,#43a047,#1e88e5,#8e24aa)", bg:"#fff8e1", thresholds:[500000,620000,760000]},
+      { name:"Master",  color:"#0d47a1", bg:"#e3f2fd", thresholds:[930000,1150000,1400000]},
+      { name:"Boss",    color:"linear-gradient(90deg,#212121,#b71c1c,#212121)", bg:"#fafafa", thresholds:[1700000,2100000,2600000]},
+    ];
+
+    function getRankFromSubscore(subscore){
+      let rankName="Wood", stage=1, color=RANKS[0].color, bg=RANKS[0].bg;
+      for(const rank of RANKS){
+        for(let s=0;s<3;s++){
+          if(subscore>=rank.thresholds[s]){
+            rankName=rank.name; stage=s+1; color=rank.color; bg=rank.bg;
+          }
+        }
+      }
+      return {name:rankName, stage, color, bg, label:`${rankName} ${stage}`};
+    }
+
+    function rankBadgeHTML(subscore, small=false){
+      const r=getRankFromSubscore(subscore);
+      const isGradient=r.color.startsWith("linear-gradient");
+      const colorStyle=isGradient?`background:${r.color};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;`:`color:${r.color};`;
+      const size=small?"9px":"11px";
+      const pad=small?"1px 5px":"2px 7px";
+      return `<span style="display:inline-block;background:${r.bg};border-radius:999px;padding:${pad};font-size:${size};font-weight:700;${colorStyle}border:1px solid ${isGradient?"#ddd":r.color}22;vertical-align:middle;margin-left:4px;">${r.label}</span>`;
+    }
     const RARITY_BASE_WEIGHTS = {
       [R.COMMON]:60,[R.RARE]:25,[R.EPIC]:8,[R.LEG]:4,[R.SUP]:1.2,[R.CHR]:1,[R.MYS]:0.8
     };
@@ -1734,6 +1776,22 @@
       {name:"Dead Buddy Bot",chance:0.007,rarity:R.MYS}
     ]};
 
+    const CLOCKWORK_PACK = { id:"clockwork", name:"Clockwork Pack", color:"linear-gradient(135deg,#795548,#ffd54f)", cost:25, blooks:[
+      {name:"Clockwork Bat",        chance:13,   rarity:R.COMMON},
+      {name:"Clockwork Toucan",     chance:13,   rarity:R.COMMON},
+      {name:"Clockwork Robot",      chance:13,   rarity:R.COMMON},
+      {name:"Clockwork Bug",        chance:13,   rarity:R.COMMON},
+      {name:"Clockwork Crab",       chance:13,   rarity:R.COMMON},
+      {name:"Alarm Bot",            chance:6,    rarity:R.RARE},
+      {name:"Clockwork Tophat",     chance:6,    rarity:R.RARE},
+      {name:"Lightbulb Robot",      chance:4,    rarity:R.EPIC},
+      {name:"Giant Clockwork Bug",  chance:0.2,  rarity:R.CHR},
+      {name:"Giant Clockwork Crab", chance:0.2,  rarity:R.CHR},
+      {name:"Giant Alarm Bot",      chance:0.2,  rarity:R.CHR},
+      {name:"Giant Clockwork Robot",chance:0.2,  rarity:R.CHR},
+      {name:"Giant Lightbulb Robot",chance:0.2,  rarity:R.MYS},
+    ]};
+
     const MEME_PACK = { id:"meme", name:"Meme Pack", color:"linear-gradient(135deg,#212121,#ff6f00)", cost:25, blooks:[
       {name:"Skeleton with Shield",chance:14.90,rarity:R.COMMON},
       {name:"Ich Bin Ein Heidelberger",chance:14.30,rarity:R.COMMON},
@@ -1755,7 +1813,7 @@
       ...BASE_PACKS,
       ITALIAN_BRAINROT_PACK, CLASH_ROYALE_PACK, CASTLEVANIA_PACK, SNACK_PACK, UNDERTALE_PACK,
       VOLCANIC_PACK, RUBBER_DUCK_PACK, NEWYEARS_PACK, ICE_PACK2, FOREST_PACK, FUTURE_PACK,
-      SCHOOL_PACK, MESSED_UP_PACK, YOUTUBER_PACK, DLBY_PACK, MEME_PACK,
+      SCHOOL_PACK, MESSED_UP_PACK, YOUTUBER_PACK, DLBY_PACK, MEME_PACK, CLOCKWORK_PACK,
       BOT_PACK, PIRATE_PACK, LUCKY_PACK, VALENTINE_PACK, EASTER_PACK,
       SCIFI_PACK, COMBAT_PACK, ELEMENT_PACK, CANDY_PACK, DESSERT_PACK, MUSIC_PACK,
       APRIL_FOOLS_PACK
@@ -1772,7 +1830,7 @@
       if(isAprilFools()) return [APRIL_FOOLS_PACK];
       const arr=[...BASE_PACKS, ITALIAN_BRAINROT_PACK, CLASH_ROYALE_PACK, CASTLEVANIA_PACK, SNACK_PACK,
         UNDERTALE_PACK, VOLCANIC_PACK, RUBBER_DUCK_PACK, ICE_PACK2, FOREST_PACK, FUTURE_PACK,
-        SCHOOL_PACK, YOUTUBER_PACK, DLBY_PACK, MEME_PACK, BOT_PACK, PIRATE_PACK,
+        SCHOOL_PACK, YOUTUBER_PACK, DLBY_PACK, MEME_PACK, CLOCKWORK_PACK, BOT_PACK, PIRATE_PACK,
         SCIFI_PACK, COMBAT_PACK, ELEMENT_PACK, CANDY_PACK, DESSERT_PACK, MUSIC_PACK];
       if(isMarch()) arr.push(LUCKY_PACK);
       if(isValentineWeek()) arr.push(VALENTINE_PACK);
@@ -1877,7 +1935,11 @@
 
     function refreshTop(){
       if(!userData){ topUser.textContent="Logged out"; topCoins.textContent="Coins: 0"; }
-      else{ topUser.textContent=userData.username||"user"; topCoins.textContent="Coins: "+(userData.coins||0); }
+      else{
+        const s=calcStatsFromData(userData);
+        topUser.innerHTML=(userData.username||"user")+rankBadgeHTML(s.subscore,true);
+        topCoins.textContent="Coins: "+(userData.coins||0);
+      }
     }
 
     function spawnConfetti(color){
@@ -2050,12 +2112,35 @@
       spawnConfetti(rarityColor(chosen.rarity));
       // Announce if rare
       if(chosen.chance<0.1) announceRarePull(userData.username||"Someone", chosen.name, chosen.chance);
+      // DLBY easter egg — check if player now owns ALL blooks from the DLBY pack
+      if(actualPack.id==="dlby"){
+        const dlbyBlooks=DLBY_PACK.blooks.map(b=>b.name);
+        const owned=userData.blooks||{};
+        const hasAll=dlbyBlooks.every(n=>(owned[n]||0)>0);
+        if(hasAll) triggerDLBYEasterEgg();
+      }
       saveUserData().then(()=>{
         try{ renderBlooks(); populateTradeOfferSelect(); } catch(e){ console.error("render err",e); }
       }).catch(err=>{
         console.error("Save failed:",err);
         try{ renderBlooks(); populateTradeOfferSelect(); } catch(e){ console.error("render err",e); }
       });
+    }
+
+    function triggerDLBYEasterEgg(){
+      // Grey out screen, show creepy message
+      const overlay=document.createElement("div");
+      overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0);z-index:9999;display:flex;align-items:center;justify-content:center;transition:background 1s;pointer-events:none;";
+      document.body.appendChild(overlay);
+      const msg=document.createElement("div");
+      msg.style.cssText="font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;font-size:52px;color:#fff;opacity:0;text-align:center;text-shadow:0 0 20px #fff,0 0 40px #fff;transition:opacity 1.5s;pointer-events:none;letter-spacing:4px;";
+      msg.textContent="something's not right";
+      overlay.appendChild(msg);
+      setTimeout(()=>{ overlay.style.background="rgba(0,0,0,0.85)"; },100);
+      setTimeout(()=>{ msg.style.opacity="1"; },600);
+      setTimeout(()=>{ msg.style.opacity="0"; },4000);
+      setTimeout(()=>{ overlay.style.background="rgba(0,0,0,0)"; },5000);
+      setTimeout(()=>{ overlay.remove(); },6200);
     }
 
     packOpenOverlay.addEventListener("click",()=>{ packOpenOverlay.style.display="none"; canClosePackOverlay=true; });
@@ -2299,7 +2384,7 @@
           if(ban.until&&Date.now()<ban.until) return false;
           return true;
         })
-        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); return{username:u.username||"?",coins:u.coins||0,totalBlooks,isOwner:!!u.isOwner,isAdmin:!!u.isAdmin}; });
+        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); const s=calcStatsFromData(u); return{username:u.username||"?",coins:u.coins||0,totalBlooks,isOwner:!!u.isOwner,isAdmin:!!u.isAdmin,subscore:s.subscore}; });
       const byCoins=[...players].sort((a,b)=>b.coins-a.coins).slice(0,20);
       leaderboardList.innerHTML="";
       byCoins.forEach((p,i)=>{
@@ -2308,7 +2393,7 @@
         let tag="";
         if(p.isOwner) tag=` <span style="background:#7b1fa2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">👑 owner</span>`;
         else if(p.isAdmin) tag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">⚡ admin</span>`;
-        left.innerHTML=`${i+1}. ${p.username}${tag}`;
+        left.innerHTML=`${i+1}. ${p.username}${tag}${rankBadgeHTML(p.subscore,true)}`;
         const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
         row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row);
       });
@@ -2702,10 +2787,13 @@
 
     function refreshStatsView(){
       if(!userData){ statsUsername.textContent=""; statsCoins.textContent="0"; statsTotalCoins.textContent="0"; statsPacksOpened.textContent="0"; statsChromas.textContent="0"; statsMysticals.textContent="0"; statsBestBlook.textContent="None"; statsBestBlookRarity.textContent=""; statsSubscore.textContent="0"; return; }
-      statsUsername.textContent=userData.username||"user"; statsCoins.textContent=userData.coins||0; statsTotalCoins.textContent=userData.totalCoinsCollected||0; statsPacksOpened.textContent=userData.totalPacksOpened||0;
-      const s=calcStatsFromData(userData); statsChromas.textContent=s.chromas; statsMysticals.textContent=s.mysticals;
+      const s=calcStatsFromData(userData);
+      statsUsername.innerHTML=(userData.username||"user")+rankBadgeHTML(s.subscore);
+      statsCoins.textContent=userData.coins||0; statsTotalCoins.textContent=userData.totalCoinsCollected||0; statsPacksOpened.textContent=userData.totalPacksOpened||0;
+      statsChromas.textContent=s.chromas; statsMysticals.textContent=s.mysticals;
       if(s.best){statsBestBlook.textContent=s.best.name;statsBestBlookRarity.textContent=s.best.rarity;}else{statsBestBlook.textContent="None";statsBestBlookRarity.textContent="";}
-      statsSubscore.textContent=s.subscore;
+      const rk=getRankFromSubscore(s.subscore);
+      statsSubscore.innerHTML=s.subscore+" "+rankBadgeHTML(s.subscore);
     }
 
     statsLookupBtn.addEventListener("click",async()=>{
@@ -2825,10 +2913,15 @@
       if(!currentUser||!userData||!currentEventDef) return;
       const ev=currentEventDef; const evData=currentEventData||{};
       const cooldown=getEventCooldownRemaining(evData); if(cooldown>0) return;
-      const revealedTiles=evData.revealedTiles||{}; if(revealedTiles[tileIdx]!==undefined) return;
+      // Hourly grid regeneration — wipe revealed tiles every hour
+      const now=Date.now();
+      const lastReset=evData.lastGridReset||0;
+      let revealedTiles=evData.revealedTiles||{};
+      if(now-lastReset>=3600000){ revealedTiles={}; }
+      if(revealedTiles[tileIdx]!==undefined) return;
       const amount=pickEggAmount(); const newScore=(evData.score||0)+amount;
       revealedTiles[tileIdx]=amount;
-      const newEvData={...evData,uid:currentUser.uid,username:userData.username||"user",score:newScore,revealedTiles,lastPick:Date.now()};
+      const newEvData={...evData,uid:currentUser.uid,username:userData.username||"user",score:newScore,revealedTiles,lastPick:now,lastGridReset:now-lastReset>=3600000?now:lastReset};
       currentEventData=newEvData;
       try{ await set(ref(db,eventUserPath(ev.id,currentUser.uid)),newEvData); await set(ref(db,eventLbPath(ev.id)+"/"+currentUser.uid),{uid:currentUser.uid,username:userData.username||"user",score:newScore}); }catch(e){ console.error("Event save failed:",e); }
       try{ const lbSnap=await get(ref(db,eventLbPath(ev.id))); currentEventLb=lbSnap.exists()?Object.values(lbSnap.val()).sort((a,b)=>b.score-a.score):[]; }catch(e){}
@@ -3456,14 +3549,156 @@
 
     // Gamemodes definition
     const GAMEMODES = [
-      {
-        id: "goldrush",
-        name: "Gold Rush",
-        emoji: "⛏️",
-        color: "#f9a825",
-        desc: "Click chests to earn gold. Watch out for traps!"
-      }
+      { id:"goldrush",      name:"Gold Rush",       emoji:"⛏️",  color:"#f9a825", desc:"Click chests to earn gold. Watch out for traps!" },
+      { id:"fishingfrenzy", name:"Fishing Frenzy",  emoji:"🎣",  color:"#29b6f6", desc:"Cast your rod and reel in blooks! Rare catches score big!" },
+      { id:"busybees",      name:"Busy Bees",        emoji:"🐝",  color:"#fdd835", desc:"Spin for honey! Earn, steal, and distract your way to the top!" },
+      { id:"cryptohack",   name:"Crypto Hack",      emoji:"💻",  color:"#43a047", desc:"Spin bots to earn crypto. Hack other players to steal their stash!" },
+      { id:"dinos",         name:"Deceptive Dinos",  emoji:"🦕",  color:"#8d6e63", desc:"Excavate fossils or investigate cheaters. Use multipliers to dominate!" },
+      { id:"monsterbrawl",  name:"Monster Brawl",    emoji:"⚔️",  color:"#7b1fa2", desc:"Survive waves of monsters! Upgrade your weapons and fight to level 60!" },
     ];
+
+    // ══════════════════════════════════════════════════════════════
+    // BUSY BEES CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    const BEE_CARDS = [
+      {name:"Queen Bee",    emoji:"👑🐝", weight:2,  effect:"swap",         desc:"Swap honey with someone!"},
+      {name:"Busy Bee",     emoji:"🐝",   weight:18, honey:1,  perQ:true,   desc:"+1 Honey per question"},
+      {name:"Beehive Bee",  emoji:"🍯🐝", weight:14, honey:5,  perQ:true,   desc:"+5 Honey per question"},
+      {name:"Business Bee", emoji:"💼🐝", weight:12, honey:10, perQ:true,   desc:"+10 Honey per question"},
+      {name:"Monocle Bee",  emoji:"🧐🐝", weight:10, honey:15, perQ:true,   desc:"+15 Honey per question"},
+      {name:"Magic Bee",    emoji:"✨🐝", weight:8,  honey:20, perQ:true,   desc:"+20 Honey per question"},
+      {name:"Knight Bee",   emoji:"🛡️🐝", weight:7,  honey:25, perQ:true,   desc:"+25 Honey per question"},
+      {name:"Baseball Bee", emoji:"⚾🐝", weight:4,  honey:75, perQ:true,   desc:"+75 Honey per question"},
+      {name:"Unicorn Bee",  emoji:"🦄🐝", weight:3,  mult:2,   perQ:true,   desc:"Double Honey per question!"},
+      {name:"King Bee",     emoji:"👸🐝", weight:1,  mult:3,   perQ:true,   desc:"Triple Honey per question!"},
+      {name:"Worker Bee",   emoji:"🔨🐝", weight:16, honey:10, perQ:false,  desc:"+10 Honey now"},
+      {name:"Beanie Bee",   emoji:"🎓🐝", weight:12, honey:25, perQ:false,  desc:"+25 Honey now"},
+      {name:"Garden Bee",   emoji:"🌸🐝", weight:10, honey:50, perQ:false,  desc:"+50 Honey now"},
+      {name:"Cool Bee",     emoji:"😎🐝", weight:7,  honey:100,perQ:false,  desc:"+100 Honey now"},
+      {name:"Chef Bee",     emoji:"👨‍🍳🐝",weight:4,  mult:2,   perQ:false,  desc:"Double Honey now!"},
+      {name:"Ghost Bee",    emoji:"👻🐝", weight:2,  mult:3,   perQ:false,  desc:"Triple Honey now!"},
+      {name:"Pirate Bee",   emoji:"🏴‍☠️🐝",weight:8,  steal:10,             desc:"Take 10% from a player"},
+      {name:"Vampire Bee",  emoji:"🧛🐝", weight:5,  steal:25,             desc:"Take 25% from a player"},
+      {name:"Baby Bee",     emoji:"🍼🐝", weight:6,  distract:"minify",    desc:"Shrink others' screens!"},
+      {name:"Science Bee",  emoji:"🔬🐝", weight:5,  distract:"chemicals", desc:"Distract with Chemical Splats"},
+      {name:"Ninja Bee",    emoji:"🥷🐝", weight:5,  distract:"stars",     desc:"Distract with Ninja Stars"},
+      {name:"Astro Bee",    emoji:"🚀🐝", weight:5,  distract:"meteors",   desc:"Distract with Meteors"},
+      {name:"Sporty Bee",   emoji:"🏀🐝", weight:5,  distract:"balls",     desc:"Distract with Basketballs"},
+      {name:"Tornado Bee",  emoji:"🌪️🐝", weight:4,  distract:"tornado",   desc:"Distract with a Tornado"},
+      {name:"Barry Bee",    emoji:"🎵🐝", weight:4,  distract:"jazz",      desc:"Distract with Jazz"},
+      {name:"Clown Bee",    emoji:"🤡🐝", weight:4,  distract:"juggling",  desc:"Distract with Juggling"},
+      {name:"Judge Bee",    emoji:"⚖️🐝", weight:4,  distract:"gavel",     desc:"Distract with a Gavel"},
+      {name:"Cowboy Bee",   emoji:"🤠🐝", weight:4,  distract:"tumble",    desc:"Distract with Tumbleweeds"},
+      {name:"Night Bee",    emoji:"🌙🐝", weight:3,  distract:"darkness",  desc:"Distract with Darkness"},
+      {name:"DJ Bee",       emoji:"🎧🐝", weight:3,  distract:"edm",       desc:"Distract with EDM"},
+      {name:"Blizzard Bee", emoji:"❄️🐝", weight:3,  distract:"blizzard",  desc:"Distract with a Blizzard"},
+    ];
+    const BEE_DISTRACT_DURATION = 20000;
+
+    // ══════════════════════════════════════════════════════════════
+    // CRYPTO HACK CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    const BOT_CARDS = [
+      {name:"Watson",     emoji:"🤖",  weight:20, crypto:0,    desc:"Nothing! (0 Crypto)"},
+      {name:"Lil Bot",    emoji:"🤖",  weight:18, crypto:10,   desc:"+10 Crypto"},
+      {name:"Angry Bot",  emoji:"😠🤖",weight:15, crypto:20,   desc:"+20 Crypto"},
+      {name:"Happy Bot",  emoji:"😊🤖",weight:12, crypto:30,   desc:"+30 Crypto"},
+      {name:"Lovely Bot", emoji:"❤️🤖",weight:9,  crypto:50,   desc:"+50 Crypto"},
+      {name:"Buddy Bot",  emoji:"🤝🤖",weight:6,  mult:2,      desc:"Double Crypto!"},
+      {name:"Brainy Bot", emoji:"🧠🤖",weight:4,  mult:3,      desc:"Triple Crypto!"},
+      {name:"Mega Bot",   emoji:"⚡🤖",weight:2,  hack:true,   desc:"HACK — steal crypto!"},
+    ];
+    const CRYPTO_PASSWORDS = [
+      "alpha7","beta42","gamma9","delta3","echo11","zeta88","theta5",
+      "omega21","sigma0","kappa17","lambda6","rho33","phi99","psi14","chi72",
+      "tau55","upsilon8","nu44","mu19","xi66","iota2","eta37","epsilon60"
+    ];
+
+    // ══════════════════════════════════════════════════════════════
+    // DECEPTIVE DINOS CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    const DINO_CARDS = [
+      {name:"Amber",           emoji:"🟡", weight:22, fossils:10  },
+      {name:"Dino Egg",        emoji:"🥚",  weight:18, fossils:25  },
+      {name:"Dino Fossil",     emoji:"🦴",  weight:14, fossils:50  },
+      {name:"Stegosaurus",     emoji:"🦕",  weight:11, fossils:75  },
+      {name:"Velociraptor",    emoji:"🦖",  weight:8,  fossils:100 },
+      {name:"Brontosaurus",    emoji:"🦕",  weight:6,  fossils:125 },
+      {name:"Triceratops",     emoji:"🦏",  weight:3,  fossils:250 },
+      {name:"Tyrannosaurus Rex",emoji:"👑🦖",weight:1, fossils:500 },
+      {name:"x1.5 Multiplier", emoji:"✨",  weight:5,  mult:1.5   },
+      {name:"x2 Multiplier",   emoji:"⭐",  weight:2,  mult:2     },
+    ];
+
+    // ══════════════════════════════════════════════════════════════
+    // MONSTER BRAWL CONSTANTS
+    // ══════════════════════════════════════════════════════════════
+    const MB_MAPS = [
+      {id:"snowy",  name:"Snowy Plains",  emoji:"❄️",  bg:"linear-gradient(180deg,#b3e5ff,#e1f5fe)",
+       enemies:[
+         {name:"Ice Slime",    hp:5,   speed:0.1, xp:0.5,  emoji:"🩵"},
+         {name:"Ice Bat",      hp:20,  speed:0.1, xp:0.75, emoji:"🧊"},
+         {name:"Frozen Fossil",hp:40,  speed:0.3, xp:1.25, emoji:"💎"},
+         {name:"Bush Monster", hp:50,  speed:0.5, xp:1,    emoji:"🌿"},
+         {name:"Ice Bug",      hp:100, speed:1,   xp:2.5,  emoji:"❄️"},
+         {name:"Ice Crab",     hp:120, speed:1,   xp:3.75, emoji:"🦀"},
+         {name:"Ding",         hp:175, speed:2,   xp:5,    emoji:"🔔"},
+         {name:"Donk",         hp:200, speed:2.5, xp:6.5,  emoji:"🐸"},
+         {name:"Ice Elemental",hp:250, speed:3,   xp:7.5,  emoji:"💠"},
+         {name:"Rock Monster", hp:500, speed:2.5, xp:9,    emoji:"🪨"},
+         {name:"Yeti",         hp:1000,speed:0.9, xp:10,   emoji:"🏔️", boss:true},
+       ]},
+      {id:"clockwork",name:"Clock Tower", emoji:"⏰", bg:"linear-gradient(180deg,#d7ccc8,#bcaaa4)",
+       enemies:[
+         {name:"Clockwork Bat",   hp:5,   speed:0.1, xp:0.5,  emoji:"⚙️"},
+         {name:"Clockwork Toucan",hp:20,  speed:0.1, xp:0.75, emoji:"🦜"},
+         {name:"Clockwork Robot", hp:30,  speed:0.3, xp:1,    emoji:"🤖", shoots:true},
+         {name:"Clockwork Bug",   hp:35,  speed:0.5, xp:1.25, emoji:"🪲"},
+         {name:"Clockwork Crab",  hp:60,  speed:1,   xp:2,    emoji:"🦀"},
+         {name:"Alarm Bot",       hp:80,  speed:1,   xp:2.5,  emoji:"⏰"},
+         {name:"Clockwork Tophat",hp:120, speed:1.5, xp:3.5,  emoji:"🎩"},
+         {name:"Lightbulb Robot", hp:200, speed:2,   xp:5,    emoji:"💡", shoots:true, boss:true},
+       ]},
+    ];
+    const MB_WEAPONS = [
+      {name:"Boomerang Pizza",  emoji:"🍕", color:"#e65100"},
+      {name:"Booming Bubbles",  emoji:"🫧", color:"#29b6f6"},
+      {name:"Bouncy Slime",     emoji:"🟢", color:"#43a047"},
+      {name:"Buzzing Bees",     emoji:"🐝", color:"#f9a825"},
+      {name:"Crazy Acorns",     emoji:"🌰", color:"#8d6e63"},
+      {name:"Curving Banana",   emoji:"🍌", color:"#fdd835"},
+      {name:"Dark Energy",      emoji:"🌑", color:"#311b92"},
+      {name:"Flying Feathers",  emoji:"🪶", color:"#ff7043"},
+      {name:"Juggling Spheres", emoji:"⚽", color:"#1976d2"},
+      {name:"Rapid Eggs",       emoji:"🥚", color:"#ffcc02"},
+      {name:"Rapid-Fire Lasers",emoji:"⚡", color:"#c62828"},
+      {name:"Rebounding Shells",emoji:"🐢", color:"#388e3c"},
+      {name:"Slicing Cards",    emoji:"🃏", color:"#7b1fa2"},
+      {name:"Speeding Arrows",  emoji:"🏹", color:"#0288d1"},
+      {name:"Sticky Syrup",     emoji:"🍁", color:"#e65100"},
+      {name:"Whirling Bones",   emoji:"🦴", color:"#757575"},
+    ];
+
+    // ── Fishing Frenzy constants ──
+    // All obtainable blooks scored by rarity weight
+    const FISHING_RARITIES = [
+      {rarity:R.COMMON, weight:55,  points:10 },
+      {rarity:R.RARE,   weight:25,  points:30 },
+      {rarity:R.EPIC,   weight:12,  points:70 },
+      {rarity:R.LEG,    weight:5,   points:150},
+      {rarity:R.SUP,    weight:2,   points:220},
+      {rarity:R.CHR,    weight:0.8, points:350},
+      {rarity:R.MYS,    weight:0.2, points:600},
+    ];
+    const LURES = [
+      {name:"Basic Lure",     emoji:"🪝", speedBonus:0,    luckBonus:0   },
+      {name:"Shiny Lure",     emoji:"✨", speedBonus:0.15, luckBonus:0.1 },
+      {name:"Golden Lure",    emoji:"🥇", speedBonus:0.25, luckBonus:0.2 },
+      {name:"Rainbow Lure",   emoji:"🌈", speedBonus:0.4,  luckBonus:0.4 },
+      {name:"Mythic Lure",    emoji:"🔮", speedBonus:0.6,  luckBonus:0.7 },
+    ];
+    const FRENZY_CHANCE = 0.04; // 4% per catch
+    const FRENZY_DURATION = 10000; // 10s
 
     // Random name pool for anonymous mode
     const RANDOM_NAMES = ["Shadow Fox","Neon Tiger","Blaze Wolf","Storm Hawk","Iron Bear","Pixel Cat","Void Shark","Frost Eagle","Dark Panda","Lime Gecko","Ruby Drake","Cobalt Elk","Ghost Lynx","Solar Crow","Ember Mole"];
@@ -3488,9 +3723,13 @@
       return formatCode(next);
     }
 
-    // ── Hide sidebar + topbar ──
-    function hideShell(){ document.querySelector(".shell").style.display="none"; }
-    function showShell(){ document.querySelector(".shell").style.display="grid"; }
+    // ── Hide sidebar + topbar (entire shell + top bar inside main) ──
+    function hideShell(){
+      document.querySelector(".shell").style.display="none";
+    }
+    function showShell(){
+      document.querySelector(".shell").style.display="grid";
+    }
 
     // ── Update showView to handle joingame ──
     // (patched below in _origShowView wrapper)
@@ -3660,16 +3899,64 @@
       if(gameDbUnsubscribe) gameDbUnsubscribe();
       gameDbUnsubscribe = onValue(ref(db,"games/"+code), snap=>{
         if(!snap.exists()) return;
+        const prev=currentGame;
         currentGame = snap.val();
         renderGameLeaderboard();
         if(currentGame.status==="playing"&&!gameTimerInterval){
           document.getElementById("gs-status-pill").textContent="Playing";
           document.getElementById("gs-start-btn").style.display="none";
-          // Show leaderboard panel now that game has started
           const lbPanel=document.getElementById("game-lb-panel");
           if(lbPanel) lbPanel.style.display="flex";
+          // Init game state for player based on mode
+          if(gameRole==="player"){
+            const mid=currentGame.modeId;
+            if(mid==="fishingfrenzy"){
+              fishingState={casting:false,lureIdx:0,catchCount:0,frenzyActive:false,frenzyTimeout:null};
+              myGameData.fishScore=0;
+            } else if(mid==="busybees"){
+              beeState={honey:0,perQMult:1,perQBonus:0,distractActive:null,distractTimeout:null,spinning:false};
+            } else if(mid==="cryptohack"){
+              cryptoState={crypto:0,spinning:false,myPassword:"",hackPending:false};
+            } else if(mid==="dinos"){
+              dinoState={fossils:0,mult:1,digging:false};
+            } else if(mid==="monsterbrawl"){
+              mbState={hp:100,maxHp:100,xp:0,level:1,weapons:[],enemies:[],gameLoop:null,mapId:"",score:0};
+            }
+          }
           renderGameActionArea(code);
           startGameTimer(code);
+        }
+        // Fishing frenzy: sync frenzy state and host catches
+        if(currentGame.modeId==="fishingfrenzy"){
+          // Sync frenzy to non-host players
+          if(gameRole==="player"&&currentGame.frenzyActive&&!fishingState.frenzyActive){
+            fishingState.frenzyActive=true;
+            clearTimeout(fishingState.frenzyTimeout);
+            const remaining=Math.max(0,(currentGame.frenzyEndsAt||0)-Date.now());
+            fishingState.frenzyTimeout=setTimeout(()=>{
+              fishingState.frenzyActive=false;
+              const area=document.getElementById("game-action-area");
+              if(area) area.style.background="#e0f4ff";
+              const fs=document.getElementById("frenzy-style"); if(fs) fs.remove();
+              renderFishingFrenzy(code);
+            },remaining);
+            renderFishingFrenzy(code);
+          }
+          if(!currentGame.frenzyActive&&fishingState.frenzyActive&&gameRole==="player"){
+            fishingState.frenzyActive=false;
+          }
+          // Host: watch for new catches to animate
+          if(gameRole==="host"&&currentGame.players){
+            const fhBanner=document.getElementById("frenzy-host-banner");
+            if(fhBanner) fhBanner.style.display=currentGame.frenzyActive?"block":"none";
+            Object.values(currentGame.players).forEach(p=>{
+              if(!p.lastCatch) return;
+              const prev_player=prev?.players?.[p.uid];
+              if(!prev_player||prev_player.lastCatch?.ts!==p.lastCatch.ts){
+                spawnHostCatchAnimation(p.displayName||p.username,p.lastCatch.name,p.lastCatch.rarity);
+              }
+            });
+          }
         }
         if(currentGame.status==="ended") endGame();
       });
@@ -3687,10 +3974,17 @@
         </div>`;
     }
 
+    function getScoreKey(modeId){ return modeId==="fishingfrenzy"?"fishScore":modeId==="busybees"?"honey":modeId==="cryptohack"?"crypto":modeId==="dinos"?"fossils":modeId==="monsterbrawl"?"xp":"gold"; }
+    function getScoreEmoji(modeId){ return modeId==="fishingfrenzy"?"🐟":modeId==="busybees"?"🍯":modeId==="cryptohack"?"💻":modeId==="dinos"?"🦴":modeId==="monsterbrawl"?"⭐":"⛏️"; }
+
     function renderGameLeaderboard(){
       const lb = document.getElementById("game-leaderboard");
       if(!lb||!currentGame) return;
-      const players = Object.values(currentGame.players||{}).sort((a,b)=>(b.gold||0)-(a.gold||0));
+      const scoreKey = getScoreKey(currentGame.modeId);
+      const scoreEmoji = getScoreEmoji(currentGame.modeId);
+      const players = Object.values(currentGame.players||{})
+        .filter(p=>p.uid!==currentGame.hostUid)
+        .sort((a,b)=>(b[scoreKey]||0)-(a[scoreKey]||0));
       document.getElementById("gs-player-count").textContent=players.length+" players";
       lb.innerHTML="";
       players.forEach((p,i)=>{
@@ -3698,7 +3992,7 @@
         row.style.cssText=`display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:${p.uid===currentUser.uid?"rgba(13,71,161,.15)":"rgba(255,255,255,.6)"};border:1px solid ${p.uid===currentUser.uid?"rgba(13,71,161,.3)":"rgba(13,71,161,.1)"};`;
         const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":`<span style="font-size:12px;color:#789;min-width:18px;">${i+1}.</span>`;
         const blookEl = p.blook?`<div style="width:32px;height:32px;border-radius:8px;background:${rarityColor((BLOOK_INFO[p.blook]||{rarity:"Common"}).rarity)};font-size:7px;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;flex-shrink:0;">${p.blook}</div>`:"<div style='width:32px;height:32px;border-radius:8px;background:#ccc;flex-shrink:0;'></div>";
-        row.innerHTML=`${medal}${blookEl}<span style="flex:1;font-size:13px;color:#123;font-weight:600;">${p.displayName||p.username}</span><span style="font-size:13px;color:#0d47a1;font-weight:700;">${(p.gold||0)} ⛏️</span>`;
+        row.innerHTML=`${medal}${blookEl}<span style="flex:1;font-size:13px;color:#123;font-weight:600;">${p.displayName||p.username}</span><span style="font-size:13px;color:#0d47a1;font-weight:700;">${(p[scoreKey]||0)} ${scoreEmoji}</span>`;
         lb.appendChild(row);
       });
     }
@@ -3741,8 +4035,895 @@
     let lastChestResult = "";
 
     function renderGameActionArea(code){
-      if(currentGame.modeId==="goldrush") renderGoldRush(code);
+      if(currentGame.modeId==="goldrush")      renderGoldRush(code);
+      else if(currentGame.modeId==="fishingfrenzy") renderFishingFrenzy(code);
+      else if(currentGame.modeId==="busybees")  renderBusyBees(code);
+      else if(currentGame.modeId==="cryptohack") renderCryptoHack(code);
+      else if(currentGame.modeId==="dinos")     renderDeceptiveDinos(code);
+      else if(currentGame.modeId==="monsterbrawl") renderMonsterBrawl(code);
     }
+
+    // ── FISHING FRENZY ──
+    let fishingState = { casting:false, lureIdx:0, catchCount:0, frenzyActive:false, frenzyTimeout:null };
+
+    function pickFishingBlook(luckBonus){
+      // Pick a rarity weighted by luck bonus
+      const rarities = FISHING_RARITIES.map(r=>({...r, w:r.weight*(1+luckBonus)}));
+      const total = rarities.reduce((s,r)=>s+r.w,0);
+      let rnd = Math.random()*total;
+      let chosen = rarities[0];
+      for(const r of rarities){ if(rnd<=r.w){chosen=r;break;} rnd-=r.w; }
+      // Pick a blook of that rarity from ALL packs
+      const pool=[];
+      ALL_PACKS_FOR_OWNER.forEach(pack=>{ pack.blooks.forEach(b=>{ if(b.rarity===chosen.rarity) pool.push(b); }); });
+      if(!pool.length) return {name:"Old Boot",rarity:R.COMMON,points:10};
+      const b=pool[Math.floor(Math.random()*pool.length)];
+      return {name:b.name, rarity:b.rarity, points:chosen.points};
+    }
+
+    function renderFishingFrenzy(code){
+      if(gameRole==="host"){
+        renderFishingHostView(code);
+        return;
+      }
+      const lure = LURES[fishingState.lureIdx]||LURES[0];
+      const area = document.getElementById("game-action-area");
+      area.style.background = fishingState.frenzyActive
+        ? "linear-gradient(135deg,#ff8a80,#ffab40,#ffff8d,#69f0ae,#82b1ff,#ea80fc)"
+        : "#e0f4ff";
+      area.innerHTML=`
+        <div style="width:100%;max-width:520px;text-align:center;">
+          ${fishingState.frenzyActive?`<div id="frenzy-banner" style="font-family:'Titan One',system-ui;font-size:22px;color:#c62828;background:rgba(255,255,255,.8);border-radius:12px;padding:8px 20px;margin-bottom:12px;animation:pulse-frenzy 0.5s infinite alternate;">🌈 FRENZY! 🌈</div>`:""}
+          <!-- Sky / Water scene -->
+          <div id="fishing-scene" style="position:relative;width:100%;height:220px;border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#b3e5ff 0%,#b3e5ff 55%,#0288d1 55%,#01579b 100%);border:2px solid rgba(13,71,161,.2);margin-bottom:14px;">
+            <!-- Dock -->
+            <div style="position:absolute;bottom:90px;left:50%;transform:translateX(-50%);width:120px;height:14px;background:#8d6e63;border-radius:4px;z-index:2;"></div>
+            <!-- Player blook on dock -->
+            <div style="position:absolute;bottom:104px;left:50%;transform:translateX(-50%);width:44px;height:44px;border-radius:10px;background:${rarityColor((BLOOK_INFO[myGameData.blook]||{rarity:'Common'}).rarity)};display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;text-align:center;padding:2px;z-index:3;">${myGameData.blook||"?"}</div>
+            <!-- Fishing rod line -->
+            <div id="fish-line" style="position:absolute;left:50%;bottom:104px;width:2px;background:#333;transform-origin:top;height:${fishingState.casting?90:0}px;transition:height 0.4s;z-index:2;"></div>
+            <!-- Catch animation -->
+            <div id="catch-display" style="position:absolute;bottom:55px;left:50%;transform:translateX(-50%);font-size:28px;opacity:0;transition:opacity 0.3s;z-index:4;"></div>
+          </div>
+          <!-- Score and lure -->
+          <div style="display:flex;gap:16px;justify-content:center;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+            <div style="font-size:14px;color:#0d47a1;font-weight:700;">Score: <span id="fish-score-display" style="font-size:20px;">${myGameData.fishScore||0}</span> 🐟</div>
+            <div style="font-size:13px;background:#e3f2fd;border-radius:8px;padding:6px 12px;border:1px solid #90caf9;">${lure.emoji} ${lure.name} <span style="color:#43a047;font-size:11px;">${lure.luckBonus>0?"+"+Math.round(lure.luckBonus*100)+"% luck":""} ${lure.speedBonus>0?"+"+Math.round(lure.speedBonus*100)+"% speed":""}</span></div>
+            <div style="font-size:11px;color:#789;">Catches: ${fishingState.catchCount} • Next lure at ${Math.ceil((fishingState.catchCount+1)/7)*7}</div>
+          </div>
+          <div id="fish-result-msg" style="min-height:28px;font-size:16px;font-weight:700;color:#0d47a1;margin-bottom:12px;"></div>
+          <button id="cast-btn" style="background:${fishingState.casting?"#90caf9":"#0288d1"};color:#fff;font-size:18px;font-weight:700;padding:14px 48px;border-radius:14px;box-shadow:0 4px 14px rgba(2,136,209,.35);${fishingState.casting?"opacity:0.6;cursor:not-allowed;":""}" ${fishingState.casting?"disabled":""}>
+            ${fishingState.casting?"Reeling in...":"🎣 Cast!"}
+          </button>
+        </div>`;
+      if(!fishingState.casting){
+        document.getElementById("cast-btn").addEventListener("click",()=>doCast(code));
+      }
+      // Add frenzy CSS if needed
+      if(fishingState.frenzyActive && !document.getElementById("frenzy-style")){
+        const s=document.createElement("style");
+        s.id="frenzy-style";
+        s.textContent="@keyframes pulse-frenzy{from{transform:scale(1)}to{transform:scale(1.04)}}";
+        document.head.appendChild(s);
+      }
+    }
+
+    async function doCast(code){
+      if(fishingState.casting) return;
+      fishingState.casting=true;
+      renderFishingFrenzy(code);
+      // Animate line extending
+      const line=document.getElementById("fish-line");
+      if(line) line.style.height="90px";
+      const lure=LURES[fishingState.lureIdx]||LURES[0];
+      const baseTime=1000+Math.random()*4000;
+      const castTime=baseTime*(1-lure.speedBonus)*(fishingState.frenzyActive?0.5:1);
+      setTimeout(async()=>{
+        // Pick catch
+        const luckBonus=(lure.luckBonus||0)+(fishingState.frenzyActive?0.5:0);
+        const catch_=pickFishingBlook(luckBonus);
+        fishingState.catchCount++;
+        myGameData.fishScore=(myGameData.fishScore||0)+catch_.points;
+        // Upgrade lure every 7 catches
+        const newLureIdx=Math.min(LURES.length-1,Math.floor(fishingState.catchCount/7));
+        const lureUpgrade=newLureIdx>fishingState.lureIdx;
+        fishingState.lureIdx=newLureIdx;
+        // Check frenzy
+        if(!fishingState.frenzyActive && Math.random()<FRENZY_CHANCE){
+          fishingState.frenzyActive=true;
+          clearTimeout(fishingState.frenzyTimeout);
+          fishingState.frenzyTimeout=setTimeout(()=>{
+            fishingState.frenzyActive=false;
+            const area=document.getElementById("game-action-area");
+            if(area) area.style.background="#e0f4ff";
+            renderFishingFrenzy(code);
+            const fs=document.getElementById("frenzy-style"); if(fs) fs.remove();
+          },FRENZY_DURATION);
+          // Broadcast frenzy to DB
+          await update(ref(db,"games/"+code),{frenzyActive:true,frenzyEndsAt:Date.now()+FRENZY_DURATION});
+          setTimeout(()=>update(ref(db,"games/"+code),{frenzyActive:false,frenzyEndsAt:0}).catch(()=>{}),FRENZY_DURATION);
+        }
+        // Save to Firebase
+        await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{
+          fishScore:myGameData.fishScore,
+          lastCatch:{name:catch_.name,rarity:catch_.rarity,points:catch_.points,ts:Date.now()}
+        });
+        fishingState.casting=false;
+        // Show catch display
+        const catchEl=document.getElementById("catch-display");
+        if(catchEl){
+          catchEl.textContent=rarityColor(catch_.rarity)==="#6a1b9a"?"🔮":"🐟";
+          catchEl.style.opacity="1";
+          setTimeout(()=>{if(catchEl)catchEl.style.opacity="0";},1200);
+        }
+        // Show result
+        const resultEl=document.getElementById("fish-result-msg");
+        if(resultEl){
+          resultEl.textContent=`${catch_.name} (${catch_.rarity}) +${catch_.points} pts!${lureUpgrade?" 🎉 Lure upgraded to "+LURES[fishingState.lureIdx].name+"!":""}`;
+          resultEl.style.color=rarityColor(catch_.rarity);
+        }
+        const scoreEl=document.getElementById("fish-score-display");
+        if(scoreEl) scoreEl.textContent=myGameData.fishScore||0;
+        // Re-render cast button
+        const castBtn=document.getElementById("cast-btn");
+        if(castBtn){
+          castBtn.textContent="🎣 Cast!";
+          castBtn.disabled=false;
+          castBtn.style.opacity="1";
+          castBtn.style.background="#0288d1";
+          castBtn.style.cursor="pointer";
+          castBtn.addEventListener("click",()=>doCast(code));
+        }
+        const lineEl=document.getElementById("fish-line");
+        if(lineEl) lineEl.style.height="0px";
+      }, castTime);
+    }
+
+    // Host view for Fishing Frenzy — show catches jumping from bottom
+    function renderFishingHostView(code){
+      const area=document.getElementById("game-action-area");
+      area.style.background="#e0f4ff";
+      area.innerHTML=`
+        <div style="width:100%;height:100%;position:relative;display:flex;flex-direction:column;align-items:center;">
+          <div style="font-family:'Titan One',system-ui;font-size:22px;color:#0d47a1;margin-bottom:8px;margin-top:16px;">🎣 Fishing Frenzy — Live Catches</div>
+          <div style="font-size:13px;color:#567;margin-bottom:16px;">Watch what your players are catching!</div>
+          <div id="host-catch-stage" style="position:relative;width:100%;flex:1;overflow:hidden;background:linear-gradient(180deg,#b3e5ff 0%,#b3e5ff 60%,#0288d1 60%,#01579b 100%);border-radius:16px;border:2px solid rgba(13,71,161,.2);"></div>
+          <div id="frenzy-host-banner" style="display:none;font-family:'Titan One',system-ui;font-size:18px;color:#c62828;margin-top:10px;background:rgba(255,255,255,.8);padding:6px 20px;border-radius:10px;">🌈 FRENZY ACTIVE!</div>
+        </div>`;
+    }
+
+    function spawnHostCatchAnimation(playerName, blookName, rarity){
+      const stage=document.getElementById("host-catch-stage"); if(!stage) return;
+      const el=document.createElement("div");
+      const col=rarityColor(rarity);
+      el.style.cssText=`position:absolute;bottom:-80px;left:${10+Math.random()*70}%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;animation:fish-jump 2.4s ease-out forwards;pointer-events:none;`;
+      el.innerHTML=`<div style="width:44px;height:44px;border-radius:10px;background:${col};display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;text-align:center;padding:3px;box-shadow:0 4px 12px rgba(0,0,0,.3);">${blookName}</div><div style="font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);">${playerName}</div>`;
+      stage.appendChild(el);
+      setTimeout(()=>el.remove(),2500);
+      if(!document.getElementById("fish-jump-style")){
+        const s=document.createElement("style"); s.id="fish-jump-style";
+        s.textContent="@keyframes fish-jump{0%{bottom:-80px;opacity:1}45%{bottom:60%;opacity:1}100%{bottom:-80px;opacity:0}}";
+        document.head.appendChild(s);
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // BUSY BEES
+    // ══════════════════════════════════════════════════════════════
+    let beeState = {honey:0,perQMult:1,perQBonus:0,distractActive:null,distractTimeout:null,spinning:false};
+    let beeDistractInterval = null;
+
+    function pickBeeCard(){
+      const total=BEE_CARDS.reduce((s,c)=>s+c.weight,0);
+      let r=Math.random()*total;
+      for(const c of BEE_CARDS){if(r<=c.weight)return c;r-=c.weight;}
+      return BEE_CARDS[0];
+    }
+
+    function renderBusyBees(code){
+      if(gameRole==="host"){
+        const area=document.getElementById("game-action-area");
+        area.innerHTML=`<div style="text-align:center"><div style="font-size:60px">🐝</div><div style="font-family:'Titan One',system-ui;font-size:28px;color:#0d47a1;margin-top:12px;">Hosting Busy Bees</div><div style="font-size:14px;color:#567;margin-top:8px;">Watch the leaderboard — you can't play as host!</div></div>`;
+        return;
+      }
+      const area=document.getElementById("game-action-area");
+      const distract=beeState.distractActive;
+      area.style.background=distract==="darkness"?"#111":distract==="blizzard"?"#e3f2fd":"#e0f4ff";
+      area.innerHTML=`
+        <div style="width:100%;max-width:480px;text-align:center;position:relative;">
+          ${distract?`<div id="bee-distract-overlay" style="position:absolute;inset:0;z-index:10;pointer-events:none;overflow:hidden;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${distract==="darkness"?"rgba(0,0,0,.85)":distract==="blizzard"?"rgba(200,230,255,.4)":"transparent"};">
+            <div style="font-size:60px;opacity:.7;">${distract==="chemicals"?"⚗️":distract==="stars"?"⭐":distract==="meteors"?"☄️":distract==="balls"?"🏀":distract==="tornado"?"🌪️":distract==="jazz"?"🎵":distract==="juggling"?"🤹":distract==="gavel"?"⚖️":distract==="tumble"?"🌵":distract==="edm"?"🎧":distract==="blizzard"?"❄️":distract==="minify"?"🔍":"💥"}</div>
+          </div>`:""}
+          <div style="font-size:14px;color:#0d47a1;font-weight:700;margin-bottom:4px;">Your Honey: <span id="bee-honey-display" style="font-size:26px;">${beeState.honey||0}</span> 🍯</div>
+          <div style="font-size:12px;color:#789;margin-bottom:12px;">Per-question bonus: +${beeState.perQBonus||0}🍯 × ${beeState.perQMult||1}x</div>
+          <div id="bee-result-msg" style="min-height:28px;font-size:16px;font-weight:700;color:#f9a825;margin-bottom:14px;"></div>
+          <div id="bee-spin-area" style="width:160px;height:160px;border-radius:50%;background:conic-gradient(#fdd835,#f9a825,#fdd835,#ffee58,#fdd835);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:56px;box-shadow:0 6px 20px rgba(249,168,37,.4);border:4px solid #f9a825;cursor:${beeState.spinning?"not-allowed":"pointer"};transition:.2s;" id="bee-hive">🍯</div>
+          <button id="bee-spin-btn" style="background:${beeState.spinning?"#ccc":"#f9a825"};color:#fff;font-size:18px;font-weight:700;padding:12px 40px;border-radius:12px;" ${beeState.spinning?"disabled":""}>
+            ${beeState.spinning?"Buzzing...":"🐝 Spin!"}
+          </button>
+        </div>`;
+      if(!beeState.spinning){
+        document.getElementById("bee-spin-btn").addEventListener("click",()=>doBeeSpin(code));
+      }
+    }
+
+    async function doBeeSpin(code){
+      if(beeState.spinning||currentGame.status!=="playing") return;
+      beeState.spinning=true;
+      renderBusyBees(code);
+      const hive=document.getElementById("bee-hive");
+      if(hive){hive.style.transform="rotate(360deg)";hive.style.transition="transform 0.8s ease";}
+      setTimeout(async()=>{
+        const card=pickBeeCard();
+        let resultMsg="";
+        if(card.steal){
+          // Steal from random player
+          const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid&&(p.honey||0)>0);
+          if(players.length){
+            const target=players[Math.floor(Math.random()*players.length)];
+            const stolen=Math.floor((target.honey||0)*(card.steal/100));
+            await update(ref(db,"games/"+code+"/players/"+target.uid),{honey:Math.max(0,(target.honey||0)-stolen)});
+            beeState.honey=(beeState.honey||0)+stolen;
+            resultMsg=`${card.emoji} Stole ${stolen}🍯 from ${target.displayName||target.username}!`;
+          } else {
+            resultMsg=`${card.emoji} No one to steal from!`;
+          }
+        } else if(card.effect==="swap"){
+          const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid);
+          if(players.length){
+            const target=players[Math.floor(Math.random()*players.length)];
+            const myH=beeState.honey||0; const theirH=target.honey||0;
+            beeState.honey=theirH;
+            await update(ref(db,"games/"+code+"/players/"+target.uid),{honey:myH});
+            resultMsg=`${card.emoji} Swapped honey with ${target.displayName||target.username}!`;
+          } else { resultMsg=`${card.emoji} No one to swap with!`; }
+        } else if(card.distract){
+          // Broadcast distraction to all other players
+          await update(ref(db,"games/"+code),{distract:card.distract,distractBy:currentUser.uid,distractAt:Date.now()});
+          resultMsg=`${card.emoji} ${card.desc}!`;
+        } else if(card.perQ){
+          if(card.mult){ beeState.perQMult=(beeState.perQMult||1)*card.mult; resultMsg=`${card.emoji} ${card.desc}`; }
+          else{ beeState.perQBonus=(beeState.perQBonus||0)+card.honey; resultMsg=`${card.emoji} ${card.desc}`; }
+          // Grant immediate per-Q honey
+          const earned=Math.floor(((beeState.perQBonus||0))*(beeState.perQMult||1));
+          beeState.honey=(beeState.honey||0)+earned;
+        } else {
+          if(card.mult){ beeState.honey=Math.floor((beeState.honey||0)*card.mult); resultMsg=`${card.emoji} ${card.desc}`; }
+          else{ beeState.honey=(beeState.honey||0)+(card.honey||0); resultMsg=`${card.emoji} +${card.honey}🍯`; }
+        }
+        await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{honey:beeState.honey});
+        beeState.spinning=false;
+        renderBusyBees(code);
+        const msgEl=document.getElementById("bee-result-msg");
+        if(msgEl){msgEl.textContent=resultMsg; setTimeout(()=>{if(msgEl)msgEl.textContent="";},3000);}
+        const scoreEl=document.getElementById("bee-honey-display");
+        if(scoreEl) scoreEl.textContent=beeState.honey||0;
+      },900);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // CRYPTO HACK
+    // ══════════════════════════════════════════════════════════════
+    let cryptoState = {crypto:0,spinning:false,myPassword:"",hackPending:false};
+
+    function pickBotCard(){
+      const total=BOT_CARDS.reduce((s,c)=>s+c.weight,0);
+      let r=Math.random()*total;
+      for(const c of BOT_CARDS){if(r<=c.weight)return c;r-=c.weight;}
+      return BOT_CARDS[0];
+    }
+
+    function renderCryptoHack(code){
+      if(gameRole==="host"){
+        const area=document.getElementById("game-action-area");
+        area.innerHTML=`<div style="text-align:center"><div style="font-size:60px">💻</div><div style="font-family:'Titan One',system-ui;font-size:28px;color:#0d47a1;margin-top:12px;">Hosting Crypto Hack</div><div style="font-size:14px;color:#567;margin-top:8px;">Watch the leaderboard!</div></div>`;
+        return;
+      }
+      // If no password chosen yet, show password picker
+      if(!cryptoState.myPassword){
+        renderCryptoPasswordPicker(code);
+        return;
+      }
+      const area=document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="width:100%;max-width:500px;text-align:center;">
+          <div style="font-size:14px;color:#43a047;font-weight:700;margin-bottom:4px;">Your Crypto: <span id="crypto-display" style="font-size:26px;">${cryptoState.crypto||0}</span> 💻</div>
+          <div style="font-size:11px;color:#789;margin-bottom:12px;">Your password: <code style="background:#e8f5e9;padding:2px 6px;border-radius:4px;color:#2e7d32;">${cryptoState.myPassword}</code></div>
+          <div id="crypto-result-msg" style="min-height:28px;font-size:16px;font-weight:700;color:#43a047;margin-bottom:14px;"></div>
+          <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:18px;">
+            ${[0,1,2].map(i=>`<div class="bot-card-slot" data-idx="${i}" style="width:100px;height:100px;border-radius:16px;background:linear-gradient(135deg,#1b5e20,#43a047);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:40px;box-shadow:0 4px 14px rgba(67,160,71,.3);border:3px solid #66bb6a;transition:.15s;">🤖</div>`).join("")}
+          </div>
+          <button id="crypto-spin-btn" style="background:${cryptoState.spinning?"#ccc":"#43a047"};color:#fff;font-size:18px;font-weight:700;padding:12px 40px;border-radius:12px;" ${cryptoState.spinning?"disabled":""}>
+            ${cryptoState.spinning?"Processing...":"💻 Spin Bots!"}
+          </button>
+        </div>`;
+      if(!cryptoState.spinning){
+        document.getElementById("crypto-spin-btn").addEventListener("click",()=>doCryptoSpin(code));
+      }
+    }
+
+    function renderCryptoPasswordPicker(code){
+      const area=document.getElementById("game-action-area");
+      // Show 5 random passwords to pick from
+      const opts=[];
+      const pool=[...CRYPTO_PASSWORDS].sort(()=>Math.random()-0.5).slice(0,5);
+      area.innerHTML=`
+        <div style="text-align:center;max-width:420px;">
+          <div style="font-family:'Titan One',system-ui;font-size:22px;color:#2e7d32;margin-bottom:8px;">💻 Choose Your Password</div>
+          <div style="font-size:13px;color:#567;margin-bottom:16px;">Pick a password. Other players will try to hack you by guessing it!</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${pool.map(p=>`<button class="pw-choice" data-pw="${p}" style="background:#e8f5e9;border:2px solid #43a047;color:#1b5e20;font-size:16px;font-weight:700;padding:12px 20px;border-radius:10px;font-family:monospace;">${p}</button>`).join("")}
+          </div>
+        </div>`;
+      document.querySelectorAll(".pw-choice").forEach(btn=>{
+        btn.addEventListener("click",async()=>{
+          cryptoState.myPassword=btn.dataset.pw;
+          await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{password:cryptoState.myPassword});
+          renderCryptoHack(code);
+        });
+      });
+    }
+
+    async function doCryptoSpin(code){
+      if(cryptoState.spinning||currentGame.status!=="playing") return;
+      cryptoState.spinning=true;
+      renderCryptoHack(code);
+      setTimeout(async()=>{
+        const card=pickBotCard();
+        let resultMsg="";
+        if(card.hack){
+          // Show hack screen — pick a player and guess their password
+          cryptoState.spinning=false;
+          renderHackScreen(code);
+          return;
+        } else if(card.mult){
+          cryptoState.crypto=Math.floor((cryptoState.crypto||0)*card.mult);
+          resultMsg=`${card.emoji} ${card.desc}`;
+        } else {
+          cryptoState.crypto=(cryptoState.crypto||0)+(card.crypto||0);
+          resultMsg=`${card.emoji} +${card.crypto} Crypto!`;
+        }
+        await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{crypto:cryptoState.crypto});
+        cryptoState.spinning=false;
+        renderCryptoHack(code);
+        const msgEl=document.getElementById("crypto-result-msg");
+        if(msgEl){msgEl.textContent=resultMsg;setTimeout(()=>{if(msgEl)msgEl.textContent="";},2500);}
+        const dispEl=document.getElementById("crypto-display");
+        if(dispEl) dispEl.textContent=cryptoState.crypto||0;
+      },900);
+    }
+
+    function renderHackScreen(code){
+      // Pick 3 random password guesses from pool including victim's real one
+      const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid&&p.password);
+      if(!players.length){ cryptoState.spinning=false; renderCryptoHack(code); return; }
+      const victim=players[Math.floor(Math.random()*players.length)];
+      const realPw=victim.password;
+      const fakes=[...CRYPTO_PASSWORDS].filter(p=>p!==realPw).sort(()=>Math.random()-0.5).slice(0,2);
+      const opts=[realPw,...fakes].sort(()=>Math.random()-0.5);
+      const area=document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="text-align:center;max-width:420px;">
+          <div style="font-family:'Titan One',system-ui;font-size:22px;color:#c62828;margin-bottom:8px;">⚡ HACKING ${victim.displayName||victim.username}</div>
+          <div style="font-size:13px;color:#567;margin-bottom:16px;">Guess their password to steal 30% of their crypto!</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${opts.map(p=>`<button class="hack-guess" data-pw="${p}" style="background:#ffebee;border:2px solid #e53935;color:#b71c1c;font-size:16px;font-weight:700;padding:12px 20px;border-radius:10px;font-family:monospace;">${p}</button>`).join("")}
+          </div>
+        </div>`;
+      document.querySelectorAll(".hack-guess").forEach(btn=>{
+        btn.addEventListener("click",async()=>{
+          const guessed=btn.dataset.pw;
+          if(guessed===realPw){
+            const stolen=Math.floor((victim.crypto||0)*0.3);
+            await update(ref(db,"games/"+code+"/players/"+victim.uid),{crypto:Math.max(0,(victim.crypto||0)-stolen)});
+            cryptoState.crypto=(cryptoState.crypto||0)+stolen;
+            await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{crypto:cryptoState.crypto});
+            renderCryptoHack(code);
+            const msgEl=document.getElementById("crypto-result-msg");
+            if(msgEl){msgEl.textContent=`✅ Hacked! Stole ${stolen} crypto!`;setTimeout(()=>{if(msgEl)msgEl.textContent="";},2500);}
+          } else {
+            renderCryptoHack(code);
+            const msgEl=document.getElementById("crypto-result-msg");
+            if(msgEl){msgEl.textContent=`❌ Wrong password! Hack failed.`;setTimeout(()=>{if(msgEl)msgEl.textContent="";},2500);}
+          }
+          cryptoState.spinning=false;
+        });
+      });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // DECEPTIVE DINOS
+    // ══════════════════════════════════════════════════════════════
+    let dinoState = {fossils:0,mult:1,digging:false};
+
+    function pickDinoCard(){
+      const total=DINO_CARDS.reduce((s,c)=>s+c.weight,0);
+      let r=Math.random()*total;
+      for(const c of DINO_CARDS){if(r<=c.weight)return c;r-=c.weight;}
+      return DINO_CARDS[0];
+    }
+
+    function renderDeceptiveDinos(code){
+      if(gameRole==="host"){
+        const area=document.getElementById("game-action-area");
+        area.innerHTML=`<div style="text-align:center"><div style="font-size:60px">🦕</div><div style="font-family:'Titan One',system-ui;font-size:28px;color:#0d47a1;margin-top:12px;">Hosting Deceptive Dinos</div><div style="font-size:14px;color:#567;margin-top:8px;">Watch the leaderboard!</div></div>`;
+        return;
+      }
+      const area=document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="width:100%;max-width:500px;text-align:center;">
+          <div style="font-size:14px;color:#8d6e63;font-weight:700;margin-bottom:4px;">Your Fossils: <span id="dino-fossils-display" style="font-size:26px;">${dinoState.fossils||0}</span> 🦴</div>
+          <div style="font-size:12px;color:#789;margin-bottom:12px;">Multiplier: ${dinoState.mult||1}x</div>
+          <div id="dino-result-msg" style="min-height:28px;font-size:16px;font-weight:700;color:#8d6e63;margin-bottom:14px;"></div>
+          <div style="display:flex;gap:16px;justify-content:center;margin-bottom:18px;">
+            <button id="dino-excavate-btn" style="background:#8d6e63;color:#fff;font-size:16px;font-weight:700;padding:14px 28px;border-radius:12px;box-shadow:0 4px 12px rgba(141,110,99,.3);" ${dinoState.digging?"disabled":""}>
+              ⛏️ Excavate
+            </button>
+            <button id="dino-investigate-btn" style="background:#5d4037;color:#fff;font-size:16px;font-weight:700;padding:14px 28px;border-radius:12px;" ${dinoState.digging?"disabled":""}>
+              🔍 Investigate
+            </button>
+            <button id="dino-cheat-btn" style="background:#e53935;color:#fff;font-size:13px;font-weight:700;padding:10px 16px;border-radius:10px;" ${dinoState.digging?"disabled":""}>
+              👀 Cheat
+            </button>
+          </div>
+        </div>`;
+      if(!dinoState.digging){
+        document.getElementById("dino-excavate-btn").addEventListener("click",()=>doExcavate(code));
+        document.getElementById("dino-investigate-btn").addEventListener("click",()=>doInvestigate(code));
+        document.getElementById("dino-cheat-btn").addEventListener("click",()=>doCheat(code));
+      }
+    }
+
+    async function doExcavate(code){
+      if(dinoState.digging) return;
+      dinoState.digging=true;
+      renderDeceptiveDinos(code);
+      setTimeout(async()=>{
+        const card=pickDinoCard();
+        let resultMsg="";
+        if(card.mult){
+          dinoState.mult=(dinoState.mult||1)*card.mult;
+          resultMsg=`${card.emoji} ${card.name}! Multiplier now ${dinoState.mult}x!`;
+        } else {
+          const gained=Math.floor((card.fossils||0)*(dinoState.mult||1));
+          dinoState.fossils=(dinoState.fossils||0)+gained;
+          resultMsg=`${card.emoji} ${card.name}! +${gained} fossils!`;
+        }
+        await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{fossils:dinoState.fossils});
+        dinoState.digging=false;
+        renderDeceptiveDinos(code);
+        const msgEl=document.getElementById("dino-result-msg");
+        if(msgEl){msgEl.textContent=resultMsg;setTimeout(()=>{if(msgEl)msgEl.textContent="";},2500);}
+        const dispEl=document.getElementById("dino-fossils-display");
+        if(dispEl) dispEl.textContent=dinoState.fossils||0;
+      },800);
+    }
+
+    function doInvestigate(code){
+      // Show 5 players — if they have over 2x the average, "cheating"
+      const players=Object.values(currentGame.players||{}).filter(p=>p.uid!==currentUser.uid);
+      const avg=players.reduce((s,p)=>s+(p.fossils||0),0)/(players.length||1);
+      const suspects=players.sort(()=>Math.random()-0.5).slice(0,5);
+      const area=document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="text-align:center;max-width:420px;">
+          <div style="font-family:'Titan One',system-ui;font-size:20px;color:#5d4037;margin-bottom:8px;">🔍 Investigate</div>
+          <div style="font-size:13px;color:#567;margin-bottom:14px;">Click a player. If they're cheating (way above average), you steal 25% of their fossils!</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            ${suspects.map(p=>`<button class="investigate-target" data-uid="${p.uid}" style="background:#efebe9;border:2px solid #8d6e63;color:#4e342e;font-size:14px;font-weight:700;padding:10px 16px;border-radius:10px;text-align:left;">🦕 ${p.displayName||p.username} — ${p.fossils||0} 🦴</button>`).join("")}
+          </div>
+          <button id="investigate-cancel" style="background:#78909c;margin-top:12px;font-size:13px;padding:8px 20px;">Cancel</button>
+        </div>`;
+      document.querySelectorAll(".investigate-target").forEach(btn=>{
+        btn.addEventListener("click",async()=>{
+          const targetUid=btn.dataset.uid;
+          const target=currentGame.players[targetUid];
+          if(target&&(target.fossils||0)>avg*2){
+            const stolen=Math.floor((target.fossils||0)*0.25);
+            await update(ref(db,"games/"+code+"/players/"+targetUid),{fossils:Math.max(0,(target.fossils||0)-stolen)});
+            dinoState.fossils=(dinoState.fossils||0)+stolen;
+            await update(ref(db,"games/"+code+"/players/"+currentUser.uid),{fossils:dinoState.fossils});
+            alert(`✅ Cheater caught! Stole ${stolen} fossils!`);
+          } else {
+            alert(`❌ Not a cheater! No fossils stolen.`);
+          }
+          dinoState.digging=false;
+          renderDeceptiveDinos(code);
+        });
+      });
+      document.getElementById("investigate-cancel").addEventListener("click",()=>{dinoState.digging=false;renderDeceptiveDinos(code);});
+    }
+
+    function doCheat(code){
+      // Reveal what the next excavation would give (shows the card without applying it)
+      const card=pickDinoCard();
+      const area=document.getElementById("game-action-area");
+      area.innerHTML=`
+        <div style="text-align:center;max-width:380px;">
+          <div style="font-family:'Titan One',system-ui;font-size:20px;color:#c62828;margin-bottom:8px;">👀 Cheat Sheet</div>
+          <div style="font-size:14px;color:#567;margin-bottom:16px;">The next box contains:</div>
+          <div style="font-size:48px;margin-bottom:8px;">${card.emoji}</div>
+          <div style="font-size:20px;font-weight:700;color:#4e342e;">${card.name}</div>
+          <div style="font-size:14px;color:#789;margin-bottom:16px;">${card.mult?`x${card.mult} Multiplier`:`+${Math.floor((card.fossils||0)*(dinoState.mult||1))} fossils`}</div>
+          <button id="cheat-back-btn" style="background:#8d6e63;font-size:14px;padding:10px 24px;">← Back</button>
+        </div>`;
+      document.getElementById("cheat-back-btn").addEventListener("click",()=>{dinoState.digging=false;renderDeceptiveDinos(code);});
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // MONSTER BRAWL (simplified real-time simulation)
+    // ══════════════════════════════════════════════════════════════
+    let mbState = {hp:100,maxHp:100,xp:0,level:1,weapons:[],score:0,mapId:"",running:false,dead:false,px:400,py:300,enemies:[],projectiles:[],particles:[],keys:{},lastFire:{},frameId:null,canvas:null,ctx:null,upgradeReady:false,spawnTimer:0,spawnInterval:180,waveEnemyCount:0};
+
+    function stopMB(){
+      if(mbState.frameId) cancelAnimationFrame(mbState.frameId);
+      mbState.frameId=null; mbState.running=false;
+      document.removeEventListener("keydown",mbKeyDown);
+      document.removeEventListener("keyup",mbKeyUp);
+    }
+
+    function mbKeyDown(e){ mbState.keys[e.key.toLowerCase()]=true; if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"," "].includes(e.key.toLowerCase())) e.preventDefault(); }
+    function mbKeyUp(e){ mbState.keys[e.key.toLowerCase()]=false; }
+
+    function renderMonsterBrawl(code){
+      if(gameRole==="host"){
+        const area=document.getElementById("game-action-area");
+        area.innerHTML=`<div style="text-align:center"><div style="font-size:60px">⚔️</div><div style="font-family:'Titan One',system-ui;font-size:28px;color:#0d47a1;margin-top:12px;">Hosting Monster Brawl</div><div style="font-size:14px;color:#567;margin-top:8px;">Players battle waves of monsters!</div></div>`;
+        return;
+      }
+      if(!mbState.mapId){ renderMBMapPicker(code); return; }
+      if(mbState.upgradeReady){ renderMBUpgrade(code); return; }
+
+      // Build full-screen canvas UI
+      const area=document.getElementById("game-action-area");
+      area.style.cssText="flex:1;display:flex;flex-direction:column;padding:0;background:#000;position:relative;";
+      area.innerHTML=`
+        <div id="mb-ui-bar" style="display:flex;align-items:center;gap:14px;padding:8px 16px;background:rgba(0,0,0,.7);z-index:10;flex-shrink:0;">
+          <div style="font-size:13px;color:#fff;font-weight:700;">Lv.${mbState.level}/60</div>
+          <div style="flex:1;max-width:120px;background:#333;border-radius:999px;height:10px;overflow:hidden;"><div style="height:100%;background:#43a047;width:${Math.min(100,(mbState.xp%(mbState.level*50))/(mbState.level*50)*100)}%;border-radius:999px;"></div></div>
+          <div style="font-size:12px;color:#aaa;">${mbState.xp} XP</div>
+          <div style="width:1px;height:20px;background:#444;"></div>
+          <div style="font-size:12px;color:#ff5252;font-weight:700;">❤️ ${mbState.hp}/${mbState.maxHp}</div>
+          <div style="flex:1;background:#500;border-radius:999px;height:10px;overflow:hidden;max-width:120px;"><div style="height:100%;background:#e53935;width:${Math.max(0,mbState.hp/mbState.maxHp*100)}%;border-radius:999px;"></div></div>
+          <div style="font-size:11px;color:#aaa;">${mbState.weapons.map(w=>w.emoji).join(" ")||"No weapons"}</div>
+          <div style="font-size:11px;color:#ffd54f;">WASD to move</div>
+        </div>
+        <canvas id="mb-canvas" style="display:block;flex:1;width:100%;cursor:crosshair;"></canvas>`;
+
+      const canvas=document.getElementById("mb-canvas");
+      mbState.canvas=canvas;
+      mbState.ctx=canvas.getContext("2d");
+
+      // Size canvas
+      function resizeMB(){
+        canvas.width=canvas.offsetWidth;
+        canvas.height=canvas.offsetHeight;
+        if(mbState.px===400&&mbState.py===300){ mbState.px=canvas.width/2; mbState.py=canvas.height/2; }
+      }
+      resizeMB();
+      window.addEventListener("resize",resizeMB);
+
+      document.addEventListener("keydown",mbKeyDown);
+      document.addEventListener("keyup",mbKeyUp);
+
+      mbState.running=true;
+      if(!mbState.enemies.length) spawnMBWave();
+      mbGameLoop(code);
+    }
+
+    function spawnMBWave(){
+      const map=MB_MAPS.find(m=>m.id===mbState.mapId)||MB_MAPS[0];
+      const canvas=mbState.canvas;
+      const W=canvas?canvas.width:800, H=canvas?canvas.height:600;
+      const count=Math.min(2+Math.floor(mbState.level/3),15);
+      for(let i=0;i<count;i++){
+        const eType=map.enemies[Math.min(Math.floor(mbState.level/6),map.enemies.length-1)];
+        // Mix in weaker enemies
+        const idx=Math.max(0,Math.floor(mbState.level/6)-Math.floor(Math.random()*3));
+        const et=map.enemies[Math.max(0,idx)];
+        const side=Math.floor(Math.random()*4);
+        let ex,ey;
+        if(side===0){ex=Math.random()*W;ey=-30;}
+        else if(side===1){ex=W+30;ey=Math.random()*H;}
+        else if(side===2){ex=Math.random()*W;ey=H+30;}
+        else{ex=-30;ey=Math.random()*H;}
+        mbState.enemies.push({
+          ...et,
+          currentHp:et.hp*(1+mbState.level*0.05),
+          maxHp:et.hp*(1+mbState.level*0.05),
+          x:ex,y:ey,
+          shootTimer:et.shoots?Math.random()*120:Infinity
+        });
+      }
+    }
+
+    const MB_WEAPON_FIRE = {
+      "Boomerang Pizza":   {rate:90,  dmg:15, range:200, emoji:"🍕", color:"#e65100"},
+      "Booming Bubbles":   {rate:60,  dmg:8,  range:180, emoji:"🫧", color:"#29b6f6"},
+      "Bouncy Slime":      {rate:75,  dmg:12, range:220, emoji:"🟢", color:"#43a047"},
+      "Buzzing Bees":      {rate:45,  dmg:6,  range:160, emoji:"🐝", color:"#f9a825"},
+      "Crazy Acorns":      {rate:30,  dmg:5,  range:200, emoji:"🌰", color:"#8d6e63"},
+      "Curving Banana":    {rate:80,  dmg:14, range:180, emoji:"🍌", color:"#fdd835"},
+      "Dark Energy":       {rate:120, dmg:20, range:80,  emoji:"🌑", color:"#311b92"},
+      "Flying Feathers":   {rate:55,  dmg:9,  range:190, emoji:"🪶", color:"#ff7043"},
+      "Juggling Spheres":  {rate:70,  dmg:16, range:160, emoji:"⚽", color:"#1976d2"},
+      "Rapid Eggs":        {rate:25,  dmg:4,  range:260, emoji:"🥚", color:"#ffcc02"},
+      "Rapid-Fire Lasers": {rate:20,  dmg:3,  range:300, emoji:"⚡", color:"#c62828"},
+      "Rebounding Shells": {rate:85,  dmg:18, range:200, emoji:"🐢", color:"#388e3c"},
+      "Slicing Cards":     {rate:50,  dmg:10, range:240, emoji:"🃏", color:"#7b1fa2"},
+      "Speeding Arrows":   {rate:40,  dmg:7,  range:280, emoji:"🏹", color:"#0288d1"},
+      "Sticky Syrup":      {rate:100, dmg:22, range:150, emoji:"🍁", color:"#e65100"},
+      "Whirling Bones":    {rate:65,  dmg:13, range:220, emoji:"🦴", color:"#757575"},
+    };
+
+    function mbGameLoop(code){
+      if(!mbState.running) return;
+      mbState.frameId=requestAnimationFrame(()=>mbGameLoop(code));
+      const canvas=mbState.canvas, ctx=mbState.ctx;
+      if(!canvas||!ctx) return;
+      const W=canvas.width, H=canvas.height;
+      const map=MB_MAPS.find(m=>m.id===mbState.mapId)||MB_MAPS[0];
+
+      // ── Move player ──
+      const spd=3;
+      if(mbState.keys["w"]||mbState.keys["arrowup"])    mbState.py=Math.max(20,mbState.py-spd);
+      if(mbState.keys["s"]||mbState.keys["arrowdown"])  mbState.py=Math.min(H-20,mbState.py+spd);
+      if(mbState.keys["a"]||mbState.keys["arrowleft"])  mbState.px=Math.max(20,mbState.px-spd);
+      if(mbState.keys["d"]||mbState.keys["arrowright"]) mbState.px=Math.min(W-20,mbState.px+spd);
+
+      // ── Move enemies toward player ──
+      const now=performance.now();
+      mbState.enemies.forEach(e=>{
+        const dx=mbState.px-e.x, dy=mbState.py-e.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist>1){ e.x+=dx/dist*e.speed*1.2; e.y+=dy/dist*e.speed*1.2; }
+        // Enemy shoots
+        if(e.shoots){
+          e.shootTimer=(e.shootTimer||0)-1;
+          if(e.shootTimer<=0){
+            e.shootTimer=120+Math.random()*60;
+            const spd2=2.5, ang=Math.atan2(dy,dx);
+            mbState.projectiles.push({x:e.x,y:e.y,vx:Math.cos(ang)*spd2,vy:Math.sin(ang)*spd2,dmg:e.speed*8,emoji:"💥",color:"#ff1744",r:8,fromEnemy:true,life:180});
+          }
+        }
+        // Damage player on touch
+        if(dist<28){
+          mbState.hp=Math.max(0,mbState.hp-e.speed*0.4);
+          // Knock enemy back a bit
+          e.x-=dx/dist*5; e.y-=dy/dist*5;
+        }
+      });
+
+      // ── Fire weapons automatically ──
+      mbState.weapons.forEach(w=>{
+        const cfg=MB_WEAPON_FIRE[w.name]||{rate:60,dmg:10,range:200,emoji:"⚡",color:"#fff"};
+        const lastF=mbState.lastFire[w.name]||0;
+        if(now-lastF<(cfg.rate/60)*1000) return;
+        // Find nearest enemy in range
+        let nearest=null, nearDist=Infinity;
+        mbState.enemies.forEach(e=>{
+          const d=Math.sqrt((e.x-mbState.px)**2+(e.y-mbState.py)**2);
+          if(d<cfg.range&&d<nearDist){nearDist=d;nearest=e;}
+        });
+        if(!nearest) return;
+        mbState.lastFire[w.name]=now;
+        const ang=Math.atan2(nearest.y-mbState.py,nearest.x-mbState.px);
+        const spd2=5+Math.random()*2;
+        mbState.projectiles.push({x:mbState.px,y:mbState.py,vx:Math.cos(ang)*spd2,vy:Math.sin(ang)*spd2,dmg:cfg.dmg*(1+mbState.level*0.08),emoji:cfg.emoji,color:cfg.color,r:10,fromEnemy:false,life:80});
+      });
+      // Auto-fire default attack if no weapons
+      if(!mbState.weapons.length){
+        const lastF=mbState.lastFire["__default"]||0;
+        if(now-lastF>600){
+          mbState.lastFire["__default"]=now;
+          let nearest=null,nearDist=Infinity;
+          mbState.enemies.forEach(e=>{const d=Math.sqrt((e.x-mbState.px)**2+(e.y-mbState.py)**2);if(d<nearDist){nearDist=d;nearest=e;}});
+          if(nearest){
+            const ang=Math.atan2(nearest.y-mbState.py,nearest.x-mbState.px);
+            mbState.projectiles.push({x:mbState.px,y:mbState.py,vx:Math.cos(ang)*5,vy:Math.sin(ang)*5,dmg:8,emoji:"⚡",color:"#ffff00",r:8,fromEnemy:false,life:60});
+          }
+        }
+      }
+
+      // ── Move & collide projectiles ──
+      mbState.projectiles=mbState.projectiles.filter(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.life--;
+        if(p.life<=0) return false;
+        if(p.fromEnemy){
+          // Hit player
+          const d=Math.sqrt((p.x-mbState.px)**2+(p.y-mbState.py)**2);
+          if(d<22){ mbState.hp=Math.max(0,mbState.hp-p.dmg); return false; }
+        } else {
+          // Hit enemies
+          for(let i=mbState.enemies.length-1;i>=0;i--){
+            const e=mbState.enemies[i];
+            const d=Math.sqrt((p.x-e.x)**2+(p.y-e.y)**2);
+            if(d<24){
+              e.currentHp-=p.dmg;
+              mbState.particles.push({x:e.x,y:e.y,vx:(Math.random()-0.5)*4,vy:(Math.random()-0.5)*4,life:20,maxLife:20,emoji:p.emoji,color:p.color});
+              if(e.currentHp<=0){
+                mbState.xp+=Math.round(e.xp*10);
+                mbState.score+=Math.round(e.xp*10);
+                mbState.particles.push({x:e.x,y:e.y,vx:0,vy:-2,life:30,maxLife:30,emoji:"✨",color:"#ffd54f"});
+                mbState.enemies.splice(i,1);
+              }
+              return false;
+            }
+          }
+        }
+        return true;
+      });
+
+      // ── Particles ──
+      mbState.particles=mbState.particles.filter(p=>{ p.x+=p.vx; p.y+=p.vy; p.life--; return p.life>0; });
+
+      // ── Level up ──
+      const xpNeeded=mbState.level*50;
+      if(mbState.xp>=mbState.level*50&&mbState.level<60){
+        mbState.xp-=xpNeeded; mbState.level++;
+        mbState.maxHp+=10; mbState.hp=Math.min(mbState.hp+20,mbState.maxHp);
+        mbState.upgradeReady=true;
+        stopMB();
+        renderMBUpgrade(code);
+        return;
+      }
+
+      // ── Spawn enemies ──
+      mbState.spawnTimer=(mbState.spawnTimer||0)+1;
+      if(mbState.spawnTimer>mbState.spawnInterval||(mbState.enemies.length===0)){
+        mbState.spawnTimer=0;
+        mbState.spawnInterval=Math.max(60,180-mbState.level*2);
+        spawnMBWave();
+      }
+
+      // ── Death ──
+      if(mbState.hp<=0){
+        stopMB();
+        mbState.running=false;
+        update(ref(db,"games/"+code+"/players/"+currentUser.uid),{xp:mbState.score}).catch(()=>{});
+        const area=document.getElementById("game-action-area");
+        if(area) area.style.cssText="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#e0f4ff;";
+        if(area) area.innerHTML=`<div style="text-align:center"><div style="font-size:70px">💀</div><div style="font-family:'Titan One',system-ui;font-size:30px;color:#c62828;margin-top:12px;">Defeated!</div><div style="font-size:15px;color:#567;margin-top:8px;">Reached Level ${mbState.level} • ${mbState.score} XP</div><button id="mb-retry" style="background:#7b1fa2;color:#fff;font-size:15px;padding:10px 28px;border-radius:10px;margin-top:16px;">Try Again</button></div>`;
+        document.getElementById("mb-retry")?.addEventListener("click",()=>{mbState={hp:100,maxHp:100,xp:0,level:1,weapons:[],score:0,mapId:"",running:false,dead:false,px:400,py:300,enemies:[],projectiles:[],particles:[],keys:{},lastFire:{},frameId:null,canvas:null,ctx:null,upgradeReady:false,spawnTimer:0,spawnInterval:180};renderMonsterBrawl(code);});
+        return;
+      }
+
+      // ── DRAW ──
+      // Background
+      const mapBg=map.bg;
+      if(mapBg.startsWith("linear-gradient")){
+        // Parse and draw gradient
+        const isSnowy=map.id==="snowy";
+        const grd=ctx.createLinearGradient(0,0,0,H);
+        if(isSnowy){grd.addColorStop(0,"#b3e5ff");grd.addColorStop(1,"#e1f5fe");}
+        else{grd.addColorStop(0,"#d7ccc8");grd.addColorStop(1,"#bcaaa4");}
+        ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+      } else { ctx.fillStyle=mapBg; ctx.fillRect(0,0,W,H); }
+
+      // Grid lines for depth
+      ctx.strokeStyle="rgba(0,0,0,0.05)"; ctx.lineWidth=1;
+      for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+      // Enemies
+      mbState.enemies.forEach(e=>{
+        ctx.font="28px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(e.emoji,e.x,e.y);
+        // HP bar
+        const bw=36, bh=5, bx=e.x-bw/2, by=e.y+18;
+        ctx.fillStyle="#500"; ctx.fillRect(bx,by,bw,bh);
+        ctx.fillStyle="#e53935"; ctx.fillRect(bx,by,bw*(e.currentHp/e.maxHp),bh);
+      });
+
+      // Projectiles
+      mbState.projectiles.forEach(p=>{
+        const alpha=Math.min(1,p.life/20);
+        ctx.globalAlpha=alpha;
+        ctx.font="16px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(p.emoji,p.x,p.y);
+        // Glow trail
+        ctx.globalAlpha=alpha*0.3;
+        ctx.fillStyle=p.color||"#fff";
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r||8,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha=1;
+      });
+
+      // Particles
+      mbState.particles.forEach(p=>{
+        ctx.globalAlpha=p.life/p.maxLife;
+        ctx.font="14px serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText(p.emoji,p.x,p.y);
+        ctx.globalAlpha=1;
+      });
+
+      // Player blook
+      const blookName=myGameData?.blook||"?";
+      const blookColor=rarityColor((BLOOK_INFO[blookName]||{rarity:"Common"}).rarity);
+      ctx.fillStyle=blookColor;
+      // Draw rounded rectangle (compatible with all browsers)
+      const bx=mbState.px-22,by=mbState.py-22,bw=44,bh=44,br=10;
+      ctx.beginPath();
+      ctx.moveTo(bx+br,by);
+      ctx.lineTo(bx+bw-br,by);
+      ctx.arcTo(bx+bw,by,bx+bw,by+br,br);
+      ctx.lineTo(bx+bw,by+bh-br);
+      ctx.arcTo(bx+bw,by+bh,bx+bw-br,by+bh,br);
+      ctx.lineTo(bx+br,by+bh);
+      ctx.arcTo(bx,by+bh,bx,by+bh-br,br);
+      ctx.lineTo(bx,by+br);
+      ctx.arcTo(bx,by,bx+br,by,br);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="bold 9px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      const shortName=blookName.length>8?blookName.slice(0,7)+"…":blookName;
+      ctx.fillText(shortName,mbState.px,mbState.py);
+
+      // Update UI bar
+      const bar=document.getElementById("mb-ui-bar");
+      if(bar) bar.innerHTML=`
+        <div style="font-size:13px;color:#fff;font-weight:700;">Lv.${mbState.level}/60</div>
+        <div style="flex:1;max-width:120px;background:#333;border-radius:999px;height:10px;overflow:hidden;"><div style="height:100%;background:#43a047;width:${Math.min(100,(mbState.xp/(mbState.level*50))*100)}%;border-radius:999px;"></div></div>
+        <div style="font-size:11px;color:#aaa;">${mbState.xp}/${mbState.level*50} XP</div>
+        <div style="width:1px;height:20px;background:#444;"></div>
+        <div style="font-size:12px;color:#ff5252;font-weight:700;">❤️ ${Math.ceil(mbState.hp)}/${mbState.maxHp}</div>
+        <div style="flex:1;background:#500;border-radius:999px;height:10px;overflow:hidden;max-width:120px;"><div style="height:100%;background:#e53935;width:${Math.max(0,mbState.hp/mbState.maxHp*100)}%;border-radius:999px;"></div></div>
+        <div style="font-size:11px;color:#aaa;">${mbState.weapons.map(w=>w.emoji).join(" ")||"⚡"}</div>
+        <div style="font-size:11px;color:#ffd54f;">WASD to move</div>`;
+    }
+
+    function renderMBMapPicker(code){
+      const area=document.getElementById("game-action-area");
+      area.style.cssText="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#e0f4ff;";
+      area.innerHTML=`
+        <div style="text-align:center;max-width:420px;">
+          <div style="font-family:'Titan One',system-ui;font-size:26px;color:#7b1fa2;margin-bottom:14px;">⚔️ Choose Your Map</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            ${MB_MAPS.map(m=>`<button class="mb-map-btn" data-id="${m.id}" style="font-size:16px;font-weight:700;padding:18px 24px;border-radius:14px;text-align:left;display:flex;align-items:center;gap:12px;border:2px solid rgba(13,71,161,.2);background:rgba(255,255,255,.8);color:#0d47a1;">
+              <span style="font-size:32px;">${m.emoji}</span>
+              <div><div>${m.name}</div><div style="font-size:12px;font-weight:400;color:#567;">${m.enemies.length} enemy types • Move with WASD</div></div>
+            </button>`).join("")}
+          </div>
+        </div>`;
+      document.querySelectorAll(".mb-map-btn").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          const canvas=document.createElement("canvas");
+          mbState.mapId=btn.dataset.id;
+          mbState.hp=100;mbState.maxHp=100;mbState.xp=0;mbState.level=1;mbState.weapons=[];mbState.score=0;
+          mbState.enemies=[];mbState.projectiles=[];mbState.particles=[];mbState.keys={};mbState.lastFire={};
+          mbState.px=400;mbState.py=300;mbState.spawnTimer=0;mbState.upgradeReady=false;
+          renderMonsterBrawl(code);
+        });
+      });
+    }
+
+    function renderMBUpgrade(code){
+      const area=document.getElementById("game-action-area");
+      area.style.cssText="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#1a0030;";
+      const available=MB_WEAPONS.filter(w=>!mbState.weapons.find(ow=>ow.name===w.name));
+      const choices=available.sort(()=>Math.random()-0.5).slice(0,3);
+      area.innerHTML=`
+        <div style="text-align:center;max-width:420px;">
+          <div style="font-family:'Titan One',system-ui;font-size:24px;color:#ffd54f;margin-bottom:6px;">⬆️ Level Up! (${mbState.level})</div>
+          <div style="font-size:13px;color:#aaa;margin-bottom:18px;">Choose a weapon upgrade:</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${choices.map(w=>`<button class="mb-upg" data-name="${w.name}" data-emoji="${w.emoji}" style="background:${w.color}33;border:2px solid ${w.color};color:#fff;font-size:15px;font-weight:700;padding:16px 22px;border-radius:12px;text-align:left;display:flex;align-items:center;gap:12px;">
+              <span style="font-size:32px;">${w.emoji}</span><div><div>${w.name}</div><div style="font-size:11px;font-weight:400;opacity:.7;">DMG ${MB_WEAPON_FIRE[w.name]?.dmg||"?"} • Range ${MB_WEAPON_FIRE[w.name]?.range||"?"}</div></div>
+            </button>`).join("")}
+          </div>
+          <button id="mb-upg-skip" style="background:#555;color:#fff;margin-top:12px;font-size:13px;padding:8px 22px;border-radius:8px;">Skip</button>
+        </div>`;
+      document.querySelectorAll(".mb-upg").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          mbState.weapons.push({name:btn.dataset.name,emoji:btn.dataset.emoji});
+          mbState.upgradeReady=false;
+          renderMonsterBrawl(code);
+        });
+      });
+      document.getElementById("mb-upg-skip")?.addEventListener("click",()=>{ mbState.upgradeReady=false; renderMonsterBrawl(code); });
+    }
+
+    function doMBUpgrade(code){ mbState.upgradeReady=true; renderMBUpgrade(code); }
+
 
     function renderGoldRush(code){
       // Host cannot play — show spectator view
@@ -3857,83 +5038,63 @@
     function endGame(){
       if(gameTimerInterval){clearInterval(gameTimerInterval);gameTimerInterval=null;}
       if(gameDbUnsubscribe){gameDbUnsubscribe();gameDbUnsubscribe=null;}
+      if(fishingState&&fishingState.frenzyTimeout){clearTimeout(fishingState.frenzyTimeout);}
       document.getElementById("game-screen").style.display="none";
-      const players=Object.values(currentGame.players||{}).sort((a,b)=>(b.gold||0)-(a.gold||0));
+      const isFishing=currentGame.modeId==="fishingfrenzy";
+      const scoreKey=getScoreKey(currentGame.modeId);
+      const scoreEmoji=getScoreEmoji(currentGame.modeId);
+      const players=Object.values(currentGame.players||{})
+        .filter(p=>p.uid!==currentGame.hostUid)
+        .sort((a,b)=>(b[scoreKey]||0)-(a[scoreKey]||0));
       const endScreen=document.getElementById("game-end-screen");
       document.getElementById("ges-title").textContent="Game Over!";
       document.getElementById("ges-game-name").textContent=currentGame.modeEmoji+" "+currentGame.modeName;
-
-      // Build podium
-      const podium=document.getElementById("ges-podium");
-      podium.innerHTML="";
-
-      // Podium heights: 1st tallest in middle, 2nd left, 3rd right
-      const podiumOrder=[1,0,2]; // index into top3: show 2nd, 1st, 3rd
+      const podium=document.getElementById("ges-podium"); podium.innerHTML="";
       const top3=players.slice(0,3);
-      const heights=["160px","220px","120px"]; // 2nd, 1st, 3rd
+      const podiumOrder=[1,0,2];
+      const heights=["160px","220px","120px"];
       const medals=["🥇","🥈","🥉"];
       const bgColors=["#ffd54f","#ffe57b","#ffcc02"];
       const placeLabels=["1st","2nd","3rd"];
-
       const podiumWrapper=document.createElement("div");
       podiumWrapper.style.cssText="display:flex;align-items:flex-end;gap:12px;justify-content:center;";
-
       podiumOrder.forEach((topIdx,colIdx)=>{
-        const p=top3[topIdx];
-        if(!p) return;
-        const col=document.createElement("div");
-        col.style.cssText="display:flex;flex-direction:column;align-items:center;gap:0;";
-
-        // Name + blook above pedestal
-        const nameEl=document.createElement("div");
-        nameEl.style.cssText="text-align:center;margin-bottom:8px;";
+        const p=top3[topIdx]; if(!p) return;
+        const col=document.createElement("div"); col.style.cssText="display:flex;flex-direction:column;align-items:center;";
+        const nameEl=document.createElement("div"); nameEl.style.cssText="text-align:center;margin-bottom:8px;";
         const blookDiv=document.createElement("div");
         blookDiv.style.cssText=`width:52px;height:52px;border-radius:12px;background:${p.blook?rarityColor((BLOOK_INFO[p.blook]||{rarity:"Common"}).rarity):"#aaa"};font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:3px;margin:0 auto 6px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.2);`;
         blookDiv.textContent=p.blook||"?";
-        const nameText=document.createElement("div");
-        nameText.style.cssText=`font-family:'Titan One',system-ui;font-size:${topIdx===0?"18px":"15px"};color:#0d47a1;`;
-        nameText.textContent=p.displayName||p.username;
-        const goldText=document.createElement("div");
-        goldText.style.cssText="font-size:13px;color:#e65100;font-weight:700;margin-top:2px;";
-        goldText.textContent=`${p.gold||0} ⛏️`;
-        nameEl.appendChild(blookDiv); nameEl.appendChild(nameText); nameEl.appendChild(goldText);
-
-        // Pedestal
+        const nameText=document.createElement("div"); nameText.style.cssText=`font-family:'Titan One',system-ui;font-size:${topIdx===0?"18px":"15px"};color:#0d47a1;`; nameText.textContent=p.displayName||p.username;
+        const scoreText=document.createElement("div"); scoreText.style.cssText="font-size:13px;color:#e65100;font-weight:700;margin-top:2px;"; scoreText.textContent=`${(p[scoreKey]||0)} ${scoreEmoji}`;
+        nameEl.appendChild(blookDiv); nameEl.appendChild(nameText); nameEl.appendChild(scoreText);
         const pedestal=document.createElement("div");
         pedestal.style.cssText=`width:${topIdx===0?"110px":"90px"};height:${heights[colIdx]};background:linear-gradient(180deg,${bgColors[colIdx]},${bgColors[colIdx]}cc);border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;box-shadow:0 4px 12px rgba(0,0,0,.15);border:2px solid rgba(255,255,255,.6);`;
-        const medalEl=document.createElement("div");
-        medalEl.style.cssText=`font-size:${topIdx===0?"42px":"32px"};`;
-        medalEl.textContent=medals[topIdx];
-        const placeEl=document.createElement("div");
-        placeEl.style.cssText="font-family:'Titan One',system-ui;font-size:14px;color:#5d4037;margin-top:4px;";
-        placeEl.textContent=placeLabels[topIdx];
+        const medalEl=document.createElement("div"); medalEl.style.cssText=`font-size:${topIdx===0?"42px":"32px"};`; medalEl.textContent=medals[topIdx];
+        const placeEl=document.createElement("div"); placeEl.style.cssText="font-family:'Titan One',system-ui;font-size:14px;color:#5d4037;margin-top:4px;"; placeEl.textContent=placeLabels[topIdx];
         pedestal.appendChild(medalEl); pedestal.appendChild(placeEl);
-
-        col.appendChild(nameEl); col.appendChild(pedestal);
-        podiumWrapper.appendChild(col);
+        col.appendChild(nameEl); col.appendChild(pedestal); podiumWrapper.appendChild(col);
       });
       podium.appendChild(podiumWrapper);
-
-      // My place
       const myPlace=players.findIndex(p=>p.uid===currentUser.uid)+1;
-      if(myPlace>0){
-        const placeText=myPlace===1?"🥇 1st":myPlace===2?"🥈 2nd":myPlace===3?"🥉 3rd":myPlace+"th";
-        document.getElementById("ges-your-place").textContent=`Your finish: ${placeText} out of ${players.length} players`;
-      } else {
-        document.getElementById("ges-your-place").textContent="";
-      }
+      if(gameRole==="host"){ document.getElementById("ges-your-place").textContent="You hosted this game!"; }
+      else if(myPlace>0){ const pt=myPlace===1?"🥇 1st":myPlace===2?"🥈 2nd":myPlace===3?"🥉 3rd":myPlace+"th"; document.getElementById("ges-your-place").textContent=`Your finish: ${pt} out of ${players.length} players`; }
+      else{ document.getElementById("ges-your-place").textContent=""; }
       endScreen.style.display="flex";
     }
 
     document.getElementById("ges-leave-btn").addEventListener("click",()=>{
       document.getElementById("game-end-screen").style.display="none";
       showShell();
-      currentGame=null;
-      gameRole=null;
-      myGameData=null;
-      selectedBlook=null;
-      chestCooldown=false;
-      lastChestResult="";
+      currentGame=null; gameRole=null; myGameData=null; selectedBlook=null;
+      chestCooldown=false; lastChestResult="";
+      fishingState={casting:false,lureIdx:0,catchCount:0,frenzyActive:false,frenzyTimeout:null};
+      beeState={honey:0,perQMult:1,perQBonus:0,distractActive:null,distractTimeout:null,spinning:false};
+      cryptoState={crypto:0,spinning:false,myPassword:"",hackPending:false};
+      dinoState={fossils:0,mult:1,digging:false};
+      mbState={hp:100,maxHp:100,xp:0,level:1,weapons:[],enemies:[],gameLoop:null,mapId:"",score:0};
+      const fs=document.getElementById("frenzy-style"); if(fs) fs.remove();
+      const fj=document.getElementById("fish-jump-style"); if(fj) fj.remove();
       showView("market");
     });
 
