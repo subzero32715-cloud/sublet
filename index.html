@@ -543,6 +543,26 @@
     <div class="start-right" id="floating-blooks-area"></div>
   </div>
 
+  <!-- POLL BAR -->
+  <div id="poll-bar" style="display:none;position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#0d47a1,#1565c0);padding:10px 24px;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,.3);align-items:center;gap:0;">
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;gap:5px;">
+      <button onclick="castPollVote('left')" id="poll-btn-left" style="padding:8px 18px;border-radius:999px;font-weight:700;font-size:13px;border:3px solid #e53935;cursor:pointer;max-width:220px;width:100%;color:#fff;background:rgba(229,57,53,.85);">Option A</button>
+      <div style="display:flex;justify-content:space-between;width:100%;font-size:10px;color:rgba(255,255,255,.8);font-weight:700;"><span id="poll-left-count">0 votes</span><span id="poll-left-pct">0%</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;flex:2;min-width:80px;padding:0 12px;gap:4px;">
+      <div style="font-family:'Titan One',system-ui;font-size:14px;color:#fff;text-align:center;" id="poll-question-label">Question?</div>
+      <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.15);position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.25);width:100%;">
+        <div id="poll-fill-left" style="position:absolute;left:0;top:0;bottom:0;background:#e53935;border-radius:999px 0 0 999px;transition:width .5s;width:50%;"></div>
+        <div id="poll-fill-right" style="position:absolute;right:0;top:0;bottom:0;background:#43a047;border-radius:0 999px 999px 0;transition:width .5s;width:50%;"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:600;" id="poll-timer-display"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;gap:5px;">
+      <button onclick="castPollVote('right')" id="poll-btn-right" style="padding:8px 18px;border-radius:999px;font-weight:700;font-size:13px;border:3px solid #43a047;cursor:pointer;max-width:220px;width:100%;color:#fff;background:rgba(67,160,71,.85);">Option B</button>
+      <div style="display:flex;justify-content:space-between;width:100%;font-size:10px;color:rgba(255,255,255,.8);font-weight:700;"><span id="poll-right-pct">0%</span><span id="poll-right-count">0 votes</span></div>
+    </div>
+  </div>
+
   <div id="app">
     <div class="shell">
       <div class="sidebar">
@@ -559,6 +579,7 @@
         <button class="nav" data-view="news">📰 News</button>
         <button class="nav" data-view="giveaway">🎉 Giveaways</button>
         <button class="nav" data-view="joingame">🕹️ Join Game</button>
+        <button class="nav" data-view="rng">🎲 RNG</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
         <button id="owner-panel-btn">Owner panel</button>
@@ -692,6 +713,45 @@
             <button id="join-game-btn" style="background:#e65100;font-size:15px;padding:10px 24px;">Join →</button>
           </div>
           <div id="join-game-err" class="err-small"></div>
+          <div style="margin-top:18px;border-top:1px solid #e0e0e0;padding-top:14px;">
+            <div style="font-weight:700;font-size:15px;color:#0d47a1;margin-bottom:8px;">🎮 Active Games</div>
+            <button id="refresh-active-games-btn" style="font-size:12px;padding:5px 14px;background:#1976d2;margin-bottom:10px;">&#8635; Refresh</button>
+            <div id="active-games-list"><div style="font-size:13px;color:#888;">Click Refresh to load active games.</div></div>
+          </div>
+        </div>
+
+        <!-- RNG VIEW -->
+        <div id="view-rng" class="card" style="display:none;">
+          <div class="section-title">🎲 RNG Spinner</div>
+          <div class="section-sub">Spin for a random rarity. Costs 10 coins. Upgrade luck to shift odds toward rarer results!</div>
+          <div style="display:flex;gap:16px;flex:1;min-height:0;">
+            <!-- LEFT: Luck -->
+            <div style="width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-weight:700;font-size:14px;color:#0d47a1;">🍀 Luck</div>
+              <div id="rng-luck-display" style="font-size:28px;font-weight:700;color:#43a047;text-align:center;background:#e8f5e9;border-radius:10px;padding:10px;">0.0</div>
+              <button id="rng-upgrade-luck-btn" style="background:#43a047;font-size:13px;padding:8px;">⬆ Upgrade Luck<br><span style="font-size:11px;font-weight:400;">(costs 100 coins)</span></button>
+              <div style="font-size:11px;color:#789;text-align:center;">Each upgrade adds +0.5 luck.<br>Higher luck = rarer results.</div>
+            </div>
+            <!-- MIDDLE: Spinner -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;">
+              <div id="rng-result-display" style="width:100%;max-width:340px;height:72px;border-radius:14px;background:#f5f5f5;border:3px solid #e0e0e0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#555;transition:background .3s,border-color .3s;overflow:hidden;">
+                <span id="rng-result-text">?</span>
+              </div>
+              <div style="width:100%;max-width:340px;height:48px;border-radius:10px;overflow:hidden;border:2px solid #e0e0e0;background:#fafafa;position:relative;">
+                <div id="rng-reel" style="display:flex;white-space:nowrap;"></div>
+              </div>
+              <button id="rng-spin-btn" style="background:linear-gradient(135deg,#7b1fa2,#e040fb);color:#fff;font-size:16px;font-weight:700;padding:12px 36px;border-radius:12px;box-shadow:0 4px 14px rgba(123,31,162,.4);">🎲 Spin (10 coins)</button>
+              <div style="font-size:12px;color:#789;text-align:center;">Luck: <span id="rng-luck-inline">0.0</span> — shifts odds toward rarer results</div>
+            </div>
+            <!-- RIGHT: Leaderboard -->
+            <div style="width:180px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;">
+              <div style="font-weight:700;font-size:14px;color:#0d47a1;">🏆 Rarest Pulls</div>
+              <div style="font-size:11px;color:#789;margin-bottom:2px;">Who pulled the rarest?</div>
+              <div id="rng-lb-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:300px;">
+                <div style="font-size:12px;color:#aaa;">Loading...</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="view-settings" class="card" style="display:none;">
@@ -808,10 +868,17 @@
                 <option value="Epic">Epic</option><option value="Legendary">Legendary</option>
                 <option value="Supreeme">Supreeme</option><option value="Chroma">Chroma</option>
                 <option value="Mystical">Mystical</option>
+                <option value="Unique">Unique ❖</option>
               </select>
               <input id="single-price" type="number" min="1" value="25" placeholder="Price">
               <input id="single-expire" type="date">
               <button id="single-add-btn" style="background:#43a047;">Add</button>
+            </div>
+            <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <label style="font-size:12px;font-weight:600;color:#555;">Custom Image (optional):</label>
+              <input id="single-img-upload" type="file" accept="image/*" style="font-size:12px;">
+              <img id="single-img-preview" style="display:none;width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid #43a047;" alt="preview">
+              <button id="single-img-clear" style="background:#e53935;font-size:11px;padding:4px 10px;display:none;">Remove image</button>
             </div>
             <div id="single-status" class="err-small"></div>
             <div class="owner-single-list" id="single-list"></div>
@@ -874,6 +941,19 @@
           </div>
 
           <button id="owner-create-news-btn" style="background:#0d47a1;margin-top:10px;">📰 Create News Post</button>
+          <div style="margin-top:14px;padding:14px;border-radius:12px;background:#e8eaf6;font-size:13px;">
+            <div style="font-size:15px;font-weight:700;color:#283593;margin-bottom:6px;">📊 Create Poll <span style="font-size:11px;font-weight:400;color:#666;">(auto-expires 1 min)</span></div>
+            <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px;">
+              <textarea id="poll-left-text" placeholder="Left option" style="flex:1;min-width:110px;height:52px;border-radius:8px;border:1px solid #9fa8da;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;"></textarea>
+              <textarea id="poll-middle-text" placeholder="Question" style="width:150px;height:52px;border-radius:8px;border:2px solid #5c6bc0;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;text-align:center;font-weight:700;"></textarea>
+              <textarea id="poll-right-text" placeholder="Right option" style="flex:1;min-width:110px;height:52px;border-radius:8px;border:1px solid #9fa8da;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;"></textarea>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="owner-publish-poll-btn" style="background:#283593;font-size:13px;padding:7px 16px;">📊 Publish Poll</button>
+              <button id="owner-clear-poll-btn" style="background:#e53935;font-size:13px;padding:7px 16px;">✕ Clear Poll</button>
+            </div>
+            <div id="poll-owner-status" style="font-size:12px;color:#2e7d32;margin-top:6px;min-height:16px;"></div>
+          </div>
 
           <!-- Set coins for any user -->
           <div class="owner-single-box" style="background:#e3f2fd;margin-top:14px;">
@@ -1291,17 +1371,17 @@
     const singleShopRef = () => ref(db, "singleShopBlooks");
     const reportsRef = () => ref(db, "reports");
 
-    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme" };
+    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme", UNIQUE:"Unique" };
 
     const RARITY_COLORS = {
       [R.COMMON]:"#4caf50",[R.RARE]:"#2196f3",[R.EPIC]:"#9c27b0",
-      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000"
+      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000",[R.UNIQUE]:"#00bcd4"
     };
     const SELL_VALUES = {
-      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000
+      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000,[R.UNIQUE]:500
     };
     const SUBSCORE_VALUES = {
-      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100
+      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100,[R.UNIQUE]:75
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -1346,7 +1426,7 @@
       return `<span style="display:inline-block;background:${r.bg};border-radius:999px;padding:${pad};font-size:${size};font-weight:700;${colorStyle}border:1px solid ${isGradient?"#ddd":r.color}22;vertical-align:middle;margin-left:4px;">${r.label}</span>`;
     }
     const RARITY_BASE_WEIGHTS = {
-      [R.COMMON]:60,[R.RARE]:25,[R.EPIC]:8,[R.LEG]:4,[R.SUP]:1.2,[R.CHR]:1,[R.MYS]:0.8
+      [R.COMMON]:60,[R.RARE]:25,[R.EPIC]:8,[R.LEG]:4,[R.SUP]:1.2,[R.CHR]:1,[R.MYS]:0.8,[R.UNIQUE]:0
     };
     const BOOSTABLE_RARITIES = new Set([R.LEG, R.SUP, R.CHR, R.MYS]);
     const BOOSTER_COSTS = { 2:10000, 3:50000, 4:350000, 5:500000 };
@@ -2764,6 +2844,7 @@
       checkMonthlyChatReset();
       checkPastEventResults();
       startSubletBotInterval();
+      subscribePoll();
       startPresenceUpdates();
       updatePresence("market");
       setTimeout(checkAndDrawGiveaways, 3000);
@@ -3300,6 +3381,8 @@
       if(vJoin) vJoin.style.display=name==="joingame"?"flex":"none";
       updatePresence(name);
       if(name==="admin") loadAdminOnlinePlayers();
+      if(name==="rng"){ renderRngView(); loadRngLeaderboard(); }
+      const vRng=document.getElementById("view-rng"); if(vRng) vRng.style.display=name==="rng"?"flex":"none";
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -5106,6 +5189,314 @@
     // ── Floating blooks on start screen ──
     const floatColors=["#4caf50","#2196f3","#9c27b0","#ffb300","#81d4fa","#6a1b9a"];
     for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="floating-blook"; d.style.background=floatColors[i%floatColors.length]; d.style.left=Math.random()*70+15+"%"; d.style.top=Math.random()*70+15+"%"; d.style.setProperty("--tilt",(Math.random()*10-5)+"deg"); d.textContent="Sublet"; floatingArea.appendChild(d); }
-  </script>
+  
+    // ═══════════════════════════════════════════
+    // POLL SYSTEM
+    // ═══════════════════════════════════════════
+    const pollDbRef = () => ref(db, "poll");
+    let activePoll = null, myPollVote = null, pollTimerInterval = null;
+
+    function subscribePoll(){
+      onValue(pollDbRef(), snap => {
+        if(!snap.exists()||!snap.val()||!snap.val().active){
+          activePoll=null;
+          document.getElementById("poll-bar").style.display="none";
+          if(pollTimerInterval){clearInterval(pollTimerInterval);pollTimerInterval=null;}
+          return;
+        }
+        activePoll=snap.val();
+        if(Date.now()>activePoll.createdAt+60000){
+          remove(pollDbRef()).catch(()=>{});
+          activePoll=null;
+          document.getElementById("poll-bar").style.display="none";
+          if(pollTimerInterval){clearInterval(pollTimerInterval);pollTimerInterval=null;}
+          return;
+        }
+        myPollVote=(activePoll.votes&&activePoll.votes[currentUser?.uid])?activePoll.votes[currentUser.uid]:null;
+        renderPollBar();
+        if(pollTimerInterval) clearInterval(pollTimerInterval);
+        pollTimerInterval=setInterval(()=>{
+          if(!activePoll){clearInterval(pollTimerInterval);return;}
+          const remaining=Math.max(0,(activePoll.createdAt+60000)-Date.now());
+          const t=document.getElementById("poll-timer-display");
+          if(t) t.textContent="⏱ "+Math.ceil(remaining/1000)+"s";
+          if(remaining<=0){
+            clearInterval(pollTimerInterval);pollTimerInterval=null;
+            document.getElementById("poll-bar").style.display="none";
+            remove(pollDbRef()).catch(()=>{});
+          }
+        },500);
+      });
+    }
+
+    function renderPollBar(){
+      if(!activePoll){document.getElementById("poll-bar").style.display="none";return;}
+      document.getElementById("poll-bar").style.display="flex";
+      document.getElementById("poll-question-label").textContent=activePoll.question||"Which do you prefer?";
+      document.getElementById("poll-btn-left").textContent=activePoll.leftText||"Option A";
+      document.getElementById("poll-btn-right").textContent=activePoll.rightText||"Option B";
+      const votes=activePoll.votes||{}; let lc=0,rc=0;
+      Object.values(votes).forEach(v=>{if(v==="left")lc++;else rc++;});
+      const total=lc+rc||1;
+      const lp=Math.round(lc/total*100),rp=Math.round(rc/total*100);
+      document.getElementById("poll-fill-left").style.width=lp+"%";
+      document.getElementById("poll-fill-right").style.width=rp+"%";
+      document.getElementById("poll-left-count").textContent=lc+" vote"+(lc!==1?"s":"");
+      document.getElementById("poll-right-count").textContent=rc+" vote"+(rc!==1?"s":"");
+      document.getElementById("poll-left-pct").textContent=lp+"%";
+      document.getElementById("poll-right-pct").textContent=rp+"%";
+      const voted=!!myPollVote;
+      const bL=document.getElementById("poll-btn-left"),bR=document.getElementById("poll-btn-right");
+      bL.disabled=voted;bR.disabled=voted;
+      bL.style.opacity=(voted&&myPollVote!=="left")?"0.5":"1";
+      bR.style.opacity=(voted&&myPollVote!=="right")?"0.5":"1";
+    }
+
+    window.castPollVote=async function(side){
+      if(!currentUser||!activePoll||myPollVote)return;
+      if(Date.now()>activePoll.createdAt+60000)return;
+      myPollVote=side;
+      await set(ref(db,"poll/votes/"+currentUser.uid),side);
+    };
+
+    document.getElementById("owner-publish-poll-btn")?.addEventListener("click",async()=>{
+      if(!ownerMode)return;
+      const lt=(document.getElementById("poll-left-text")?.value||"").trim();
+      const rt=(document.getElementById("poll-right-text")?.value||"").trim();
+      const q=(document.getElementById("poll-middle-text")?.value||"").trim();
+      const s=document.getElementById("poll-owner-status");
+      if(!lt||!rt){if(s){s.textContent="Fill both option fields.";s.style.color="#c62828";}return;}
+      if(!q){if(s){s.textContent="Fill the question field.";s.style.color="#c62828";}return;}
+      await set(pollDbRef(),{active:true,leftText:lt,rightText:rt,question:q,votes:{},createdAt:Date.now()});
+      if(s){s.style.color="#2e7d32";s.textContent="Poll published! Auto-expires in 1 minute.";}
+      document.getElementById("poll-left-text").value="";
+      document.getElementById("poll-right-text").value="";
+      document.getElementById("poll-middle-text").value="";
+    });
+
+    document.getElementById("owner-clear-poll-btn")?.addEventListener("click",async()=>{
+      if(!ownerMode)return;
+      await remove(pollDbRef());
+      const s=document.getElementById("poll-owner-status");
+      if(s){s.style.color="#555";s.textContent="Poll cleared.";}
+    });
+
+    // ═══════════════════════════════════════════
+    // SPECIAL SHOP IMAGE UPLOAD
+    // ═══════════════════════════════════════════
+    (function(){
+      let singleImgData="";
+      const imgUp=document.getElementById("single-img-upload");
+      const imgPrev=document.getElementById("single-img-preview");
+      const imgClr=document.getElementById("single-img-clear");
+      if(!imgUp)return;
+      imgUp.addEventListener("change",()=>{
+        const file=imgUp.files[0];if(!file)return;
+        const reader=new FileReader();
+        reader.onload=()=>{singleImgData=reader.result;imgPrev.src=singleImgData;imgPrev.style.display="block";imgClr.style.display="inline-block";};
+        reader.readAsDataURL(file);
+      });
+      imgClr.addEventListener("click",()=>{singleImgData="";imgPrev.src="";imgPrev.style.display="none";imgClr.style.display="none";imgUp.value="";});
+      const oldBtn=document.getElementById("single-add-btn");
+      const newBtn=oldBtn.cloneNode(true);
+      oldBtn.parentNode.replaceChild(newBtn,oldBtn);
+      newBtn.addEventListener("click",async()=>{
+        const ss=document.getElementById("single-status");if(ss)ss.textContent="";
+        const name=document.getElementById("single-name").value.trim();
+        const rarity=document.getElementById("single-rarity").value;
+        const price=parseInt(document.getElementById("single-price").value||"0",10);
+        const expireStr=document.getElementById("single-expire").value;
+        if(!name||!rarity||!price||price<=0||!expireStr){if(ss)ss.textContent="Fill name, rarity, price, and expiration date.";return;}
+        const expireTime=new Date(expireStr+"T23:59:59").getTime();
+        if(isNaN(expireTime)){if(ss)ss.textContent="Invalid expiration date.";return;}
+        const id=name.toLowerCase().replace(/\s+/g,"_")+"_"+Date.now();
+        await set(ref(db,"singleShopBlooks/"+id),{id,name,rarity,price,expiresAt:expireTime,createdAt:Date.now(),imageData:singleImgData||""});
+        if(ss)ss.textContent="Added to shop.";
+        document.getElementById("single-name").value="";document.getElementById("single-price").value="25";document.getElementById("single-expire").value="";
+        singleImgData="";imgPrev.src="";imgPrev.style.display="none";imgClr.style.display="none";imgUp.value="";
+      });
+    })();
+
+    // ═══════════════════════════════════════════
+    // ACTIVE GAMES LIST
+    // ═══════════════════════════════════════════
+    async function loadActiveGames(){
+      const listEl=document.getElementById("active-games-list");
+      if(!listEl)return;
+      listEl.innerHTML="<div style='font-size:13px;color:#888;'>Loading...</div>";
+      try{
+        const snap=await get(ref(db,"games"));
+        if(!snap.exists()){listEl.innerHTML="<div style='font-size:13px;color:#888;'>No active games right now.</div>";return;}
+        const now=Date.now();
+        const games=Object.values(snap.val())
+          .filter(g=>g.status==="lobby"||(g.status==="playing"&&g.endsAt>now))
+          .sort((a,b)=>b.createdAt-a.createdAt);
+        if(!games.length){listEl.innerHTML="<div style='font-size:13px;color:#888;'>No active games right now.</div>";return;}
+        listEl.innerHTML="";
+        games.forEach(g=>{
+          const pc=Object.values(g.players||{}).filter(p=>p.uid!==g.hostUid).length;
+          const rem=g.endsAt>now?Math.ceil((g.endsAt-now)/60000):null;
+          const sl=g.status==="lobby"?"<span style='color:#43a047;font-weight:700;'>&#128994; Lobby</span>":"<span style='color:#e65100;font-weight:700;'>&#128308; Playing ("+rem+"m left)</span>";
+          const card=document.createElement("div");
+          card.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:#f5f5f5;margin-bottom:8px;border:1px solid #e0e0e0;flex-wrap:wrap;";
+          card.innerHTML=`<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:24px;">${g.modeEmoji||"🎮"}</span><div><div style="font-weight:700;font-size:14px;color:#0d47a1;">${g.modeName||"Game"}</div><div style="font-size:11px;color:#789;">${sl} &bull; Host: ${g.hostName||"?"} &bull; ${pc} player${pc!==1?"s":""}</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:20px;font-weight:700;color:#0d47a1;letter-spacing:4px;background:rgba(13,71,161,.08);border-radius:8px;padding:5px 14px;border:2px solid rgba(13,71,161,.2);font-family:monospace;">${g.code}</div><button class="agj" data-code="${g.code}" style="background:#e65100;font-size:13px;padding:7px 18px;border-radius:8px;color:#fff;font-weight:700;border:none;cursor:pointer;">Join &rarr;</button></div>`;
+          listEl.appendChild(card);
+        });
+        listEl.querySelectorAll(".agj").forEach(btn=>{
+          btn.addEventListener("click",()=>{const i=document.getElementById("join-game-code");if(i){i.value=btn.dataset.code;i.focus();}});
+        });
+      }catch(e){listEl.innerHTML="<div style='font-size:13px;color:#c62828;'>Failed to load.</div>";}
+    }
+    document.getElementById("refresh-active-games-btn")?.addEventListener("click",loadActiveGames);
+
+    // ═══════════════════════════════════════════
+    // RNG SPINNER
+    // ═══════════════════════════════════════════
+    const RNG_RARITIES = [
+      {name:"Common",        denom:2,                    color:"#9ca3af"},
+      {name:"Uncommon",      denom:3,                    color:"#22c55e"},
+      {name:"Rare",          denom:5,                    color:"#2563eb"},
+      {name:"Super Rare",    denom:8,                    color:"#1d4ed8"},
+      {name:"Ultra Rare",    denom:12,                   color:"#7c3aed"},
+      {name:"Epic",          denom:18,                   color:"#a855f7"},
+      {name:"Legendary",     denom:27,                   color:"#f97316"},
+      {name:"Secret",        denom:40,                   color:"#facc15"},
+      {name:"Ultra Secret",  denom:60,                   color:"#ec4899"},
+      {name:"Mythic",        denom:90,                   color:"#22d3ee"},
+      {name:"Ascended",      denom:135,                  color:"#0ea5e9"},
+      {name:"Transcendent",  denom:200,                  color:"#6366f1"},
+      {name:"Ethereal",      denom:300,                  color:"#38bdf8"},
+      {name:"Astral",        denom:450,                  color:"#f97316"},
+      {name:"Divine",        denom:675,                  color:"#eab308"},
+      {name:"Celestial",     denom:1000,                 color:"#a855f7"},
+      {name:"Radiant",       denom:1500,                 color:"#facc15"},
+      {name:"Prismatic",     denom:2250,                 color:"#22c55e"},
+      {name:"Chromatic",     denom:3400,                 color:"#ec4899"},
+      {name:"Spectral",      denom:5100,                 color:"#38bdf8"},
+      {name:"Phantom",       denom:7600,                 color:"#6366f1"},
+      {name:"Illusory",      denom:11300,                color:"#a855f7"},
+      {name:"Mirage",        denom:17000,                color:"#f97316"},
+      {name:"Arcane",        denom:25500,                color:"#6366f1"},
+      {name:"Mystic",        denom:38000,                color:"#22c55e"},
+      {name:"Enigmatic",     denom:57000,                color:"#f97316"},
+      {name:"Paradox",       denom:86000,                color:"#facc15"},
+      {name:"Anomaly",       denom:130000,               color:"#38bdf8"},
+      {name:"Singular",      denom:195000,               color:"#a855f7"},
+      {name:"Fractured",     denom:290000,               color:"#4b5563"},
+      {name:"Shattered",     denom:440000,               color:"#6b7280"},
+      {name:"Broken Reality",denom:660000,               color:"#111827"},
+      {name:"Infinite",      denom:15600000000000000000, color:"#facc15"},
+    ];
+
+    let rngSpinning = false;
+
+    function getRngLuck(){ return parseFloat(userData?.rngLuck||0); }
+
+    function pickRngRarity(luck){
+      const luckMult=Math.pow(1.5,luck*2);
+      const weights=RNG_RARITIES.map((r,i)=>{
+        const base=1/(typeof r.denom==="bigint"?Number(r.denom):r.denom);
+        return base*Math.pow(luckMult,i/RNG_RARITIES.length);
+      });
+      const total=weights.reduce((a,b)=>a+b,0);
+      let rnd=Math.random()*total;
+      for(let i=0;i<weights.length;i++){rnd-=weights[i];if(rnd<=0)return i;}
+      return 0;
+    }
+
+    function renderRngView(){
+      const luck=getRngLuck();
+      const luckEl=document.getElementById("rng-luck-display");
+      const luckInline=document.getElementById("rng-luck-inline");
+      if(luckEl)luckEl.textContent=luck.toFixed(1);
+      if(luckInline)luckInline.textContent=luck.toFixed(1);
+      const reel=document.getElementById("rng-reel");
+      if(reel){
+        reel.innerHTML="";
+        [...RNG_RARITIES,...RNG_RARITIES,...RNG_RARITIES].forEach(r=>{
+          const el=document.createElement("div");
+          el.style.cssText=`display:inline-flex;align-items:center;justify-content:center;width:120px;height:44px;font-size:10px;font-weight:700;color:#fff;background:${r.color};flex-shrink:0;border-right:2px solid rgba(255,255,255,.2);padding:0 4px;text-align:center;`;
+          el.textContent=r.name;
+          reel.appendChild(el);
+        });
+      }
+    }
+
+    async function loadRngLeaderboard(){
+      const listEl=document.getElementById("rng-lb-list");
+      if(!listEl)return;
+      listEl.innerHTML="<div style='font-size:12px;color:#aaa;'>Loading...</div>";
+      try{
+        const snap=await get(ref(db,"rngLeaderboard"));
+        if(!snap.exists()){listEl.innerHTML="<div style='font-size:12px;color:#aaa;'>No pulls yet!</div>";return;}
+        const entries=Object.values(snap.val()).sort((a,b)=>b.rarityIndex-a.rarityIndex).slice(0,15);
+        listEl.innerHTML="";
+        entries.forEach((e,i)=>{
+          const r=RNG_RARITIES[e.rarityIndex]||RNG_RARITIES[0];
+          const denom=typeof r.denom==="bigint"?Number(r.denom):r.denom;
+          const row=document.createElement("div");
+          row.style.cssText="padding:5px 7px;border-radius:8px;background:#f5f5f5;display:flex;flex-direction:column;gap:1px;margin-bottom:4px;";
+          row.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:700;font-size:12px;color:#0d47a1;">${i+1}. ${e.username||"?"}</span><span style="font-size:10px;font-weight:700;color:${r.color};background:${r.color}22;padding:1px 5px;border-radius:999px;">${r.name}</span></div><div style="font-size:10px;color:#aaa;">1 in ${denom.toLocaleString()}</div>`;
+          listEl.appendChild(row);
+        });
+      }catch(e){listEl.innerHTML="<div style='font-size:12px;color:#c62828;'>Failed.</div>";}
+    }
+
+    document.getElementById("rng-spin-btn")?.addEventListener("click",async()=>{
+      if(rngSpinning||!currentUser||!userData)return;
+      if((userData.coins||0)<10){alert("Not enough coins! Need 10.");return;}
+      rngSpinning=true;
+      const btn=document.getElementById("rng-spin-btn");
+      btn.disabled=true;btn.textContent="Spinning...";
+      userData.coins=(userData.coins||0)-10;
+      await saveUserData();
+      const luck=getRngLuck();
+      const idx=pickRngRarity(luck);
+      const result=RNG_RARITIES[idx];
+      // Animate reel
+      const reel=document.getElementById("rng-reel");
+      const itemW=122;
+      const targetPos=-(RNG_RARITIES.length*itemW+idx*itemW-60);
+      if(reel){
+        reel.style.transition="none";
+        reel.style.transform="translateX(0)";
+        void reel.offsetWidth;
+        reel.style.transition="transform 0.5s cubic-bezier(0.17,0.67,0.35,1)";
+        reel.style.transform=`translateX(${targetPos}px)`;
+      }
+      setTimeout(async()=>{
+        const displayEl=document.getElementById("rng-result-display");
+        const textEl=document.getElementById("rng-result-text");
+        const denom=typeof result.denom==="bigint"?Number(result.denom):result.denom;
+        if(displayEl&&textEl){
+          displayEl.style.background=result.color;
+          displayEl.style.borderColor=result.color;
+          textEl.style.color="#fff";
+          textEl.textContent=result.name+" (1 in "+denom.toLocaleString()+")";
+        }
+        try{
+          const snap=await get(ref(db,"rngLeaderboard/"+currentUser.uid));
+          const existing=snap.exists()?snap.val():null;
+          if(!existing||idx>existing.rarityIndex){
+            await set(ref(db,"rngLeaderboard/"+currentUser.uid),{uid:currentUser.uid,username:userData.username||"user",rarityIndex:idx,rarityName:result.name,pulledAt:Date.now()});
+            if(existing&&idx>existing.rarityIndex&&displayEl){displayEl.style.boxShadow="0 0 20px "+result.color;}
+          }
+        }catch(e){}
+        loadRngLeaderboard();
+        rngSpinning=false;
+        btn.disabled=false;btn.textContent="🎲 Spin (10 coins)";
+      },550);
+    });
+
+    document.getElementById("rng-upgrade-luck-btn")?.addEventListener("click",async()=>{
+      if(!currentUser||!userData)return;
+      if((userData.coins||0)<100){alert("Not enough coins! Need 100 to upgrade luck.");return;}
+      userData.coins=(userData.coins||0)-100;
+      userData.rngLuck=Math.round(((parseFloat(userData.rngLuck||0))+0.5)*10)/10;
+      await saveUserData();
+      renderRngView();
+    });
+
+</script>
 </body>
 </html>
