@@ -237,6 +237,13 @@
     }
 
     .err-small{color:#c62828;font-size:12px;margin-top:4px;min-height:16px}
+    @keyframes pulse-live{from{opacity:1;transform:scale(1)}to{opacity:.4;transform:scale(.8)}}
+    @keyframes pulse-wheel{from{box-shadow:0 0 0 0 rgba(230,81,0,.4)}to{box-shadow:0 0 0 8px rgba(230,81,0,0);}}
+    @keyframes slide-in-right{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+    #live-chat-input::placeholder{color:rgba(255,255,255,.5)}
+    #live-chat-messages::-webkit-scrollbar{width:3px}#live-chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.3);border-radius:2px}
+    .live-stream-card{background:#fff;border-radius:14px;border:2px solid #e0e0e0;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:.15s;}
+    .live-stream-card:hover{border-color:#c62828;box-shadow:0 4px 14px rgba(198,40,40,.15);transform:translateY(-2px);}
 
     #wheel-overlay{
       position:fixed;inset:0;background:rgba(0,0,0,.5);
@@ -543,26 +550,6 @@
     <div class="start-right" id="floating-blooks-area"></div>
   </div>
 
-  <!-- POLL BAR -->
-  <div id="poll-bar" style="display:none;position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#0d47a1,#1565c0);padding:10px 24px;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,.3);align-items:center;gap:0;">
-    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;gap:5px;">
-      <button onclick="castPollVote('left')" id="poll-btn-left" style="padding:8px 18px;border-radius:999px;font-weight:700;font-size:13px;border:3px solid #e53935;cursor:pointer;max-width:220px;width:100%;color:#fff;background:rgba(229,57,53,.85);">Option A</button>
-      <div style="display:flex;justify-content:space-between;width:100%;font-size:10px;color:rgba(255,255,255,.8);font-weight:700;"><span id="poll-left-count">0 votes</span><span id="poll-left-pct">0%</span></div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;flex:2;min-width:80px;padding:0 12px;gap:4px;">
-      <div style="font-family:'Titan One',system-ui;font-size:14px;color:#fff;text-align:center;" id="poll-question-label">Question?</div>
-      <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.15);position:relative;overflow:hidden;border:2px solid rgba(255,255,255,.25);width:100%;">
-        <div id="poll-fill-left" style="position:absolute;left:0;top:0;bottom:0;background:#e53935;border-radius:999px 0 0 999px;transition:width .5s;width:50%;"></div>
-        <div id="poll-fill-right" style="position:absolute;right:0;top:0;bottom:0;background:#43a047;border-radius:0 999px 999px 0;transition:width .5s;width:50%;"></div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.7);font-weight:600;" id="poll-timer-display"></div>
-    </div>
-    <div style="display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;gap:5px;">
-      <button onclick="castPollVote('right')" id="poll-btn-right" style="padding:8px 18px;border-radius:999px;font-weight:700;font-size:13px;border:3px solid #43a047;cursor:pointer;max-width:220px;width:100%;color:#fff;background:rgba(67,160,71,.85);">Option B</button>
-      <div style="display:flex;justify-content:space-between;width:100%;font-size:10px;color:rgba(255,255,255,.8);font-weight:700;"><span id="poll-right-pct">0%</span><span id="poll-right-count">0 votes</span></div>
-    </div>
-  </div>
-
   <div id="app">
     <div class="shell">
       <div class="sidebar">
@@ -580,6 +567,8 @@
         <button class="nav" data-view="giveaway">🎉 Giveaways</button>
         <button class="nav" data-view="joingame">🕹️ Join Game</button>
         <button class="nav" data-view="rng">🎲 RNG</button>
+        <button class="nav" data-view="vip">&#11088; VIP</button>
+        <button class="nav" data-view="lives">📺 Lives</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
         <button id="owner-panel-btn">Owner panel</button>
@@ -589,9 +578,11 @@
           <div class="top-left">
             <div class="pill" id="top-user">Logged out</div>
             <div class="pill" id="top-coins">Coins: 0</div>
+            <div class="pill" id="streak-display" style="background:linear-gradient(90deg,#e65100,#f9a825);color:#fff;cursor:help;">&#128293; 0 day streak</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <button id="daily-wheel-btn" style="font-size:12px;padding:6px 10px;">Daily Wheel</button>
+            <button id="stop-stream-btn" style="display:none;background:#c62828;font-size:12px;padding:6px 10px;">🔴 Stop Stream</button>
             <button id="host-game-btn" style="font-size:12px;padding:6px 10px;background:#e65100;">🎮 Host Game</button>
             <button id="admin-panel-btn" style="display:none;font-size:12px;padding:6px 10px;">Admin</button>
             <button id="signout-btn" style="background:#ef5350;font-size:12px;padding:6px 10px;">Sign Out</button>
@@ -713,13 +704,9 @@
             <button id="join-game-btn" style="background:#e65100;font-size:15px;padding:10px 24px;">Join →</button>
           </div>
           <div id="join-game-err" class="err-small"></div>
-          <div style="margin-top:18px;border-top:1px solid #e0e0e0;padding-top:14px;">
-            <div style="font-weight:700;font-size:15px;color:#0d47a1;margin-bottom:8px;">🎮 Active Games</div>
-            <button id="refresh-active-games-btn" style="font-size:12px;padding:5px 14px;background:#1976d2;margin-bottom:10px;">&#8635; Refresh</button>
-            <div id="active-games-list"><div style="font-size:13px;color:#888;">Click Refresh to load active games.</div></div>
-          </div>
         </div>
 
+        
         <!-- RNG VIEW -->
         <div id="view-rng" class="card" style="display:none;">
           <div class="section-title">🎲 RNG Spinner</div>
@@ -729,8 +716,8 @@
             <div style="width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;">
               <div style="font-weight:700;font-size:14px;color:#0d47a1;">🍀 Luck</div>
               <div id="rng-luck-display" style="font-size:28px;font-weight:700;color:#43a047;text-align:center;background:#e8f5e9;border-radius:10px;padding:10px;">0.0</div>
-              <button id="rng-upgrade-luck-btn" style="background:#43a047;font-size:13px;padding:8px;">⬆ Upgrade Luck<br><span style="font-size:11px;font-weight:400;">(costs 100 coins)</span></button>
-              <div style="font-size:11px;color:#789;text-align:center;">Each upgrade adds +0.5 luck.<br>Higher luck = rarer results.</div>
+              <button id="rng-upgrade-luck-btn" style="background:#43a047;font-size:13px;padding:8px;">⬆ Upgrade Luck<br><span id="rng-luck-cost-label" style="font-size:11px;font-weight:400;">(costs 100 coins)</span></button>
+              <div style="font-size:11px;color:#789;text-align:center;">Each upgrade adds +0.5 luck.<br>Cost ×5 each upgrade.<br>Higher luck = rarer results.</div>
             </div>
             <!-- MIDDLE: Spinner -->
             <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;">
@@ -750,6 +737,163 @@
               <div id="rng-lb-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:300px;">
                 <div style="font-size:12px;color:#aaa;">Loading...</div>
               </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <!-- VIP VIEW -->
+        <div id="view-vip" class="card" style="display:none;">
+          <div class="section-title">&#11088; VIP Membership</div>
+          <div class="section-sub">Exclusive perks for dedicated players.</div>
+          <div id="vip-status-banner" style="padding:12px 16px;border-radius:12px;background:#f5f5f5;margin-bottom:16px;font-size:13px;color:#555;"></div>
+          <div style="background:linear-gradient(135deg,#7b1fa2,#1565c0);border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;">
+            <div style="font-family:'Titan One',system-ui;font-size:22px;margin-bottom:6px;">&#11088; VIP Pass</div>
+            <div style="font-size:13px;opacity:.9;margin-bottom:14px;">100,000 coins per month. Cancel anytime.</div>
+            <div style="font-size:12px;display:flex;flex-direction:column;gap:4px;margin-bottom:16px;opacity:.9;">
+              <div>&#127873; Daily free Messed Up Pack</div>
+              <div>&#10024; Golden Packs — any blook turns golden</div>
+              <div>&#11088; VIP badge on leaderboard</div>
+            </div>
+            <button id="vip-subscribe-btn" style="background:rgba(255,255,255,.95);color:#7b1fa2;font-weight:700;font-size:14px;padding:10px 28px;border-radius:999px;">Subscribe — 100,000 coins</button>
+            <div id="vip-subscribe-status" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+          </div>
+          <div id="vip-daily-pack-box" style="display:none;background:#1a0030;border-radius:14px;padding:16px;color:#fff;margin-bottom:16px;">
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">&#127873; Daily Messed Up Pack</div>
+            <div style="font-size:12px;opacity:.8;margin-bottom:10px;">Free every day for VIP members.</div>
+            <button id="vip-claim-pack-btn" style="background:linear-gradient(135deg,#6a1b9a,#e65100,#1565c0);color:#fff;font-size:14px;font-weight:700;padding:10px 24px;border-radius:10px;">&#127873; Claim Today's Pack</button>
+            <div id="vip-pack-status" style="font-size:12px;margin-top:8px;color:#aaa;"></div>
+          </div>
+          <div id="vip-golden-box" style="display:none;background:#1a1000;border-radius:14px;padding:16px;color:#fff;">
+            <div style="font-weight:700;font-size:16px;margin-bottom:4px;">&#10024; Golden Packs</div>
+            <div style="font-size:12px;opacity:.8;margin-bottom:10px;">Select a pack. Next time you open it, the blook will be golden (color #FFD700, &#11088; star in name).</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="font-size:13px;color:#fff;">Golden Mode:</span>
+              <button id="vip-golden-toggle" style="background:#555;color:#fff;font-size:13px;padding:5px 16px;border-radius:999px;">OFF</button>
+            </div>
+            <div id="vip-golden-pack-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
+          </div>
+        </div>
+
+        <!-- LIVES VIEW -->
+        <div id="view-lives" class="card" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <div class="section-title" style="margin-bottom:0;">📺 Lives</div>
+            <button id="go-live-btn" style="background:#c62828;font-size:13px;padding:6px 16px;">🔴 Go Live</button>
+          </div>
+          <div class="section-sub">Watch live streams from other players. Click a stream to watch fullscreen.</div>
+          <button id="refresh-lives-btn" style="align-self:flex-start;font-size:12px;padding:5px 14px;background:#1976d2;margin-bottom:10px;">↻ Refresh</button>
+          <div id="lives-list" style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:calc(100vh - 260px);">
+            <div style="font-size:13px;color:#888;text-align:center;padding:20px;">No live streams right now.</div>
+          </div>
+        </div>
+
+
+        <!-- LIVE STUDIO (host fullscreen view) -->
+        <div id="live-studio-overlay" style="position:fixed;inset:0;background:#0a0a0a;display:none;flex-direction:column;z-index:600;overflow:hidden;">
+
+          <!-- Studio top bar -->
+          <div style="position:absolute;top:0;left:0;right:0;height:48px;background:rgba(0,0,0,.7);display:flex;align-items:center;gap:10px;padding:0 16px;z-index:10;backdrop-filter:blur(4px);">
+            <span style="width:10px;height:10px;border-radius:50%;background:#c62828;animation:pulse-live .8s infinite alternate;display:inline-block;"></span>
+            <span id="studio-title-label" style="color:#fff;font-weight:700;font-size:14px;"></span>
+            <span id="studio-timer" style="color:#aaa;font-size:12px;margin-left:4px;"></span>
+            <div style="flex:1;"></div>
+            <!-- Controls -->
+            <button id="studio-mute-btn" title="Mute/Unmute mic" style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;padding:5px 12px;border-radius:8px;">&#127908; Mic On</button>
+            <button id="studio-cam-btn" title="Show/Hide camera" style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;padding:5px 12px;border-radius:8px;">&#128247; Cam On</button>
+            <button id="studio-chat-toggle-btn" title="Toggle chat" style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;padding:5px 12px;border-radius:8px;">&#128172; Chat On</button>
+            <button id="studio-switch-btn" style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;padding:5px 12px;border-radius:8px;">&#128250; Switch Source</button>
+            <button id="studio-black-btn" style="background:rgba(255,255,255,.15);color:#fff;font-size:13px;padding:5px 12px;border-radius:8px;">&#9899; Black Screen</button>
+            <button id="studio-stop-btn" style="background:#c62828;color:#fff;font-size:13px;font-weight:700;padding:5px 16px;border-radius:8px;">&#9632; End Stream</button>
+          </div>
+
+          <!-- Screen preview (background) -->
+          <video id="studio-screen-preview" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;display:block;"></video>
+
+          <!-- Draggable camera PiP -->
+          <div id="studio-cam-window" style="position:absolute;bottom:100px;right:20px;width:200px;height:150px;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.3);cursor:move;display:none;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:20;resize:both;">
+            <video id="studio-cam-video" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;background:#111;"></video>
+            <div id="studio-cam-drag-handle" style="position:absolute;top:0;left:0;right:0;height:24px;background:rgba(0,0,0,.4);cursor:move;display:flex;align-items:center;padding:0 6px;">
+              <span style="color:#fff;font-size:9px;opacity:.7;">&#8942;&#8942; drag</span>
+            </div>
+          </div>
+
+          <!-- Draggable chat box -->
+          <div id="studio-chat-box" style="position:absolute;bottom:20px;left:20px;width:260px;background:rgba(0,0,0,.55);border-radius:12px;padding:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.1);z-index:20;cursor:move;">
+            <div id="studio-chat-drag-handle" style="font-size:10px;color:rgba(255,255,255,.5);margin-bottom:6px;cursor:move;">&#8942;&#8942; Chat</div>
+            <div id="studio-chat-messages" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:6px;"></div>
+            <div style="display:flex;gap:5px;">
+              <input id="studio-chat-input" placeholder="Chat as host..." maxlength="80" style="flex:1;font-size:11px;padding:4px 7px;border-radius:6px;border:none;background:rgba(255,255,255,.12);color:#fff;outline:none;">
+              <button id="studio-chat-send" style="background:rgba(255,255,255,.2);color:#fff;font-size:11px;padding:4px 9px;border-radius:6px;">Send</button>
+            </div>
+          </div>
+
+          <!-- Draggable donation alert -->
+          <div id="studio-donation-box" style="position:absolute;top:60px;right:20px;min-width:180px;max-width:240px;background:linear-gradient(135deg,rgba(123,31,162,.85),rgba(21,101,192,.85));border-radius:12px;padding:10px 14px;color:#fff;display:none;cursor:move;z-index:20;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.15);">
+            <div id="studio-donation-drag-handle" style="font-size:9px;opacity:.6;margin-bottom:4px;cursor:move;">&#8942;&#8942; Donations</div>
+            <div id="studio-donation-content" style="font-size:13px;font-weight:700;text-align:center;"></div>
+          </div>
+
+        </div>
+        <!-- GO LIVE SETUP MODAL -->
+        <div id="go-live-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:150;">
+          <div style="background:#fff;border-radius:16px;padding:24px;width:360px;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+            <div style="font-family:'Titan One',system-ui;font-size:20px;color:#c62828;margin-bottom:16px;">🔴 Go Live</div>
+            <label style="font-size:12px;display:block;margin-bottom:2px;">Stream Title</label>
+            <input id="live-title-input" placeholder="e.g. Opening packs!" style="width:100%;margin-bottom:12px;">
+            <label style="font-size:12px;display:block;margin-bottom:6px;">Countdown before stream starts</label>
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;"><input type="radio" name="countdown" value="0" checked> None</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;"><input type="radio" name="countdown" value="3"> 3s</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;"><input type="radio" name="countdown" value="5"> 5s</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;"><input type="radio" name="countdown" value="10"> 10s</label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+              <label style="font-size:13px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="live-use-mic"> 🎤 Include microphone</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="live-use-cam"> 📷 Include camera (picture-in-picture)</label>
+            </div>
+            <div id="go-live-err" style="color:#c62828;font-size:12px;min-height:16px;margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;">
+              <button id="go-live-confirm-btn" style="flex:2;background:#c62828;">🔴 Go Live</button>
+              <button id="go-live-cancel-btn" style="background:#78909c;">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FULLSCREEN COUNTDOWN OVERLAY -->
+        <div id="live-countdown-overlay" style="position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:500;">
+          <div style="text-align:center;color:#fff;">
+            <div style="font-family:'Titan One',system-ui;font-size:32px;margin-bottom:16px;color:#c62828;">🔴 Starting stream in...</div>
+            <div id="live-countdown-number" style="font-family:'Titan One',system-ui;font-size:200px;color:#fff;line-height:1;text-shadow:0 0 40px rgba(255,0,0,.5);">3</div>
+          </div>
+        </div>
+
+        <!-- FULLSCREEN VIEWER OVERLAY -->
+        <div id="live-viewer-overlay" style="position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;z-index:500;flex-direction:column;">
+          <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.7);border-radius:999px;padding:8px 20px;">
+            <span style="width:10px;height:10px;border-radius:50%;background:#c62828;animation:pulse-live .8s infinite alternate;display:inline-block;"></span>
+            <span id="viewer-stream-title" style="color:#fff;font-weight:700;font-size:14px;"></span>
+            <span id="viewer-stream-host" style="color:#aaa;font-size:12px;"></span>
+          </div>
+          <video id="live-viewer-video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;background:#000;"></video>
+          <div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:13px;">Press Esc to exit</div>
+          <video id="live-cam-pip" autoplay playsinline muted style="position:absolute;bottom:80px;right:24px;width:180px;border-radius:12px;border:2px solid #fff;display:none;object-fit:cover;background:#000;"></video>
+
+          <!-- Donation alert top-right -->
+          <div id="live-donation-alert" style="position:absolute;top:60px;right:20px;background:linear-gradient(135deg,rgba(123,31,162,.92),rgba(21,101,192,.92));border-radius:14px;padding:10px 16px;color:#fff;font-size:13px;font-weight:700;display:none;max-width:220px;box-shadow:0 4px 18px rgba(0,0,0,.5);animation:slide-in-right .3s ease-out;z-index:10;text-align:center;"></div>
+
+          <!-- Stream chat bottom-right -->
+          <div id="live-stream-chat" style="position:absolute;bottom:20px;right:20px;width:240px;display:flex;flex-direction:column;gap:0;z-index:10;">
+            <div id="live-chat-messages" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:6px;padding-right:2px;"></div>
+            <div style="display:flex;gap:6px;">
+              <input id="live-chat-input" placeholder="Chat..." style="flex:1;font-size:12px;padding:5px 8px;border-radius:8px;border:none;background:rgba(255,255,255,.15);color:#fff;outline:none;" maxlength="80">
+              <button id="live-chat-send" style="background:rgba(255,255,255,.2);font-size:12px;padding:5px 10px;border-radius:8px;color:#fff;font-weight:700;">Send</button>
+            </div>
+            <!-- Donate -->
+            <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+              <button id="live-donate-coins-btn" style="background:rgba(249,168,37,.85);font-size:11px;padding:4px 8px;border-radius:6px;color:#fff;font-weight:700;">&#127873; Donate Coins</button>
+              <button id="live-donate-blook-btn" style="background:rgba(67,160,71,.85);font-size:11px;padding:4px 8px;border-radius:6px;color:#fff;font-weight:700;">&#127183; Donate Blook</button>
             </div>
           </div>
         </div>
@@ -841,6 +985,16 @@
           <div class="section-title">Owner Panel</div>
           <div class="section-sub">Full control. Only Subzero32715 has access to this panel.</div>
 
+          <!-- Bot creator -->
+          <div style="padding:10px;border-radius:10px;background:#f3e5f5;font-size:13px;margin-bottom:14px;">
+            <strong>🤖 Create Bot Account</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Bots open packs &amp; chat occasionally. Max 10. Never top 3. 5h+ downtime/day.</div>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <input id="bot-name-input" type="text" placeholder="Bot username" style="flex:1;min-width:120px;">
+              <button id="make-bot-btn" style="background:#7b1fa2;font-size:12px;padding:6px 12px;">🤖 Make Bot</button>
+            </div>
+            <div id="make-bot-status" class="err-small"></div>
+          </div>
           <!-- All Players List -->
           <div class="owner-single-box" style="background:#f3e5f5;margin-bottom:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -852,6 +1006,24 @@
             <div id="owner-player-list" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
               <span style="color:#888;font-size:12px;">Click Refresh to load players.</span>
             </div>
+          </div>
+
+
+          <!-- Custom Pack Creator -->
+          <div class="owner-single-box" style="background:#e8f0fe;margin-bottom:14px;">
+            <strong>&#128230; Create Custom Pack</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Build a pack with your own blooks and chances. Chances should add up to 100.</div>
+            <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+              <input id="cp-pack-name" type="text" placeholder="Pack name" style="flex:1;min-width:140px;">
+              <input id="cp-pack-cost" type="number" placeholder="Cost (coins)" min="1" style="width:110px;">
+              <input id="cp-pack-color" type="text" placeholder="#hex or gradient" value="#4b0082" style="width:130px;">
+            </div>
+            <div id="cp-blook-rows" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+            <button id="cp-add-blook-btn" style="font-size:12px;padding:5px 12px;background:#1976d2;margin-bottom:8px;">+ Add Blook</button>
+            <div id="cp-total-chance" style="font-size:12px;font-weight:700;margin-bottom:8px;">Total chance: 0%</div>
+            <button id="cp-create-pack-btn" style="font-size:13px;padding:7px 18px;background:#2e7d32;font-weight:700;">&#9989; Create Pack</button>
+            <div id="cp-status" class="err-small"></div>
+            <div id="cp-existing-list" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;"></div>
           </div>
 
           <!-- Pack toggles -->
@@ -868,17 +1040,10 @@
                 <option value="Epic">Epic</option><option value="Legendary">Legendary</option>
                 <option value="Supreeme">Supreeme</option><option value="Chroma">Chroma</option>
                 <option value="Mystical">Mystical</option>
-                <option value="Unique">Unique ❖</option>
               </select>
               <input id="single-price" type="number" min="1" value="25" placeholder="Price">
               <input id="single-expire" type="date">
               <button id="single-add-btn" style="background:#43a047;">Add</button>
-            </div>
-            <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <label style="font-size:12px;font-weight:600;color:#555;">Custom Image (optional):</label>
-              <input id="single-img-upload" type="file" accept="image/*" style="font-size:12px;">
-              <img id="single-img-preview" style="display:none;width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid #43a047;" alt="preview">
-              <button id="single-img-clear" style="background:#e53935;font-size:11px;padding:4px 10px;display:none;">Remove image</button>
             </div>
             <div id="single-status" class="err-small"></div>
             <div class="owner-single-list" id="single-list"></div>
@@ -941,19 +1106,6 @@
           </div>
 
           <button id="owner-create-news-btn" style="background:#0d47a1;margin-top:10px;">📰 Create News Post</button>
-          <div style="margin-top:14px;padding:14px;border-radius:12px;background:#e8eaf6;font-size:13px;">
-            <div style="font-size:15px;font-weight:700;color:#283593;margin-bottom:6px;">📊 Create Poll <span style="font-size:11px;font-weight:400;color:#666;">(auto-expires 1 min)</span></div>
-            <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px;">
-              <textarea id="poll-left-text" placeholder="Left option" style="flex:1;min-width:110px;height:52px;border-radius:8px;border:1px solid #9fa8da;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;"></textarea>
-              <textarea id="poll-middle-text" placeholder="Question" style="width:150px;height:52px;border-radius:8px;border:2px solid #5c6bc0;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;text-align:center;font-weight:700;"></textarea>
-              <textarea id="poll-right-text" placeholder="Right option" style="flex:1;min-width:110px;height:52px;border-radius:8px;border:1px solid #9fa8da;padding:6px 8px;font-family:inherit;font-size:13px;resize:none;"></textarea>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button id="owner-publish-poll-btn" style="background:#283593;font-size:13px;padding:7px 16px;">📊 Publish Poll</button>
-              <button id="owner-clear-poll-btn" style="background:#e53935;font-size:13px;padding:7px 16px;">✕ Clear Poll</button>
-            </div>
-            <div id="poll-owner-status" style="font-size:12px;color:#2e7d32;margin-top:6px;min-height:16px;"></div>
-          </div>
 
           <!-- Set coins for any user -->
           <div class="owner-single-box" style="background:#e3f2fd;margin-top:14px;">
@@ -1371,17 +1523,17 @@
     const singleShopRef = () => ref(db, "singleShopBlooks");
     const reportsRef = () => ref(db, "reports");
 
-    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme", UNIQUE:"Unique" };
+    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme" };
 
     const RARITY_COLORS = {
       [R.COMMON]:"#4caf50",[R.RARE]:"#2196f3",[R.EPIC]:"#9c27b0",
-      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000",[R.UNIQUE]:"#00bcd4"
+      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000"
     };
     const SELL_VALUES = {
-      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000,[R.UNIQUE]:500
+      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000
     };
     const SUBSCORE_VALUES = {
-      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100,[R.UNIQUE]:75
+      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -1426,7 +1578,7 @@
       return `<span style="display:inline-block;background:${r.bg};border-radius:999px;padding:${pad};font-size:${size};font-weight:700;${colorStyle}border:1px solid ${isGradient?"#ddd":r.color}22;vertical-align:middle;margin-left:4px;">${r.label}</span>`;
     }
     const RARITY_BASE_WEIGHTS = {
-      [R.COMMON]:60,[R.RARE]:25,[R.EPIC]:8,[R.LEG]:4,[R.SUP]:1.2,[R.CHR]:1,[R.MYS]:0.8,[R.UNIQUE]:0
+      [R.COMMON]:60,[R.RARE]:25,[R.EPIC]:8,[R.LEG]:4,[R.SUP]:1.2,[R.CHR]:1,[R.MYS]:0.8
     };
     const BOOSTABLE_RARITIES = new Set([R.LEG, R.SUP, R.CHR, R.MYS]);
     const BOOSTER_COSTS = { 2:10000, 3:50000, 4:350000, 5:500000 };
@@ -1947,6 +2099,8 @@
       viewLeaderboard.style.display=name==="leaderboard"?"flex":"none";
       ownerPanel.style.display=name==="owner"?"flex":"none";
       adminPanel.style.display=name==="admin"?"flex":"none";
+      const _rngPanel=document.getElementById("view-rng"); if(_rngPanel) _rngPanel.style.display=name==="rng"?"flex":"none";
+      const _livesPanel=document.getElementById("view-lives"); if(_livesPanel) _livesPanel.style.display=name==="lives"?"flex":"none";
       const vBazaar=document.getElementById("view-bazaar"); if(vBazaar) vBazaar.style.display=name==="bazaar"?"flex":"none";
       const vNews=document.getElementById("view-news"); if(vNews) vNews.style.display=name==="news"?"flex":"none";
       const vEvent=document.getElementById("view-event"); if(vEvent) vEvent.style.display=name==="event"?"flex":"none";
@@ -1971,7 +2125,7 @@
       });
     });
 
-    signoutBtn.addEventListener("click",async()=>{ await signOut(auth); });
+    signoutBtn.addEventListener("click",async()=>{ await stopLiveStream().catch(()=>{}); await signOut(auth); });
 
     function userKey(username){ return username.toLowerCase(); }
 
@@ -2140,7 +2294,25 @@
         const openBtn=document.createElement("button"); openBtn.textContent="Open";
         openBtn.style.fontSize="13px"; openBtn.style.alignSelf="flex-end";
         openBtn.addEventListener("click",()=>openPack(pack.id));
-        card.appendChild(header); card.appendChild(openBtn); packGrid.appendChild(card);
+        // Golden toggle (VIP only)
+        const cardBottom=document.createElement("div"); cardBottom.style.cssText="display:flex;align-items:center;gap:6px;margin-top:4px;";
+        cardBottom.appendChild(openBtn);
+        if(isVip && isVip()) {
+          const goldenBtn=document.createElement("button");
+          const isGolden = vipGoldenMode && vipGoldenPackId===pack.id;
+          goldenBtn.textContent = isGolden ? "\u2B50 Golden" : "\u2B50";
+          goldenBtn.title = "Toggle golden mode for this pack";
+          goldenBtn.style.cssText="font-size:11px;padding:4px 8px;background:"+(isGolden?"#FFD700":"rgba(255,255,255,.2)")+";color:"+(isGolden?"#000":"#fff")+";border-radius:6px;";
+          goldenBtn.addEventListener("click",(e)=>{
+            e.stopPropagation();
+            if(!isVip()) { alert("VIP required!"); return; }
+            if(!vipGoldenMode) { vipGoldenMode=true; const t=document.getElementById("vip-golden-toggle"); if(t){t.textContent="ON";t.style.background="#f9a825";} }
+            vipGoldenPackId = vipGoldenPackId===pack.id ? null : pack.id;
+            buildPacks(); // rebuild to update all buttons
+          });
+          cardBottom.appendChild(goldenBtn);
+        }
+        card.appendChild(header); card.appendChild(cardBottom); packGrid.appendChild(card);
       });
     }
 
@@ -2179,17 +2351,25 @@
         if(list.length){ const fb=list[Math.floor(Math.random()*list.length)]; chosen={...chosen,name:fb.name,rarity:fb.rarity,chance:fb.chance}; }
         userData.nextForcedRarity=null;
       }
+      // Shiny roll: 2% chance on any pull, bonus coins + sparkle
+      const isShiny = Math.random() < 0.02;
+      const shinyBonus = isShiny ? Math.round(actualPack.cost * (2 + Math.random()*3)) : 0;
       if(!userData.blooks) userData.blooks={};
       userData.blooks[chosen.name]=(userData.blooks[chosen.name]||0)+1;
+      if(isShiny) userData.coins=(parseInt(userData.coins,10)||0)+shinyBonus;
       userData.nextPackId=null;
       userData.totalPacksOpened=(userData.totalPacksOpened||0)+1;
-      packOpenBlook.textContent=chosen.name;
-      packOpenBlook.style.background=rarityColor(chosen.rarity);
-      packOpenMeta.textContent=`${chosen.rarity} • from ${actualPack.name}`;
+      checkPackMilestone(userData.totalPacksOpened);
+      checkLuckyStreak(chosen.rarity);
+      packOpenBlook.textContent=(isShiny?"\u2728 ":"")+chosen.name;
+      packOpenBlook.style.background=isShiny?"linear-gradient(135deg,#fff176,#fff9c4,#fff176)":rarityColor(chosen.rarity);
+      packOpenBlook.style.color=isShiny?"#7b1fa2":"#fff";
+      packOpenMeta.textContent=isShiny?(`SHINY! ${chosen.rarity} • +${shinyBonus.toLocaleString()} bonus coins!`):(`${chosen.rarity} • from ${actualPack.name}`);
       packOpenOverlay.style.display="flex";
       canClosePackOverlay=false;
-      setTimeout(()=>{ canClosePackOverlay=true; },600);
-      spawnConfetti(rarityColor(chosen.rarity));
+      setTimeout(()=>{ canClosePackOverlay=true; packOpenBlook.style.color="#fff"; },600);
+      spawnConfetti(isShiny?"#fff176":rarityColor(chosen.rarity));
+      if(isShiny) showToast("\u2728 SHINY "+chosen.name+"! +"+shinyBonus.toLocaleString()+" coins", "#fbc02d", 4500);
       // Announce if rare
       if(chosen.chance<0.1) announceRarePull(userData.username||"Someone", chosen.name, chosen.chance);
       // DLBY easter egg — check if player now owns ALL blooks from the DLBY pack
@@ -2413,6 +2593,7 @@
       lastChatTime=now;
       const msgRef=push(chatRef());
       await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now()});
+      checkGiveawayCodeInMessage(text, userData.username);
       chatInput.value="";
       chatMessageCount++; if(chatMessageCount>=5){chatMessageCount=0;userData.coins=(userData.coins||0)+1;userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+1;await saveUserData();}
     });
@@ -2437,6 +2618,11 @@
       if(subletBotInterval) clearInterval(subletBotInterval);
       subletBotInterval = setInterval(async()=>{
         try{
+          // ~12% chance to fire a surprise giveaway instead of the normal message
+          if(Math.random() < 0.12) {
+            await fireChatGiveawayEvent();
+            return;
+          }
           const msgRef=push(chatRef());
           await set(msgRef,{
             username:"🤖 SubletBot",
@@ -2447,6 +2633,45 @@
           });
         }catch(e){ console.error("SubletBot interval failed:",e); }
       }, 60000);
+    }
+
+    // ── Random chat giveaway events ──
+    let _activeChatGiveaway = null;
+    async function fireChatGiveawayEvent() {
+      const code = Math.random().toString(36).slice(2,7).toUpperCase();
+      const amount = [500,1000,2500,5000][Math.floor(Math.random()*4)];
+      _activeChatGiveaway = { code, amount, claimedBy: [] };
+      await set(ref(db,"chatGiveaway"), { code, amount, createdAt: Date.now(), expiresAt: Date.now()+90000 });
+      const msgRef=push(chatRef());
+      await set(msgRef,{
+        username:"🤖 SubletBot",
+        text:"🎉 SURPRISE GIVEAWAY! Type the code below in chat in the next 90 seconds to win "+amount.toLocaleString()+" coins! Code: "+code,
+        imageUrl:"",
+        createdAt:Date.now(),
+        isBot:true
+      });
+      showToast("🎉 A giveaway just dropped in chat!", "#7b1fa2", 5000);
+    }
+
+    // Check incoming chat messages for giveaway code matches
+    async function checkGiveawayCodeInMessage(text, senderUsername) {
+      if(!_activeChatGiveaway) return;
+      const giveSnap = await get(ref(db,"chatGiveaway"));
+      if(!giveSnap.exists()) { _activeChatGiveaway = null; return; }
+      const g = giveSnap.val();
+      if(Date.now() > g.expiresAt) { _activeChatGiveaway = null; await remove(ref(db,"chatGiveaway")); return; }
+      const trimmed = (text||"").trim().toUpperCase();
+      if(trimmed === g.code && senderUsername && senderUsername.toLowerCase() === (userData?.username||"").toLowerCase()) {
+        // Claim it (first valid match by current user)
+        await remove(ref(db,"chatGiveaway"));
+        _activeChatGiveaway = null;
+        userData.coins = (parseInt(userData.coins,10)||0) + g.amount;
+        userData.totalCoinsCollected = (userData.totalCoinsCollected||0) + g.amount;
+        await saveUserData();
+        showToast("🎉 You won the giveaway! +"+g.amount.toLocaleString()+" coins", "#43a047", 5000);
+        const winMsgRef=push(chatRef());
+        await set(winMsgRef,{ username:"🤖 SubletBot", text:"🏆 "+(userData.username||"Someone")+" claimed the giveaway! Better luck next time everyone else.", imageUrl:"", createdAt:Date.now(), isBot:true });
+      }
     }
 
     async function buildLeaderboard(){
@@ -2464,20 +2689,30 @@
           if(ban.until&&Date.now()<ban.until) return false;
           return true;
         })
-        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); const s=calcStatsFromData(u); return{username:u.username||"?",coins:u.coins||0,totalBlooks,isOwner:!!u.isOwner,isAdmin:!!u.isAdmin,subscore:s.subscore}; });
-      const byCoins=[...players].sort((a,b)=>b.coins-a.coins).slice(0,20);
+        .map(u=>{ const blooks=u.blooks||{}; let totalBlooks=0; Object.values(blooks).forEach(c=>{totalBlooks+=c;}); const s=calcStatsFromData(u); return{username:u.username||"?",coins:u.coins||0,totalBlooks,isOwner:!!u.isOwner,isAdmin:!!u.isAdmin,subscore:s.subscore,isBot:!!u.isBot}; });
+      // Bots never in top 3
+      const sorted=[...players].sort((a,b)=>b.coins-a.coins);
+      const nonBotTop3=sorted.filter(p=>!p.isBot).slice(0,3);
+      const rest=sorted.filter(p=>!nonBotTop3.includes(p));
+      const byCoins=[...nonBotTop3,...rest].slice(0,20);
       leaderboardList.innerHTML="";
+      const myIndex=byCoins.findIndex(p=>p.username.toLowerCase()===(userData?.username||"").toLowerCase());
       byCoins.forEach((p,i)=>{
         const row=document.createElement("div"); row.className="lb-entry";
+        const isMe = i===myIndex;
+        if(isMe) row.style.cssText="background:rgba(123,31,162,.1);border-radius:8px;border:1px solid rgba(123,31,162,.3);";
         const left=document.createElement("div"); left.className="lb-name";
         let tag="";
         if(p.isOwner) tag=` <span style="background:#7b1fa2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">👑 owner</span>`;
         else if(p.isAdmin) tag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">⚡ admin</span>`;
+        if(isMe) tag+=` <span style="background:#43a047;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">YOU</span>`;
         left.innerHTML=`${i+1}. ${p.username}${tag}${rankBadgeHTML(p.subscore,true)}`;
         const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
         row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row);
       });
+      renderRivalryCard(byCoins, myIndex);
       ownerPanelBtn.style.display=ownerMode?"inline-block":"none";
+      if(ownerMode) setTimeout(()=>startBotActivity(),2000);
     }
 
     async function loadOwnerPlayerList(){
@@ -2636,7 +2871,18 @@
     function canSpinWheel(){ if(!userData) return false; return Date.now()-(userData.lastWheel||0)>=12*60*60*1000; }
     function getWheelRemaining(){ if(!userData) return 0; const remaining=12*60*60*1000-(Date.now()-(userData.lastWheel||0)); return remaining>0?remaining:0; }
     function formatRemaining(ms){ const totalSec=Math.floor(ms/1000); const h=Math.floor(totalSec/3600); const m=Math.floor((totalSec%3600)/60); return `${h}h ${m}m`; }
-    function updateWheelButtonState(){ if(!userData){dailyWheelBtn.disabled=true;return;} dailyWheelBtn.disabled=!canSpinWheel(); }
+    function updateWheelButtonState(){
+      if(!userData){dailyWheelBtn.disabled=true;return;}
+      const ready=canSpinWheel();
+      dailyWheelBtn.disabled=!ready;
+      if(ready){
+        dailyWheelBtn.style.animation="pulse-wheel .8s ease-in-out infinite alternate";
+        dailyWheelBtn.style.background="#e65100";
+      } else {
+        dailyWheelBtn.style.animation="";
+        dailyWheelBtn.style.background="";
+      }
+    }
 
     dailyWheelBtn.addEventListener("click",()=>{
       if(!currentUser||!userData) return;
@@ -2650,9 +2896,54 @@
     wheelSpinBtn.addEventListener("click",async()=>{
       if(!canSpinWheel()) return; wheelSpinBtn.disabled=true;
       wheelCircle.classList.remove("wheel-spin"); void wheelCircle.offsetWidth; wheelCircle.classList.add("wheel-spin");
-      wheelStatus.textContent="Spinning..."; const reward=pickWheelReward();
-      setTimeout(async()=>{ userData.coins=(parseInt(userData.coins,10)||0)+reward; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+reward; userData.lastWheel=Date.now(); await saveUserData(); wheelCenter.textContent=reward.toLocaleString(); wheelStatus.textContent="You won "+reward.toLocaleString()+" coins!"; wheelSpinBtn.style.display="none"; updateWheelButtonState(); },2000);
+      wheelStatus.textContent="Spinning...";
+      // 8% chance of Mystery Box instead of plain coins
+      var isMysteryBox = Math.random() < 0.08;
+      var reward = isMysteryBox ? 0 : pickWheelReward();
+      setTimeout(async()=>{
+        userData.lastWheel=Date.now();
+        if(isMysteryBox) {
+          var mb = rollMysteryBox();
+          if(mb.type==="coins") {
+            userData.coins=(parseInt(userData.coins,10)||0)+mb.amount;
+            userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+mb.amount;
+          } else if(mb.type==="blook") {
+            if(!userData.blooks) userData.blooks={};
+            userData.blooks[mb.name]=(userData.blooks[mb.name]||0)+1;
+          }
+          await saveUserData();
+          wheelCenter.textContent="\uD83C\uDF81";
+          wheelStatus.innerHTML = "<strong>\uD83C\uDF81 MYSTERY BOX!</strong><br>" + mb.label;
+          spawnConfetti("#ab47bc");
+          renderBlooks();
+        } else {
+          userData.coins=(parseInt(userData.coins,10)||0)+reward;
+          userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+reward;
+          await saveUserData();
+          wheelCenter.textContent=reward.toLocaleString();
+          wheelStatus.textContent="You won "+reward.toLocaleString()+" coins!";
+        }
+        wheelSpinBtn.style.display="none"; updateWheelButtonState();
+      },2000);
     });
+
+    function rollMysteryBox() {
+      var roll = Math.random();
+      if(roll < 0.45) {
+        var amt = [2000,5000,10000,25000][Math.floor(Math.random()*4)];
+        return { type:"coins", amount: amt, label: "+" + amt.toLocaleString() + " coins!" };
+      } else if(roll < 0.85) {
+        // Random common/rare blook from a random pack
+        var pool = allPacksForMarket();
+        var pack = pool[Math.floor(Math.random()*pool.length)];
+        var b = pack.blooks[Math.floor(Math.random()*pack.blooks.length)];
+        return { type:"blook", name: b.name, label: "Got a " + b.name + " (" + b.rarity + ")!" };
+      } else {
+        // Rare jackpot: big coins
+        var amt2 = 50000;
+        return { type:"coins", amount: amt2, label: "JACKPOT! +" + amt2.toLocaleString() + " coins!" };
+      }
+    }
 
     ownerPanelBtn.addEventListener("click",()=>{ if(!ownerMode) return; showView("owner"); });
     ownerBackBtn.addEventListener("click",()=>{ showView("leaderboard"); });
@@ -2844,9 +3135,9 @@
       checkMonthlyChatReset();
       checkPastEventResults();
       startSubletBotInterval();
-      subscribePoll();
       startPresenceUpdates();
       updatePresence("market");
+      setTimeout(()=>checkDailyStreak(), 2000);
       setTimeout(checkAndDrawGiveaways, 3000);
       setInterval(checkAndDrawGiveaways, 60000);
       // Show event nav if active
@@ -3376,13 +3667,17 @@
     const _origShowView = showView;
     showView = function(name){
       _origShowView(name);
+      const vRng=document.getElementById("view-rng"); if(vRng) vRng.style.display=name==="rng"?"flex":"none";
+      if(name==="rng"){ renderRngView(); loadRngLeaderboard(); }
+      const vVip=document.getElementById("view-vip"); if(vVip) vVip.style.display=name==="vip"?"flex":"none";
+      if(name==="vip") loadVipView();
+      const vLives=document.getElementById("view-lives"); if(vLives) vLives.style.display=name==="lives"?"flex":"none";
+      if(name==="lives") loadLivesList();
       // Show/hide joingame view
       const vJoin=document.getElementById("view-joingame");
       if(vJoin) vJoin.style.display=name==="joingame"?"flex":"none";
       updatePresence(name);
       if(name==="admin") loadAdminOnlinePlayers();
-      if(name==="rng"){ renderRngView(); loadRngLeaderboard(); }
-      const vRng=document.getElementById("view-rng"); if(vRng) vRng.style.display=name==="rng"?"flex":"none";
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -5191,295 +5486,53 @@
     for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="floating-blook"; d.style.background=floatColors[i%floatColors.length]; d.style.left=Math.random()*70+15+"%"; d.style.top=Math.random()*70+15+"%"; d.style.setProperty("--tilt",(Math.random()*10-5)+"deg"); d.textContent="Sublet"; floatingArea.appendChild(d); }
   
     // ═══════════════════════════════════════════
-    // POLL SYSTEM
-    // ═══════════════════════════════════════════
-    const pollDbRef = () => ref(db, "poll");
-    let activePoll = null, myPollVote = null, pollTimerInterval = null;
-
-    function subscribePoll(){
-      onValue(pollDbRef(), snap => {
-        if(!snap.exists()||!snap.val()||!snap.val().active){
-          activePoll=null;
-          document.getElementById("poll-bar").style.display="none";
-          if(pollTimerInterval){clearInterval(pollTimerInterval);pollTimerInterval=null;}
-          return;
-        }
-        activePoll=snap.val();
-        if(Date.now()>activePoll.createdAt+60000){
-          remove(pollDbRef()).catch(()=>{});
-          activePoll=null;
-          document.getElementById("poll-bar").style.display="none";
-          if(pollTimerInterval){clearInterval(pollTimerInterval);pollTimerInterval=null;}
-          return;
-        }
-        myPollVote=(activePoll.votes&&activePoll.votes[currentUser?.uid])?activePoll.votes[currentUser.uid]:null;
-        renderPollBar();
-        if(pollTimerInterval) clearInterval(pollTimerInterval);
-        pollTimerInterval=setInterval(()=>{
-          if(!activePoll){clearInterval(pollTimerInterval);return;}
-          const remaining=Math.max(0,(activePoll.createdAt+60000)-Date.now());
-          const t=document.getElementById("poll-timer-display");
-          if(t) t.textContent="⏱ "+Math.ceil(remaining/1000)+"s";
-          if(remaining<=0){
-            clearInterval(pollTimerInterval);pollTimerInterval=null;
-            document.getElementById("poll-bar").style.display="none";
-            remove(pollDbRef()).catch(()=>{});
-          }
-        },500);
-      });
-    }
-
-    function renderPollBar(){
-      if(!activePoll){document.getElementById("poll-bar").style.display="none";return;}
-      document.getElementById("poll-bar").style.display="flex";
-      document.getElementById("poll-question-label").textContent=activePoll.question||"Which do you prefer?";
-      document.getElementById("poll-btn-left").textContent=activePoll.leftText||"Option A";
-      document.getElementById("poll-btn-right").textContent=activePoll.rightText||"Option B";
-      const votes=activePoll.votes||{}; let lc=0,rc=0;
-      Object.values(votes).forEach(v=>{if(v==="left")lc++;else rc++;});
-      const total=lc+rc||1;
-      const lp=Math.round(lc/total*100),rp=Math.round(rc/total*100);
-      document.getElementById("poll-fill-left").style.width=lp+"%";
-      document.getElementById("poll-fill-right").style.width=rp+"%";
-      document.getElementById("poll-left-count").textContent=lc+" vote"+(lc!==1?"s":"");
-      document.getElementById("poll-right-count").textContent=rc+" vote"+(rc!==1?"s":"");
-      document.getElementById("poll-left-pct").textContent=lp+"%";
-      document.getElementById("poll-right-pct").textContent=rp+"%";
-      const voted=!!myPollVote;
-      const bL=document.getElementById("poll-btn-left"),bR=document.getElementById("poll-btn-right");
-      bL.disabled=voted;bR.disabled=voted;
-      bL.style.opacity=(voted&&myPollVote!=="left")?"0.5":"1";
-      bR.style.opacity=(voted&&myPollVote!=="right")?"0.5":"1";
-    }
-
-    window.castPollVote=async function(side){
-      if(!currentUser||!activePoll||myPollVote)return;
-      if(Date.now()>activePoll.createdAt+60000)return;
-      myPollVote=side;
-      await set(ref(db,"poll/votes/"+currentUser.uid),side);
-    };
-
-    document.getElementById("owner-publish-poll-btn")?.addEventListener("click",async()=>{
-      if(!ownerMode)return;
-      const lt=(document.getElementById("poll-left-text")?.value||"").trim();
-      const rt=(document.getElementById("poll-right-text")?.value||"").trim();
-      const q=(document.getElementById("poll-middle-text")?.value||"").trim();
-      const s=document.getElementById("poll-owner-status");
-      if(!lt||!rt){if(s){s.textContent="Fill both option fields.";s.style.color="#c62828";}return;}
-      if(!q){if(s){s.textContent="Fill the question field.";s.style.color="#c62828";}return;}
-      await set(pollDbRef(),{active:true,leftText:lt,rightText:rt,question:q,votes:{},createdAt:Date.now()});
-      if(s){s.style.color="#2e7d32";s.textContent="Poll published! Auto-expires in 1 minute.";}
-      document.getElementById("poll-left-text").value="";
-      document.getElementById("poll-right-text").value="";
-      document.getElementById("poll-middle-text").value="";
-    });
-
-    document.getElementById("owner-clear-poll-btn")?.addEventListener("click",async()=>{
-      if(!ownerMode)return;
-      await remove(pollDbRef());
-      const s=document.getElementById("poll-owner-status");
-      if(s){s.style.color="#555";s.textContent="Poll cleared.";}
-    });
-
-    // ═══════════════════════════════════════════
-    // SPECIAL SHOP IMAGE UPLOAD
-    // ═══════════════════════════════════════════
-    (function(){
-      let singleImgData="";
-      const imgUp=document.getElementById("single-img-upload");
-      const imgPrev=document.getElementById("single-img-preview");
-      const imgClr=document.getElementById("single-img-clear");
-      if(!imgUp)return;
-      imgUp.addEventListener("change",()=>{
-        const file=imgUp.files[0];if(!file)return;
-        const reader=new FileReader();
-        reader.onload=()=>{singleImgData=reader.result;imgPrev.src=singleImgData;imgPrev.style.display="block";imgClr.style.display="inline-block";};
-        reader.readAsDataURL(file);
-      });
-      imgClr.addEventListener("click",()=>{singleImgData="";imgPrev.src="";imgPrev.style.display="none";imgClr.style.display="none";imgUp.value="";});
-      const oldBtn=document.getElementById("single-add-btn");
-      const newBtn=oldBtn.cloneNode(true);
-      oldBtn.parentNode.replaceChild(newBtn,oldBtn);
-      newBtn.addEventListener("click",async()=>{
-        const ss=document.getElementById("single-status");if(ss)ss.textContent="";
-        const name=document.getElementById("single-name").value.trim();
-        const rarity=document.getElementById("single-rarity").value;
-        const price=parseInt(document.getElementById("single-price").value||"0",10);
-        const expireStr=document.getElementById("single-expire").value;
-        if(!name||!rarity||!price||price<=0||!expireStr){if(ss)ss.textContent="Fill name, rarity, price, and expiration date.";return;}
-        const expireTime=new Date(expireStr+"T23:59:59").getTime();
-        if(isNaN(expireTime)){if(ss)ss.textContent="Invalid expiration date.";return;}
-        const id=name.toLowerCase().replace(/\s+/g,"_")+"_"+Date.now();
-        await set(ref(db,"singleShopBlooks/"+id),{id,name,rarity,price,expiresAt:expireTime,createdAt:Date.now(),imageData:singleImgData||""});
-        if(ss)ss.textContent="Added to shop.";
-        document.getElementById("single-name").value="";document.getElementById("single-price").value="25";document.getElementById("single-expire").value="";
-        singleImgData="";imgPrev.src="";imgPrev.style.display="none";imgClr.style.display="none";imgUp.value="";
-      });
-    })();
-
-    // ═══════════════════════════════════════════
-    // ACTIVE GAMES LIST
-    // ═══════════════════════════════════════════
-    async function loadActiveGames(){
-      const listEl=document.getElementById("active-games-list");
-      if(!listEl)return;
-      listEl.innerHTML="<div style='font-size:13px;color:#888;'>Loading...</div>";
-      try{
-        const snap=await get(ref(db,"games"));
-        if(!snap.exists()){listEl.innerHTML="<div style='font-size:13px;color:#888;'>No active games right now.</div>";return;}
-        const now=Date.now();
-        const games=Object.values(snap.val())
-          .filter(g=>g.status==="lobby"||(g.status==="playing"&&g.endsAt>now))
-          .sort((a,b)=>b.createdAt-a.createdAt);
-        if(!games.length){listEl.innerHTML="<div style='font-size:13px;color:#888;'>No active games right now.</div>";return;}
-        listEl.innerHTML="";
-        games.forEach(g=>{
-          const pc=Object.values(g.players||{}).filter(p=>p.uid!==g.hostUid).length;
-          const rem=g.endsAt>now?Math.ceil((g.endsAt-now)/60000):null;
-          const sl=g.status==="lobby"?"<span style='color:#43a047;font-weight:700;'>&#128994; Lobby</span>":"<span style='color:#e65100;font-weight:700;'>&#128308; Playing ("+rem+"m left)</span>";
-          const card=document.createElement("div");
-          card.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:#f5f5f5;margin-bottom:8px;border:1px solid #e0e0e0;flex-wrap:wrap;";
-          card.innerHTML=`<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:24px;">${g.modeEmoji||"🎮"}</span><div><div style="font-weight:700;font-size:14px;color:#0d47a1;">${g.modeName||"Game"}</div><div style="font-size:11px;color:#789;">${sl} &bull; Host: ${g.hostName||"?"} &bull; ${pc} player${pc!==1?"s":""}</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:20px;font-weight:700;color:#0d47a1;letter-spacing:4px;background:rgba(13,71,161,.08);border-radius:8px;padding:5px 14px;border:2px solid rgba(13,71,161,.2);font-family:monospace;">${g.code}</div><button class="agj" data-code="${g.code}" style="background:#e65100;font-size:13px;padding:7px 18px;border-radius:8px;color:#fff;font-weight:700;border:none;cursor:pointer;">Join &rarr;</button></div>`;
-          listEl.appendChild(card);
-        });
-        listEl.querySelectorAll(".agj").forEach(btn=>{
-          btn.addEventListener("click",()=>{const i=document.getElementById("join-game-code");if(i){i.value=btn.dataset.code;i.focus();}});
-        });
-      }catch(e){listEl.innerHTML="<div style='font-size:13px;color:#c62828;'>Failed to load.</div>";}
-    }
-    document.getElementById("refresh-active-games-btn")?.addEventListener("click",loadActiveGames);
-
-    // ═══════════════════════════════════════════
     // RNG SPINNER
     // ═══════════════════════════════════════════
-  const RNG_RARITIES = [
-  { name: "Common", denom: 2, tier: 0, color: "#9ca3af" },
-  { name: "Uncommon", denom: 3, tier: 0, color: "#22c55e" },
-  { name: "Rare", denom: 5, tier: 0, color: "#2563eb" },
-  { name: "Super Rare", denom: 8, tier: 0, color: "#1d4ed8" },
-  { name: "Ultra Rare", denom: 12, tier: 0, color: "#7c3aed" },
-
-  { name: "Epic", denom: 18, tier: 1, color: "#a855f7" },
-  { name: "Legendary", denom: 27, tier: 1, color: "#f97316" },
-  { name: "Secret", denom: 40, tier: 1, color: "#facc15" },
-  { name: "Ultra Secret", denom: 60, tier: 1, color: "#ec4899" },
-  { name: "Mythic", denom: 90, tier: 1, color: "#22d3ee" },
-
-  { name: "Ascended", denom: 135, tier: 2, color: "#0ea5e9" },
-  { name: "Transcendent", denom: 200, tier: 2, color: "#6366f1" },
-  { name: "Ethereal", denom: 300, tier: 2, color: "#38bdf8" },
-  { name: "Astral", denom: 450, tier: 2, color: "#f97316" },
-  { name: "Divine", denom: 675, tier: 2, color: "#eab308" },
-
-  { name: "Celestial", denom: 1000, tier: 3, color: "#a855f7" },
-  { name: "Radiant", denom: 1500, tier: 3, color: "#facc15" },
-  { name: "Prismatic", denom: 2250, tier: 3, color: "#22c55e" },
-  { name: "Chromatic", denom: 3400, tier: 3, color: "#ec4899" },
-  { name: "Spectral", denom: 5100, tier: 3, color: "#38bdf8" },
-  { name: "Phantom", denom: 7600, tier: 3, color: "#6366f1" },
-  { name: "Illusory", denom: 11300, tier: 3, color: "#a855f7" },
-  { name: "Mirage", denom: 17000, tier: 3, color: "#f97316" },
-
-  { name: "Arcane", denom: 25500, tier: 4, color: "#6366f1" },
-  { name: "Mystic", denom: 38000, tier: 4, color: "#22c55e" },
-  { name: "Enigmatic", denom: 57000, tier: 4, color: "#f97316" },
-  { name: "Paradox", denom: 86000, tier: 4, color: "#facc15" },
-  { name: "Anomaly", denom: 130000, tier: 4, color: "#38bdf8" },
-  { name: "Singular", denom: 195000, tier: 4, color: "#a855f7" },
-  { name: "Fractured", denom: 290000, tier: 4, color: "#4b5563" },
-  { name: "Shattered", denom: 440000, tier: 4, color: "#6b7280" },
-  { name: "Broken Reality", denom: 660000, tier: 4, color: "#111827" },
-
-  // Tier 5
-  { name: "Warped", denom: 990000, tier: 5, color: "#0ea5e9" },
-  { name: "Distorted", denom: 1480000, tier: 5, color: "#22c55e" },
-  { name: "Twisted", denom: 2220000, tier: 5, color: "#a855f7" },
-  { name: "Bent", denom: 3330000, tier: 5, color: "#f97316" },
-  { name: "Curved", denom: 5000000, tier: 5, color: "#facc15" },
-  { name: "Rippled", denom: 7500000, tier: 5, color: "#38bdf8" },
-  { name: "Wavering", denom: 11200000, tier: 5, color: "#6366f1" },
-  { name: "Flickering", denom: 16800000, tier: 5, color: "#a855f7" },
-  { name: "Glowing", denom: 25200000, tier: 5, color: "#f97316" },
-  { name: "Shining", denom: 37800000, tier: 5, color: "#facc15" },
-  { name: "Brilliant", denom: 56700000, tier: 5, color: "#22c55e" },
-  { name: "Luminous", denom: 85000000, tier: 5, color: "#38bdf8" },
-  { name: "Radiating", denom: 127000000, tier: 5, color: "#0ea5e9" },
-  { name: "Blazing", denom: 190000000, tier: 5, color: "#f97316" },
-  { name: "Burning", denom: 285000000, tier: 5, color: "#ef4444" },
-  { name: "Scorching", denom: 430000000, tier: 5, color: "#b91c1c" },
-  { name: "Molten", denom: 650000000, tier: 5, color: "#f97316" },
-  { name: "Volcanic", denom: 975000000, tier: 5, color: "#ea580c" },
-
-  // Tier 6
-  { name: "Infernal", denom: 1460000000, tier: 6, color: "#7f1d1d" },
-  { name: "Hellborn", denom: 2190000000, tier: 6, color: "#991b1b" },
-  { name: "Demonic", denom: 3280000000, tier: 6, color: "#b91c1c" },
-  { name: "Abyssal", denom: 4920000000, tier: 6, color: "#111827" },
-  { name: "Nether", denom: 7380000000, tier: 6, color: "#1f2937" },
-  { name: "Void", denom: 11000000000, tier: 6, color: "#020617" },
-  { name: "Null", denom: 16500000000, tier: 6, color: "#4b5563" },
-  { name: "Zeroed", denom: 24700000000, tier: 6, color: "#6b7280" },
-  { name: "Erased", denom: 37000000000, tier: 6, color: "#9ca3af" },
-  { name: "Forgotten", denom: 55500000000, tier: 6, color: "#9ca3af" },
-  { name: "Lost", denom: 83000000000, tier: 6, color: "#6b7280" },
-
-  // Tier 7
-  { name: "Hidden", denom: 124000000000, tier: 7, color: "#0f172a" },
-  { name: "Veiled", denom: 186000000000, tier: 7, color: "#111827" },
-  { name: "Masked", denom: 279000000000, tier: 7, color: "#1f2937" },
-  { name: "Obscured", denom: 419000000000, tier: 7, color: "#374151" },
-  { name: "Shadowed", denom: 628000000000, tier: 7, color: "#020617" },
-  { name: "Darkened", denom: 942000000000, tier: 7, color: "#020617" },
-  { name: "Pitch Black", denom: 1410000000000, tier: 7, color: "#000000" },
-  { name: "Obsidian", denom: 2120000000000, tier: 7, color: "#111827" },
-  { name: "Onyx", denom: 3180000000000, tier: 7, color: "#020617" },
-  { name: "Coal", denom: 4770000000000, tier: 7, color: "#111827" },
-  { name: "Soot", denom: 7160000000000, tier: 7, color: "#4b5563" },
-  { name: "Ashen", denom: 10700000000000, tier: 7, color: "#9ca3af" },
-
-  // Tier 8
-  { name: "Dusty", denom: 16100000000000, tier: 8, color: "#9ca3af" },
-  { name: "Faded", denom: 24200000000000, tier: 8, color: "#9ca3af" },
-  { name: "Dim", denom: 36300000000000, tier: 8, color: "#6b7280" },
-  { name: "Dull", denom: 54500000000000, tier: 8, color: "#6b7280" },
-  { name: "Muted", denom: 81800000000000, tier: 8, color: "#6b7280" },
-  { name: "Soft", denom: 122000000000000, tier: 8, color: "#e5e7eb" },
-  { name: "Pale", denom: 183000000000000, tier: 8, color: "#e5e7eb" },
-  { name: "Light", denom: 275000000000000, tier: 8, color: "#f9fafb" },
-  { name: "Bright", denom: 412000000000000, tier: 8, color: "#facc15" },
-  { name: "Vivid", denom: 618000000000000, tier: 8, color: "#22c55e" },
-  { name: "Vibrant", denom: 927000000000000, tier: 8, color: "#38bdf8" },
-  { name: "Electric", denom: 1390000000000000, tier: 8, color: "#0ea5e9" },
-  { name: "Charged", denom: 2090000000000000, tier: 8, color: "#6366f1" },
-  { name: "Hypercharged", denom: 3140000000000000, tier: 8, color: "#a855f7" },
-  { name: "Overloaded", denom: 4710000000000000, tier: 8, color: "#f97316" },
-  { name: "Superloaded", denom: 7070000000000000, tier: 8, color: "#f97316" },
-  { name: "Megaloaded", denom: 10600000000000000, tier: 8, color: "#f97316" },
-  { name: "Gigaloaded", denom: 15900000000000000, tier: 8, color: "#22c55e" },
-  { name: "Teraloaded", denom: 23900000000000000, tier: 8, color: "#38bdf8" },
-  { name: "Petaloaded", denom: 35800000000000000, tier: 8, color: "#6366f1" },
-  { name: "Exaloaded", denom: 53700000000000000, tier: 8, color: "#a855f7" },
-  { name: "Zettaloaded", denom: 80600000000000000, tier: 8, color: "#f97316" },
-  { name: "Yottaloaded", denom: 121000000000000000, tier: 8, color: "#facc15" },
-
-  // Tier 9
-  { name: "Hyper", denom: 181000000000000000, tier: 9, color: "#22c55e" },
-  { name: "Ultra", denom: 272000000000000000, tier: 9, color: "#38bdf8" },
-  { name: "Mega", denom: 408000000000000000, tier: 9, color: "#6366f1" },
-  { name: "Giga", denom: 612000000000000000, tier: 9, color: "#a855f7" },
-  { name: "Tera", denom: 918000000000000000, tier: 9, color: "#f97316" },
-  { name: "Peta", denom: 1370000000000000000n, tier: 9, color: "#f97316" },
-  { name: "Exa", denom: 2050000000000000000n, tier: 9, color: "#22c55e" },
-  { name: "Zetta", denom: 3080000000000000000n, tier: 9, color: "#38bdf8" },
-  { name: "Yotta", denom: 4620000000000000000n, tier: 9, color: "#6366f1" },
-  { name: "Omni", denom: 6930000000000000000n, tier: 9, color: "#a855f7" },
-  { name: "Beyond", denom: 10400000000000000000n, tier: 9, color: "#f97316" },
-  { name: "Infinite", denom: 15600000000000000000n, tier: 9, color: "#facc15" }
-];
+    const RNG_RARITIES = [
+      { name: "Common",    denom: 2,   tier: 0, color: "#9ca3af" },
+      { name: "Uncommon",  denom: 3,   tier: 0, color: "#22c55e" },
+      { name: "Rare",      denom: 5,   tier: 0, color: "#2563eb" },
+      { name: "Super Rare",denom: 8,   tier: 0, color: "#1d4ed8" },
+      { name: "Ultra Rare",denom: 12,  tier: 0, color: "#7c3aed" },
+      { name: "Epic",      denom: 18,  tier: 1, color: "#a855f7" },
+      { name: "Legendary", denom: 27,  tier: 1, color: "#f97316" },
+      { name: "Secret",    denom: 40,  tier: 1, color: "#facc15" },
+      { name: "Ultra Secret",denom:60, tier: 1, color: "#ec4899" },
+      { name: "Mythic",    denom: 90,  tier: 1, color: "#22d3ee" },
+      { name: "Ascended",  denom: 135, tier: 2, color: "#0ea5e9" },
+      { name: "Transcendent",denom:200,tier: 2, color: "#6366f1" },
+      { name: "Ethereal",  denom: 300, tier: 2, color: "#38bdf8" },
+      { name: "Astral",    denom: 450, tier: 2, color: "#f97316" },
+      { name: "Divine",    denom: 675, tier: 2, color: "#eab308" },
+      { name: "Celestial", denom: 1000,tier: 3, color: "#a855f7" },
+      { name: "Radiant",   denom: 1500,tier: 3, color: "#facc15" },
+      { name: "Prismatic", denom: 2250,tier: 3, color: "#22c55e" },
+      { name: "Chromatic", denom: 3400,tier: 3, color: "#ec4899" },
+      { name: "Spectral",  denom: 5100,tier: 3, color: "#38bdf8" },
+      { name: "Phantom",   denom: 7600,tier: 3, color: "#6366f1" },
+      { name: "Illusory",  denom:11300,tier: 3, color: "#a855f7" },
+      { name: "Mirage",    denom:17000,tier: 3, color: "#f97316" },
+      { name: "Arcane",    denom:25500,tier: 4, color: "#6366f1" },
+      { name: "Mystic",    denom:38000,tier: 4, color: "#22c55e" },
+      { name: "Enigmatic", denom:57000,tier: 4, color: "#f97316" },
+      { name: "Paradox",   denom:86000,tier: 4, color: "#facc15" },
+      { name: "Anomaly",   denom:130000,tier:4, color: "#38bdf8" },
+      { name: "Singular",  denom:195000,tier:4, color: "#a855f7" },
+      { name: "Fractured", denom:290000,tier:4, color: "#4b5563" },
+      { name: "Shattered", denom:440000,tier:4, color: "#6b7280" },
+      { name: "Broken Reality",denom:660000,tier:4,color:"#111827"},
+      { name: "Void",      denom:990000,tier:5, color: "#020617" },
+      { name: "Null",      denom:1480000,tier:5,color: "#4b5563" },
+      { name: "Infinite",  denom:15600000000000000000n,tier:9,color:"#facc15"}
+    ];
 
     let rngSpinning = false;
 
     function getRngLuck(){ return parseFloat(userData?.rngLuck||0); }
+    function getRngLuckCost(){
+      const upgrades=parseInt(userData?.rngLuckUpgrades||0,10);
+      return 100*Math.pow(5,upgrades);
+    }
 
     function pickRngRarity(luck){
       const luckMult=Math.pow(1.5,luck*2);
@@ -5493,18 +5546,29 @@
       return 0;
     }
 
+    function formatRngCost(cost){
+      if(cost>=1e12) return (cost/1e12).toFixed(0)+"T";
+      if(cost>=1e9)  return (cost/1e9).toFixed(0)+"B";
+      if(cost>=1e6)  return (cost/1e6).toFixed(0)+"M";
+      if(cost>=1e3)  return (cost/1e3).toFixed(0)+"K";
+      return cost.toString();
+    }
+
     function renderRngView(){
       const luck=getRngLuck();
+      const cost=getRngLuckCost();
       const luckEl=document.getElementById("rng-luck-display");
       const luckInline=document.getElementById("rng-luck-inline");
+      const costLabel=document.getElementById("rng-luck-cost-label");
       if(luckEl)luckEl.textContent=luck.toFixed(1);
       if(luckInline)luckInline.textContent=luck.toFixed(1);
+      if(costLabel)costLabel.textContent="(costs "+formatRngCost(cost)+" coins)";
       const reel=document.getElementById("rng-reel");
       if(reel){
         reel.innerHTML="";
         [...RNG_RARITIES,...RNG_RARITIES,...RNG_RARITIES].forEach(r=>{
           const el=document.createElement("div");
-          el.style.cssText=`display:inline-flex;align-items:center;justify-content:center;width:120px;height:44px;font-size:10px;font-weight:700;color:#fff;background:${r.color};flex-shrink:0;border-right:2px solid rgba(255,255,255,.2);padding:0 4px;text-align:center;`;
+          el.style.cssText="display:inline-flex;align-items:center;justify-content:center;width:120px;height:44px;font-size:10px;font-weight:700;color:#fff;background:"+r.color+";flex-shrink:0;border-right:2px solid rgba(255,255,255,.2);padding:0 4px;text-align:center;";
           el.textContent=r.name;
           reel.appendChild(el);
         });
@@ -5525,7 +5589,7 @@
           const denom=typeof r.denom==="bigint"?Number(r.denom):r.denom;
           const row=document.createElement("div");
           row.style.cssText="padding:5px 7px;border-radius:8px;background:#f5f5f5;display:flex;flex-direction:column;gap:1px;margin-bottom:4px;";
-          row.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:700;font-size:12px;color:#0d47a1;">${i+1}. ${e.username||"?"}</span><span style="font-size:10px;font-weight:700;color:${r.color};background:${r.color}22;padding:1px 5px;border-radius:999px;">${r.name}</span></div><div style="font-size:10px;color:#aaa;">1 in ${denom.toLocaleString()}</div>`;
+          row.innerHTML="<div style='display:flex;justify-content:space-between;align-items:center;'><span style='font-weight:700;font-size:12px;color:#0d47a1;'>"+i+". "+(e.username||"?")+"</span><span style='font-size:10px;font-weight:700;color:"+r.color+";background:"+r.color+"22;padding:1px 5px;border-radius:999px;'>"+r.name+"</span></div><div style='font-size:10px;color:#aaa;'>1 in "+denom.toLocaleString()+"</div>";
           listEl.appendChild(row);
         });
       }catch(e){listEl.innerHTML="<div style='font-size:12px;color:#c62828;'>Failed.</div>";}
@@ -5542,7 +5606,6 @@
       const luck=getRngLuck();
       const idx=pickRngRarity(luck);
       const result=RNG_RARITIES[idx];
-      // Animate reel
       const reel=document.getElementById("rng-reel");
       const itemW=122;
       const targetPos=-(RNG_RARITIES.length*itemW+idx*itemW-60);
@@ -5551,7 +5614,7 @@
         reel.style.transform="translateX(0)";
         void reel.offsetWidth;
         reel.style.transition="transform 0.5s cubic-bezier(0.17,0.67,0.35,1)";
-        reel.style.transform=`translateX(${targetPos}px)`;
+        reel.style.transform="translateX("+targetPos+"px)";
       }
       setTimeout(async()=>{
         const displayEl=document.getElementById("rng-result-display");
@@ -5579,13 +5642,1215 @@
 
     document.getElementById("rng-upgrade-luck-btn")?.addEventListener("click",async()=>{
       if(!currentUser||!userData)return;
-      if((userData.coins||0)<100){alert("Not enough coins! Need 100 to upgrade luck.");return;}
-      userData.coins=(userData.coins||0)-100;
+      const cost=getRngLuckCost();
+      if((userData.coins||0)<cost){alert("Not enough coins! Need "+formatRngCost(cost)+" to upgrade luck.");return;}
+      userData.coins=(userData.coins||0)-cost;
       userData.rngLuck=Math.round(((parseFloat(userData.rngLuck||0))+0.5)*10)/10;
+      userData.rngLuckUpgrades=(parseInt(userData.rngLuckUpgrades||0,10))+1;
       await saveUserData();
       renderRngView();
     });
 
-</script>
+
+    // ═══════════════════════════════════════════
+    // BOT SYSTEM
+    // ═══════════════════════════════════════════
+    const BOT_CHAT_LINES = ["nice pack!","gg everyone","anyone wanna trade?","woah that's rare!","this game is so fun","let's gooo","i love sublet","just opened a legendary!","anyone online?","grind time 🔥","subzero is the goat","almost at top 10!","what pack should i open?","good luck everyone!","wow nice blook","rip my coins lol","sublet never gets old","daily wheel was good today","packs are calling me"];
+    const BOT_PACK_IDS = ["space","ice","spooky","medieval","ocean","science","bug","autumn","sports","wonderland"];
+    let botIntervals = [];
+
+    function stopAllBotIntervals(){ botIntervals.forEach(i=>clearInterval(i)); botIntervals=[]; }
+
+    function isBotActiveNow(uid){
+      let hash=0; for(const c of uid) hash=(hash*31+c.charCodeAt(0))&0xffff;
+      const offStart=(hash%19); const h=new Date().getHours();
+      const off2=(offStart+5)%24;
+      if(offStart<off2) return h<offStart||h>=off2;
+      return h>=off2&&h<offStart;
+    }
+
+    async function startBotActivity(){
+      if(!ownerMode) return;
+      stopAllBotIntervals();
+      try{
+        const snap=await get(ref(db,"users"));
+        if(!snap.exists()) return;
+        const bots=Object.entries(snap.val()).filter(([,u])=>u.isBot===true);
+        if(!bots.length) return;
+        bots.forEach(([uid])=>{
+          const packInt=setInterval(async()=>{
+            if(!ownerMode){clearInterval(packInt);return;}
+            if(!isBotActiveNow(uid)) return;
+            try{
+              const s=await get(ref(db,"users/"+uid));
+              if(!s.exists())return;
+              const bd=s.val(); let coins=bd.coins||0;
+              if(coins<25){ await update(ref(db,"users/"+uid),{coins:300+Math.floor(Math.random()*500)}); return; }
+              const affordable=BOT_PACK_IDS.filter(id=>{const pk=ALL_PACKS_FOR_OWNER.find(pp=>pp.id===id);return pk&&coins>=pk.cost;});
+              if(!affordable.length) return;
+              const packId=affordable[Math.floor(Math.random()*affordable.length)];
+              const pack=ALL_PACKS_FOR_OWNER.find(p=>p.id===packId);
+              if(!pack) return;
+              const blook=pack.blooks[Math.floor(Math.random()*pack.blooks.length)];
+              const blooks=bd.blooks||{}; blooks[blook.name]=(blooks[blook.name]||0)+1;
+              await update(ref(db,"users/"+uid),{coins:Math.max(0,coins-pack.cost),blooks,totalPacksOpened:(bd.totalPacksOpened||0)+1});
+            }catch(e){}
+          }, 180000+Math.random()*300000);
+          botIntervals.push(packInt);
+          const chatInt=setInterval(async()=>{
+            if(!ownerMode){clearInterval(chatInt);return;}
+            if(!isBotActiveNow(uid)) return;
+            if(Math.random()>0.15) return;
+            try{
+              const s=await get(ref(db,"users/"+uid));
+              if(!s.exists()) return;
+              const bd=s.val();
+              const line=BOT_CHAT_LINES[Math.floor(Math.random()*BOT_CHAT_LINES.length)];
+              const msgRef=push(ref(db,"chat"));
+              await set(msgRef,{username:bd.username||"Bot",text:line,imageUrl:"",createdAt:Date.now(),isBot:false});
+            }catch(e){}
+          }, 600000+Math.random()*900000);
+          botIntervals.push(chatInt);
+        });
+      }catch(e){ console.error("startBotActivity error:",e); }
+    }
+
+    // Make Bot handler
+    document.addEventListener("click", async e=>{
+      const btn=e.target.closest("#make-bot-btn");
+      if(!btn||!ownerMode) return;
+      const statusEl=document.getElementById("make-bot-status");
+      statusEl.textContent=""; statusEl.style.color="#c62828";
+      const name=(document.getElementById("bot-name-input")?.value||"").trim();
+      if(!name){statusEl.textContent="Enter a bot name.";return;}
+      const existing=await findUserByUsername(name);
+      if(existing){statusEl.textContent="Username already taken.";return;}
+      const snap=await get(ref(db,"users"));
+      const botCount=snap.exists()?Object.values(snap.val()).filter(u=>u.isBot===true).length:0;
+      if(botCount>=10){statusEl.textContent="Max 10 bots reached.";return;}
+      statusEl.style.color="#555"; statusEl.textContent="Creating...";
+      try{
+        const botPass="bot_"+Math.random().toString(36).slice(2)+"_"+Date.now();
+        const cred=await createUserWithEmailAndPassword(auth,name+"@sublet.fake",botPass);
+        await set(ref(db,"users/"+cred.user.uid),{username:name,coins:500,blooks:{},lastWheel:0,nextPackId:null,isBot:true,botPass,totalCoinsCollected:0,totalPacksOpened:0,isAdmin:false,isOwner:false});
+        statusEl.style.color="#2e7d32"; statusEl.textContent="Bot created! Reloading...";
+        document.getElementById("bot-name-input").value="";
+        setTimeout(()=>location.reload(),1800);
+      }catch(err){ statusEl.textContent="Error: "+err.message; }
+    });
+
+    // Player list loader with Login-as (replaces old loadOwnerPlayerList with Login-as buttons)
+    const _origLoadOwnerPlayerList=loadOwnerPlayerList;
+    async function loadOwnerPlayerListFull(){
+      const listEl=document.getElementById("owner-player-list"); if(!listEl) return;
+      listEl.innerHTML="<span style='color:#888;font-size:12px;'>Loading...</span>";
+      const [usersSnap,bansSnap]=await Promise.all([get(ref(db,"users")),get(bansRef())]);
+      if(!usersSnap.exists()){listEl.innerHTML="<span style='color:#888;font-size:12px;'>No players.</span>";return;}
+      const allUsers=usersSnap.val(); const bans=bansSnap.exists()?bansSnap.val():{};
+      const now=Date.now(); listEl.innerHTML="";
+      Object.values(allUsers).sort((a,b)=>(a.username||"").localeCompare(b.username||"")).forEach(u=>{
+        const uname=u.username||"?"; const key=uname.toLowerCase();
+        const ban=bans[key]; const isBanned=ban&&(ban.permanent||(ban.until&&now<ban.until));
+        const row=document.createElement("div");
+        row.style.cssText="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:#fff;font-size:12px;margin-bottom:3px;";
+        const dot=document.createElement("span"); dot.style.cssText="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:"+(isBanned?"#e53935":"#bdbdbd")+";";
+        const nameSpan=document.createElement("span"); nameSpan.style.flex="1";
+        let tag=""; if(u.isBot) tag=' <span style="background:#546e7a;color:#fff;border-radius:999px;font-size:9px;padding:1px 4px;">🤖</span>';
+        nameSpan.innerHTML=uname+tag;
+        const loginBtn=document.createElement("button"); loginBtn.textContent="Login as"; loginBtn.style.cssText="background:#1565c0;font-size:10px;padding:2px 6px;";
+        loginBtn.addEventListener("click",async()=>{
+          if(!confirm("Log in as "+uname+"?")) return;
+          try{
+            if(u.isBot&&u.botPass){ await signInWithEmailAndPassword(auth,uname+"@sublet.fake",u.botPass); }
+            else{ const pw=prompt("Enter "+uname+"'s password:"); if(!pw)return; await signInWithEmailAndPassword(auth,uname+"@sublet.fake",pw); }
+          }catch(err){alert("Login failed: "+err.message);}
+        });
+        row.appendChild(dot); row.appendChild(nameSpan); row.appendChild(loginBtn); listEl.appendChild(row);
+      });
+    }
+    loadOwnerPlayerList=loadOwnerPlayerListFull;
+
+
+    // ═══════════════════════════════════════════
+    // LIVE STREAMING SYSTEM (WebRTC peer-to-peer)
+    // Firebase only holds tiny signal metadata — video never touches Firebase
+    // ═══════════════════════════════════════════
+    const livesDbRef   = () => ref(db, "liveStreams");
+    const liveSignalRef= (hostUid) => ref(db, "liveSignals/" + hostUid);
+
+    let liveState = {
+      hosting: false,
+      screenStream: null,
+      micStream: null,
+      camStream: null,
+      hostUid: null,
+      peers: {},           // uid → RTCPeerConnection (host side, one per viewer)
+      viewerPc: null,      // RTCPeerConnection (viewer side)
+      viewerUnsub: null,
+      startedAt: 0,
+      liveTimerInterval: null,
+      liveDbKey: null,
+    };
+
+    const RTC_CONFIG = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" }
+      ]
+    };
+
+    // ── Go Live button (opens modal) ──
+    document.getElementById("go-live-btn").addEventListener("click", () => {
+      if(liveState.hosting){ alert("You are already live!"); return; }
+      document.getElementById("go-live-err").textContent = "";
+      document.getElementById("live-title-input").value = "";
+      document.getElementById("live-use-mic").checked = false;
+      document.getElementById("live-use-cam").checked = false;
+      document.querySelector('input[name="countdown"][value="0"]').checked = true;
+      document.getElementById("go-live-overlay").style.display = "flex";
+    });
+
+    document.getElementById("go-live-cancel-btn").addEventListener("click", () => {
+      document.getElementById("go-live-overlay").style.display = "none";
+    });
+
+    document.getElementById("go-live-confirm-btn").addEventListener("click", async () => {
+      const title = (document.getElementById("live-title-input").value || "").trim() || "Untitled Stream";
+      const useMic = document.getElementById("live-use-mic").checked;
+      const useCam = document.getElementById("live-use-cam").checked;
+      const countdown = parseInt(document.querySelector('input[name="countdown"]:checked').value, 10);
+      document.getElementById("go-live-overlay").style.display = "none";
+      await startLiveStream(title, useMic, useCam, countdown);
+    });
+
+    async function startLiveStream(title, useMic, useCam, countdown) {
+      // Capture screen
+      let screenStream;
+      try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: false });
+      } catch(e) { alert("Screen capture was denied or cancelled."); return; }
+
+      let micStream = null;
+      if(useMic) {
+        try { micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); }
+        catch(e) { console.warn("Mic denied:", e); }
+      }
+
+      let camStream = null;
+      if(useCam) {
+        try { camStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }); }
+        catch(e) { console.warn("Cam denied:", e); }
+      }
+
+      if(countdown > 0) { await runCountdown(countdown); }
+
+      // Register in Firebase
+      await set(ref(db, "liveStreams/" + currentUser.uid), {
+        hostUid: currentUser.uid,
+        hostName: userData.username || "user",
+        title,
+        startedAt: Date.now(),
+        hasCam: !!camStream,
+        hasMic: !!micStream,
+      });
+
+      liveState.hosting = true;
+      liveState.screenStream = screenStream;
+      liveState.micStream = micStream;
+      liveState.camStream = camStream;
+      liveState.hostUid = currentUser.uid;
+      liveState.peers = {};
+      liveState.startedAt = Date.now();
+      liveState.chatEnabled = true;
+      liveState.micMuted = false;
+      liveState.camHidden = false;
+
+      // Open studio
+      openLiveStudio(title, screenStream, micStream, camStream);
+
+      // Show stop button in main nav (hidden — studio has its own stop)
+      document.getElementById("stop-stream-btn").style.display = "inline-block";
+
+      // Listen for viewer join signals
+      onValue(liveSignalRef(currentUser.uid), async function(snap) {
+        if(!snap.exists() || !liveState.hosting) return;
+        var signals = snap.val();
+        for(var key in signals) {
+          if(key.indexOf("viewer_") !== 0) continue;
+          var vUid = key.slice(7);
+          var vData = signals[key];
+          if(vData.offer && !liveState.peers[vUid]) {
+            await handleViewerOffer(vUid, vData.offer);
+          }
+        }
+      });
+
+      screenStream.getVideoTracks()[0].addEventListener("ended", () => { stopLiveStream(); });
+
+      // Timer
+      liveState.liveTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - liveState.startedAt) / 1000);
+        const m = Math.floor(elapsed / 60), s = elapsed % 60;
+        const timerEl = document.getElementById("studio-timer");
+        if(timerEl) timerEl.textContent = m + ":" + String(s).padStart(2,"0");
+        const btn = document.getElementById("stop-stream-btn");
+        if(btn) btn.textContent = "\uD83D\uDD34 " + m + ":" + String(s).padStart(2,"0") + " Stop";
+      }, 1000);
+    }
+
+    function openLiveStudio(title, screenStream, micStream, camStream) {
+      const studio = document.getElementById("live-studio-overlay");
+      studio.style.display = "flex";
+
+      // Title
+      const titleEl = document.getElementById("studio-title-label");
+      if(titleEl) titleEl.textContent = title;
+
+      // Screen preview
+      const preview = document.getElementById("studio-screen-preview");
+      if(preview) preview.srcObject = screenStream;
+
+      // Camera PiP
+      const camWin = document.getElementById("studio-cam-window");
+      const camVid = document.getElementById("studio-cam-video");
+      if(camStream && camWin && camVid) {
+        camVid.srcObject = camStream;
+        camWin.style.display = "block";
+      } else if(camWin) {
+        camWin.style.display = "none";
+      }
+
+      // Subscribe to host's own chat
+      subscribeStreamChat(currentUser.uid);
+
+      // Wire studio chat input
+      const studioSend = document.getElementById("studio-chat-send");
+      const studioInput = document.getElementById("studio-chat-input");
+      const doStudioChat = async () => {
+        if(!studioInput.value.trim()) return;
+        const msgRef = push(ref(db, "liveChat/" + currentUser.uid + "/messages"));
+        await set(msgRef, { u: userData.username||"Host", msg: studioInput.value.trim(), t: Date.now() });
+        studioInput.value = "";
+      };
+      studioSend.onclick = doStudioChat;
+      studioInput.onkeydown = e => { if(e.key==="Enter") doStudioChat(); };
+
+      // Mirror studio chat messages from subscribeStreamChat into studio-chat-messages
+      onValue(ref(db, "liveChat/" + currentUser.uid + "/messages"), snap => {
+        const el = document.getElementById("studio-chat-messages");
+        if(!el) return;
+        el.innerHTML = "";
+        if(!snap.exists()) return;
+        const msgs = Object.values(snap.val()).sort((a,b)=>a.t-b.t).slice(-40);
+        msgs.forEach(m => {
+          const row = document.createElement("div");
+          row.style.cssText = "font-size:11px;color:#fff;background:rgba(255,255,255,.08);border-radius:5px;padding:3px 6px;word-break:break-word;";
+          row.innerHTML = "<span style='font-weight:700;color:#81d4fa;'>" + escHtml(m.u) + ":</span> " + escHtml(m.msg);
+          el.appendChild(row);
+          el.scrollTop = el.scrollHeight;
+        });
+      });
+
+      // Subscribe to donations for studio alert
+      onValue(ref(db, "liveChat/" + currentUser.uid + "/lastDonation"), snap => {
+        if(!snap.exists()) return;
+        const d = snap.val();
+        if(Date.now() - d.t > 6000) return;
+        const box = document.getElementById("studio-donation-box");
+        const content = document.getElementById("studio-donation-content");
+        if(!box || !content) return;
+        let line = d.coins > 0 && d.blook ? d.coins + " coins + " + d.blook : d.coins > 0 ? d.coins + " coins" : d.blook;
+        content.innerHTML = "<div style='font-size:10px;opacity:.7;'>&#127873; DONATION</div><div>" + escHtml(d.sender) + "</div><div style='font-size:11px;opacity:.85;'>gave " + escHtml(line) + "</div>";
+        box.style.display = "block";
+        setTimeout(() => { box.style.display = "none"; }, 5000);
+      });
+
+      // Make elements draggable
+      makeDraggable(document.getElementById("studio-cam-window"), document.getElementById("studio-cam-drag-handle"));
+      makeDraggable(document.getElementById("studio-chat-box"), document.getElementById("studio-chat-drag-handle"));
+      makeDraggable(document.getElementById("studio-donation-box"), document.getElementById("studio-donation-drag-handle"));
+
+      // Control buttons
+      document.getElementById("studio-mute-btn").onclick = () => {
+        if(!micStream) { alert("No mic in this stream."); return; }
+        liveState.micMuted = !liveState.micMuted;
+        micStream.getAudioTracks().forEach(t => t.enabled = !liveState.micMuted);
+        document.getElementById("studio-mute-btn").textContent = liveState.micMuted ? "&#127908; Mic Off" : "&#127908; Mic On";
+        document.getElementById("studio-mute-btn").style.background = liveState.micMuted ? "rgba(198,40,40,.6)" : "rgba(255,255,255,.15)";
+      };
+
+      document.getElementById("studio-cam-btn").onclick = () => {
+        if(!camStream) { alert("No camera in this stream."); return; }
+        liveState.camHidden = !liveState.camHidden;
+        camStream.getVideoTracks().forEach(t => t.enabled = !liveState.camHidden);
+        const camWin = document.getElementById("studio-cam-window");
+        if(camWin) camWin.style.opacity = liveState.camHidden ? "0.2" : "1";
+        document.getElementById("studio-cam-btn").textContent = liveState.camHidden ? "&#128247; Cam Off" : "&#128247; Cam On";
+        document.getElementById("studio-cam-btn").style.background = liveState.camHidden ? "rgba(198,40,40,.6)" : "rgba(255,255,255,.15)";
+      };
+
+      document.getElementById("studio-chat-toggle-btn").onclick = () => {
+        liveState.chatEnabled = !liveState.chatEnabled;
+        const chatBox = document.getElementById("studio-chat-box");
+        if(chatBox) chatBox.style.display = liveState.chatEnabled ? "block" : "none";
+        document.getElementById("studio-chat-toggle-btn").textContent = liveState.chatEnabled ? "&#128172; Chat On" : "&#128172; Chat Off";
+        document.getElementById("studio-chat-toggle-btn").style.background = liveState.chatEnabled ? "rgba(255,255,255,.15)" : "rgba(198,40,40,.6)";
+      };
+
+      document.getElementById("studio-stop-btn").onclick = async () => {
+        if(!confirm("End your stream?")) return;
+        await stopLiveStream();
+      };
+    }
+
+    function makeDraggable(el, handle) {
+      if(!el || !handle) return;
+      let startX, startY, startLeft, startTop;
+      handle.addEventListener("mousedown", e => {
+        e.preventDefault();
+        const rect = el.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        startLeft = rect.left; startTop = rect.top;
+        const onMove = ev => {
+          el.style.left = Math.max(0, startLeft + ev.clientX - startX) + "px";
+          el.style.top  = Math.max(0, startTop  + ev.clientY - startY) + "px";
+          el.style.right = "auto"; el.style.bottom = "auto";
+        };
+        const onUp = () => {
+          document.removeEventListener("mousemove", onMove);
+          document.removeEventListener("mouseup", onUp);
+        };
+        document.addEventListener("mousemove", onMove);
+        document.addEventListener("mouseup", onUp);
+      });
+    }
+
+    async function handleViewerOffer(viewerUid, offerData) {
+      if(liveState.peers[viewerUid]) return;
+      var pc2 = new RTCPeerConnection(RTC_CONFIG);
+      liveState.peers[viewerUid] = pc2;
+      var sigBase2 = "liveSignals/" + currentUser.uid + "/viewer_" + viewerUid;
+      if(liveState.screenStream) {
+        liveState.screenStream.getTracks().forEach(function(t){ pc2.addTrack(t, liveState.screenStream); });
+      }
+      if(liveState.micStream) {
+        liveState.micStream.getAudioTracks().forEach(function(t){ pc2.addTrack(t, liveState.micStream); });
+      }
+      pc2.onicecandidate = async function(e) {
+        if(e.candidate) {
+          var ir = push(ref(db, sigBase2 + "/hostIce"));
+          await set(ir, e.candidate.toJSON());
+        }
+      };
+      pc2.onconnectionstatechange = function() {
+        var s = pc2.connectionState;
+        if(s === "disconnected" || s === "failed") {
+          pc2.close(); delete liveState.peers[viewerUid];
+          remove(ref(db, sigBase2)).catch(function(){});
+        }
+      };
+      await pc2.setRemoteDescription(new RTCSessionDescription({ type: "offer", sdp: offerData.sdp }));
+      var ans = await pc2.createAnswer();
+      await pc2.setLocalDescription(ans);
+      await set(ref(db, sigBase2 + "/answer"), { sdp: ans.sdp, type: "answer" });
+      onValue(ref(db, sigBase2 + "/viewerIce"), async function(snap) {
+        if(!snap.exists()) return;
+        var vals = Object.values(snap.val());
+        for(var i=0; i<vals.length; i++) {
+          try { await pc2.addIceCandidate(new RTCIceCandidate(vals[i])); } catch(ex){}
+        }
+      });
+    }
+
+    async function stopLiveStream() {
+      if(!liveState.hosting) return;
+      liveState.hosting = false;
+      // Stop all tracks
+      if(liveState.screenStream) liveState.screenStream.getTracks().forEach(t => t.stop());
+      if(liveState.micStream)    liveState.micStream.getTracks().forEach(t => t.stop());
+      if(liveState.camStream)    liveState.camStream.getTracks().forEach(t => t.stop());
+      // Close all peer connections
+      Object.values(liveState.peers).forEach(pc => pc.close());
+      liveState.peers = {};
+      // Clear Firebase records
+      await remove(ref(db, "liveStreams/" + currentUser.uid));
+      await remove(liveSignalRef(currentUser.uid));
+      // Hide stop button
+      document.getElementById("stop-stream-btn").style.display = "none";
+      document.getElementById("stop-stream-btn").textContent = "🔴 Stop Stream";
+      if(liveState.liveTimerInterval) { clearInterval(liveState.liveTimerInterval); liveState.liveTimerInterval = null; }
+      liveState.screenStream = liveState.micStream = liveState.camStream = null;
+    }
+
+    document.getElementById("stop-stream-btn").addEventListener("click", async () => {
+      if(!confirm("Stop your live stream?")) return;
+      await stopLiveStream();
+    });
+
+    function runCountdown(seconds) {
+      return new Promise(resolve => {
+        const overlay = document.getElementById("live-countdown-overlay");
+        const numEl   = document.getElementById("live-countdown-number");
+        overlay.style.display = "flex";
+        let n = seconds;
+        numEl.textContent = n;
+        const iv = setInterval(() => {
+          n--;
+          if(n <= 0) {
+            clearInterval(iv);
+            overlay.style.display = "none";
+            resolve();
+          } else {
+            numEl.textContent = n;
+            numEl.style.transform = "scale(1.3)";
+            setTimeout(() => { numEl.style.transform = "scale(1)"; numEl.style.transition = "transform .2s"; }, 100);
+          }
+        }, 1000);
+      });
+    }
+
+    // ── Load lives list ──
+    async function loadLivesList() {
+      const listEl = document.getElementById("lives-list");
+      if(!listEl) return;
+      listEl.innerHTML = "<div style='font-size:13px;color:#888;text-align:center;padding:20px;'>Loading...</div>";
+      try {
+        const snap = await get(livesDbRef());
+        listEl.innerHTML = "";
+        if(!snap.exists()) {
+          listEl.innerHTML = "<div style='font-size:13px;color:#888;text-align:center;padding:20px;'>No live streams right now.</div>";
+          return;
+        }
+        const streams = Object.values(snap.val());
+        if(!streams.length) {
+          listEl.innerHTML = "<div style='font-size:13px;color:#888;text-align:center;padding:20px;'>No live streams right now.</div>";
+          return;
+        }
+        streams.forEach(stream => {
+          const elapsed = Math.floor((Date.now() - stream.startedAt) / 1000);
+          const m = Math.floor(elapsed / 60), s = elapsed % 60;
+          const card = document.createElement("div");
+          card.className = "live-stream-card";
+          card.innerHTML =
+            '<div style="display:flex;align-items:center;gap:10px;">'
+            + '<span style="width:10px;height:10px;border-radius:50%;background:#c62828;animation:pulse-live .8s infinite alternate;display:inline-block;flex-shrink:0;"></span>'
+            + '<div style="flex:1;">'
+            + '<div style="font-weight:700;font-size:15px;color:#0d47a1;">' + (stream.title||'Untitled Stream') + '</div>'
+            + '<div style="font-size:12px;color:#666;">' + stream.hostName + ' &bull; Live for ' + m + 'm ' + s + 's' + (stream.hasMic?' &#127908;':'') + (stream.hasCam?' &#128247;':'') + '</div>'
+            + '</div>'
+            + '<button class="watch-btn" data-uid="' + stream.hostUid + '" style="background:#c62828;font-size:12px;padding:6px 14px;">&#9654; Watch</button>'
+            + '</div>'
+            + '<div style="font-size:11px;color:#999;">Click to watch fullscreen &bull; Press Esc to exit</div>';
+          card.querySelector(".watch-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            watchStream(stream);
+          });
+          card.addEventListener("click", () => watchStream(stream));
+          listEl.appendChild(card);
+        });
+      } catch(e) {
+        listEl.innerHTML = "<div style='font-size:13px;color:#c62828;'>Failed to load streams.</div>";
+      }
+    }
+
+    document.getElementById("refresh-lives-btn").addEventListener("click", loadLivesList);
+
+    // ── Watch a stream ──
+    async function watchStream(stream) {
+      if(stream.hostUid === currentUser.uid) { alert("You cannot watch your own stream!"); return; }
+      const overlay = document.getElementById("live-viewer-overlay");
+      const videoEl = document.getElementById("live-viewer-video");
+      document.getElementById("viewer-stream-title").textContent = stream.title || "Untitled Stream";
+      document.getElementById("viewer-stream-host").textContent = "by " + stream.hostName;
+      overlay.style.display = "flex";
+      videoEl.srcObject = null;
+      if(liveState.viewerPc) { liveState.viewerPc.close(); liveState.viewerPc = null; }
+      if(liveState.viewerUnsub) { liveState.viewerUnsub(); liveState.viewerUnsub = null; }
+      const myUid = currentUser.uid;
+      const hostUid = stream.hostUid;
+      const sigBase = "liveSignals/" + hostUid + "/viewer_" + myUid;
+      const pc = new RTCPeerConnection(RTC_CONFIG);
+      liveState.viewerPc = pc;
+      const iceQueue = [];
+      let rdSet = false;
+      pc.ontrack = function(e) {
+        if(!videoEl.srcObject) videoEl.srcObject = new MediaStream();
+        videoEl.srcObject.addTrack(e.track);
+      };
+      pc.onicecandidate = async function(e) {
+        if(e.candidate) {
+          var ir = push(ref(db, sigBase + "/viewerIce"));
+          await set(ir, e.candidate.toJSON());
+        }
+      };
+      pc.onconnectionstatechange = function() {
+        var s = pc.connectionState;
+        var info = document.getElementById("viewer-stream-host");
+        if(s === "connected" && info) info.textContent = "by " + stream.hostName + " - Connected";
+        if((s === "failed" || s === "disconnected") && info) info.textContent = "by " + stream.hostName + " - Disconnected";
+      };
+      var offer = await pc.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true });
+      await pc.setLocalDescription(offer);
+      await set(ref(db, sigBase + "/offer"), { sdp: offer.sdp, type: "offer" });
+      var unsub = onValue(ref(db, sigBase), async function(snap) {
+        if(!snap.exists()) return;
+        var data = snap.val();
+        if(data.answer && !rdSet) {
+          try {
+            await pc.setRemoteDescription(new RTCSessionDescription({ sdp: data.answer.sdp, type: "answer" }));
+            rdSet = true;
+            for(var i=0; i<iceQueue.length; i++) {
+              try { await pc.addIceCandidate(new RTCIceCandidate(iceQueue[i])); } catch(ex){}
+            }
+            iceQueue.length = 0;
+          } catch(ex2) { console.warn("SRD failed:", ex2); }
+        }
+        if(data.hostIce) {
+          var vals = Object.values(data.hostIce);
+          for(var j=0; j<vals.length; j++) {
+            if(rdSet) { try { await pc.addIceCandidate(new RTCIceCandidate(vals[j])); } catch(ex){} }
+            else iceQueue.push(vals[j]);
+          }
+        }
+      });
+      liveState.viewerUnsub = unsub;
+      subscribeStreamChat(hostUid);
+    }
+
+    function closeViewer() {
+      const overlay = document.getElementById("live-viewer-overlay");
+      const videoEl = document.getElementById("live-viewer-video");
+      overlay.style.display = "none";
+      if(videoEl.srcObject) { videoEl.srcObject.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; }
+      if(liveState.viewerPc) { liveState.viewerPc.close(); liveState.viewerPc = null; }
+      if(liveState.viewerUnsub) { liveState.viewerUnsub(); liveState.viewerUnsub = null; }
+      // Clean up our signals
+      if(currentUser) remove(ref(db, "liveSignals/" + currentUser?.uid)).catch(()=>{});
+    }
+
+    // Esc closes viewer
+    document.addEventListener("keydown", e => {
+      if(e.key === "Escape") {
+        if(document.getElementById("live-viewer-overlay").style.display !== "none") {
+          closeViewer();
+        }
+        if(document.getElementById("live-countdown-overlay").style.display !== "none") {
+          document.getElementById("live-countdown-overlay").style.display = "none";
+          stopLiveStream();
+        }
+      }
+    });
+
+    // Clean up stream on sign-out
+    const _origSignOut = signOut;
+
+    // ═══════════════════════════════════════════
+    // VIP SYSTEM
+    // ═══════════════════════════════════════════
+    var vipGoldenMode = false;
+    var vipGoldenPackId = null;
+
+    function isVip() { return !!(userData && Date.now() < (userData.vipExpires||0)); }
+    function vipDaysLeft() { return userData ? Math.max(0,Math.ceil(((userData.vipExpires||0)-Date.now())/86400000)) : 0; }
+
+    async function loadVipView() {
+      await loadUserData(currentUser.uid);
+      var banner = document.getElementById("vip-status-banner");
+      var dailyBox = document.getElementById("vip-daily-pack-box");
+      var goldenBox = document.getElementById("vip-golden-box");
+      if(!banner) return;
+      if(isVip()) {
+        banner.style.cssText = "padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,#4a148c22,#1565c022);font-weight:700;color:#4a148c;font-size:13px;margin-bottom:16px;";
+        banner.innerHTML = "&#11088; VIP Active &mdash; " + vipDaysLeft() + " day(s) remaining";
+        dailyBox.style.display = "block";
+        goldenBox.style.display = "block";
+        buildGoldenPackList();
+        var today = new Date().toDateString();
+        var claimBtn = document.getElementById("vip-claim-pack-btn");
+        var packStatus = document.getElementById("vip-pack-status");
+        if(userData.vipLastClaim === today) {
+          claimBtn.disabled = true; claimBtn.style.opacity = "0.5";
+          packStatus.textContent = "Already claimed today. Come back tomorrow!";
+        } else {
+          claimBtn.disabled = false; claimBtn.style.opacity = "1";
+          packStatus.textContent = "";
+        }
+      } else {
+        banner.innerHTML = "No active VIP membership.";
+        dailyBox.style.display = "none";
+        goldenBox.style.display = "none";
+      }
+    }
+
+    document.getElementById("vip-subscribe-btn").addEventListener("click", async function() {
+      if(!currentUser||!userData) return;
+      var statusEl = document.getElementById("vip-subscribe-status");
+      statusEl.textContent = "";
+      if((userData.coins||0) < 100000) {
+        statusEl.textContent = "Not enough coins! Need 100,000.";
+        statusEl.style.color = "#ffcccc"; return;
+      }
+      if(!confirm("Subscribe to VIP for 100,000 coins (30 days)?")) return;
+      userData.coins = (userData.coins||0) - 100000;
+      userData.vipExpires = Math.max(Date.now(), userData.vipExpires||0) + 30*24*60*60*1000;
+      await saveUserData();
+      statusEl.style.color = "#aaffaa";
+      statusEl.textContent = "VIP activated!";
+      loadVipView();
+    });
+
+    document.getElementById("vip-claim-pack-btn").addEventListener("click", async function() {
+      if(!currentUser||!userData||!isVip()) return;
+      var today = new Date().toDateString();
+      if(userData.vipLastClaim === today) { alert("Already claimed today!"); return; }
+      var pack = ALL_PACKS_FOR_OWNER.find(function(p){ return p.id==="messedup"; });
+      if(!pack) { alert("Pack not found."); return; }
+      var chosen;
+      try { chosen = pickFromPack(pack); } catch(e) { alert("Error opening pack."); return; }
+      if(!userData.blooks) userData.blooks = {};
+      userData.blooks[chosen.name] = (userData.blooks[chosen.name]||0) + 1;
+      userData.vipLastClaim = today;
+      userData.totalPacksOpened = (userData.totalPacksOpened||0) + 1;
+      await saveUserData(); renderBlooks();
+      packOpenBlook.textContent = chosen.name;
+      packOpenBlook.style.background = rarityColor(chosen.rarity);
+      packOpenBlook.style.color = "#fff";
+      packOpenMeta.textContent = chosen.rarity + " from Messed Up Pack (VIP Daily)";
+      packOpenOverlay.style.display = "flex";
+      spawnConfetti(rarityColor(chosen.rarity));
+      setTimeout(function(){ packOpenOverlay.style.display = "none"; }, 2000);
+      var claimBtn = document.getElementById("vip-claim-pack-btn");
+      var packStatus = document.getElementById("vip-pack-status");
+      if(claimBtn) { claimBtn.disabled=true; claimBtn.style.opacity="0.5"; }
+      if(packStatus) packStatus.textContent = "Claimed! Got: " + chosen.name + " (" + chosen.rarity + ")";
+    });
+
+    document.getElementById("vip-golden-toggle").addEventListener("click", function() {
+      if(!isVip()) { alert("You need VIP for golden packs!"); return; }
+      vipGoldenMode = !vipGoldenMode;
+      var btn = document.getElementById("vip-golden-toggle");
+      btn.textContent = vipGoldenMode ? "ON" : "OFF";
+      btn.style.background = vipGoldenMode ? "#f9a825" : "#555";
+      buildGoldenPackList();
+    });
+
+    function buildGoldenPackList() {
+      var listEl = document.getElementById("vip-golden-pack-list");
+      if(!listEl) return;
+      listEl.innerHTML = "";
+      if(!vipGoldenMode) {
+        listEl.innerHTML = "<div style='font-size:12px;color:#888;'>Enable golden mode above, then pick a pack.</div>";
+        return;
+      }
+      allPacksForMarket().filter(function(p){ return packAvailability[p.id]!==false; }).forEach(function(pack) {
+        var selected = vipGoldenPackId === pack.id;
+        var row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;background:" + (selected?"rgba(255,215,0,.2)":"rgba(255,255,255,.05)") + ";border:1px solid " + (selected?"#FFD700":"rgba(255,255,255,.08)") + ";cursor:pointer;margin-bottom:2px;";
+        row.innerHTML = "<span style='font-size:13px;color:#fff;'>" + pack.name + "</span>"
+          + (selected ? "<span style='color:#FFD700;font-size:12px;font-weight:700;'>&#11088; Selected</span>" : "<span style='color:#888;font-size:12px;'>Select</span>");
+        row.addEventListener("click", function() {
+          vipGoldenPackId = selected ? null : pack.id;
+          buildGoldenPackList();
+        });
+        listEl.appendChild(row);
+      });
+    }
+
+    // Patch openPack for golden mode
+    var _origOpenPack2 = openPack;
+    openPack = async function(packId) {
+      if(vipGoldenMode && isVip() && vipGoldenPackId === packId) {
+        if(!userData||!currentUser) return;
+        var pack = getPackById(packId); if(!pack) return;
+        var coins = parseInt(userData.coins,10)||0;
+        if(coins < pack.cost) { alert("Not enough coins!"); return; }
+        userData.coins = coins - pack.cost;
+        var chosen;
+        try { chosen = pickFromPack(pack); } catch(e) { userData.coins = coins; return; }
+        if(!chosen) { userData.coins = coins; return; }
+        var gName = "⭐ " + chosen.name;
+        if(!userData.blooks) userData.blooks = {};
+        userData.blooks[gName] = (userData.blooks[gName]||0) + 1;
+        BLOOK_INFO[gName] = { packId: pack.id, packName: pack.name+" (Golden)", rarity: chosen.rarity, chance: chosen.chance, golden: true };
+        userData.totalPacksOpened = (userData.totalPacksOpened||0)+1;
+        userData.nextPackId = null;
+        await saveUserData();
+        packOpenBlook.textContent = gName;
+        packOpenBlook.style.background = "#FFD700";
+        packOpenBlook.style.color = "#000";
+        packOpenMeta.textContent = chosen.rarity + " (Golden) from " + pack.name;
+        packOpenOverlay.style.display = "flex";
+        spawnConfetti("#FFD700");
+        setTimeout(function(){ packOpenOverlay.style.display="none"; packOpenBlook.style.color="#fff"; }, 2000);
+        renderBlooks(); populateTradeOfferSelect();
+        return;
+      }
+      return _origOpenPack2(packId);
+    };
+
+    // Tint golden blook cards after render
+    var _origRenderBlooks2 = renderBlooks;
+    renderBlooks = function() {
+      _origRenderBlooks2();
+      if(!userData||!userData.blooks) return;
+      Object.keys(userData.blooks).forEach(function(name) {
+        if(name.indexOf("⭐ ") !== 0) return;
+        document.querySelectorAll(".bcard").forEach(function(card) {
+          var ne = card.querySelector(".bname");
+          if(ne && ne.textContent === name) {
+            card.style.background = "linear-gradient(135deg,#fff8dc,#ffd70066)";
+            card.style.border = "2px solid #FFD700";
+            var ie = card.querySelector(".bimg");
+            if(ie) { ie.style.background="#FFD700"; ie.style.color="#000"; }
+          }
+        });
+      });
+    };
+
+
+    // ═══════════════════════════════════════════
+    // DAILY STREAK + ADDICTIVE FEATURES
+    // ═══════════════════════════════════════════
+
+    // Daily login streak
+    async function checkDailyStreak() {
+      if(!currentUser||!userData) return;
+      const today = new Date().toDateString();
+      const last = userData.lastLoginDay || "";
+      const yesterday = new Date(Date.now()-86400000).toDateString();
+      let streak = userData.loginStreak || 0;
+      if(last === today) {
+        // Already logged in today
+        updateStreakUI(streak);
+        return;
+      }
+      if(last === yesterday) {
+        streak++;
+      } else if(last !== today) {
+        streak = 1; // Reset streak
+      }
+      const bonus = Math.min(streak, 30) * 500; // 500 coins per streak day, max 15,000
+      userData.loginStreak = streak;
+      userData.lastLoginDay = today;
+      userData.coins = (parseInt(userData.coins,10)||0) + bonus;
+      userData.totalCoinsCollected = (userData.totalCoinsCollected||0) + bonus;
+      await saveUserData();
+      // Show streak toast
+      showToast("\uD83D\uDD25 " + streak + "-day streak! +" + bonus.toLocaleString() + " coins", "#e65100", 4000);
+      updateStreakUI(streak);
+    }
+
+    function updateStreakUI(streak) {
+      const el = document.getElementById("streak-display");
+      if(el) {
+        el.textContent = "\uD83D\uDD25 " + streak + " day streak";
+        el.title = "Login every day to keep your streak! Bonus: " + (Math.min(streak,30)*500).toLocaleString() + " coins/day";
+      }
+    }
+
+    // Toast notification system
+    function showToast(msg, color, duration) {
+      color = color || "#0d47a1";
+      duration = duration || 3000;
+      const toast = document.createElement("div");
+      toast.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:" + color + ";color:#fff;padding:10px 22px;border-radius:999px;font-weight:700;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s,transform .3s;box-shadow:0 4px 18px rgba(0,0,0,.25);pointer-events:none;white-space:nowrap;";
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      requestAnimationFrame(()=>{
+        toast.style.opacity = "1";
+        toast.style.transform = "translateX(-50%) translateY(0)";
+      });
+      setTimeout(()=>{
+        toast.style.opacity = "0";
+        toast.style.transform = "translateX(-50%) translateY(10px)";
+        setTimeout(()=>toast.remove(), 350);
+      }, duration);
+    }
+
+    // Pack opening milestone notifications
+    let _packOpenCount = 0;
+    const PACK_MILESTONES = [10,25,50,100,250,500,1000];
+    function checkPackMilestone(total) {
+      for(const m of PACK_MILESTONES) {
+        if(total === m) {
+          showToast("\uD83C\uDF89 " + m + " packs opened! Keep going!", "#7b1fa2", 4000);
+          break;
+        }
+      }
+    }
+
+    // Coin milestone notifications
+    const COIN_MILESTONES = [1000,5000,10000,50000,100000,500000,1000000];
+    function checkCoinMilestone(coins) {
+      for(const m of COIN_MILESTONES) {
+        const prev = coins - (userData?.coins||0);
+        if(prev < m && coins >= m) {
+          showToast("\uD83E\uDD11 " + m.toLocaleString() + " coins! Wealthy!", "#43a047", 4000);
+          break;
+        }
+      }
+    }
+
+    // Lucky streak: 3 packs in a row with Epic+ gives a bonus
+    let _recentRarities = [];
+    function checkLuckyStreak(rarity) {
+      const goodRarities = new Set(["Epic","Legendary","Supreeme","Chroma","Mystical","Unique"]);
+      if(goodRarities.has(rarity)) {
+        _recentRarities.push(rarity);
+        if(_recentRarities.length >= 3) {
+          showToast("\uD83C\uDF40 Lucky Streak! 3 Epic+ in a row!", "#2e7d32", 4000);
+          _recentRarities = [];
+        }
+      } else {
+        _recentRarities = [];
+      }
+    }
+
+
+
+    // ═══════════════════════════════════════════
+    // CUSTOM PACK CREATOR (Owner only)
+    // Stored at Firebase: customPacks/<packId>
+    // ═══════════════════════════════════════════
+    var customPackBlookRowCount = 0;
+
+    function cpAddBlookRow(name, chance, rarity) {
+      var rows = document.getElementById("cp-blook-rows");
+      if(!rows) return;
+      var rowId = "cp-row-" + (customPackBlookRowCount++);
+      var row = document.createElement("div");
+      row.id = rowId;
+      row.style.cssText = "display:flex;gap:5px;align-items:center;";
+      row.innerHTML =
+        '<input type="text" placeholder="Blook name" value="' + (name||"") + '" style="flex:1;font-size:12px;padding:5px 7px;" class="cp-bname">'
+        + '<input type="number" placeholder="Chance %" value="' + (chance!=null?chance:"") + '" step="0.01" min="0" max="100" style="width:80px;font-size:12px;padding:5px 7px;" class="cp-bchance">'
+        + '<select class="cp-brarity" style="font-size:12px;padding:5px 4px;">'
+        + ['Common','Rare','Epic','Legendary','Supreeme','Chroma','Mystical'].map(function(r){
+            return '<option value="'+r+'"'+(rarity===r?' selected':'')+'>'+r+'</option>';
+          }).join('')
+        + '</select>'
+        + '<button type="button" style="font-size:11px;padding:4px 8px;background:#c62828;" onclick="document.getElementById(\''+rowId+'\').remove(); cpUpdateTotal();">&#10005;</button>';
+      rows.appendChild(row);
+      row.querySelector('.cp-bchance').addEventListener('input', cpUpdateTotal);
+      cpUpdateTotal();
+    }
+
+    function cpUpdateTotal() {
+      var inputs = document.querySelectorAll('.cp-bchance');
+      var total = 0;
+      inputs.forEach(function(i){ total += parseFloat(i.value)||0; });
+      var el = document.getElementById('cp-total-chance');
+      if(el) {
+        el.textContent = 'Total chance: ' + total.toFixed(2) + '%';
+        el.style.color = Math.abs(total-100) < 0.01 ? '#2e7d32' : '#c62828';
+      }
+    }
+
+    document.getElementById('cp-add-blook-btn').addEventListener('click', function(){ cpAddBlookRow(); });
+
+    var RARITY_MAP_CP = { Common:R.COMMON, Rare:R.RARE, Epic:R.EPIC, Legendary:R.LEG, Supreeme:R.SUP, Chroma:R.CHR, Mystical:R.MYS };
+
+    document.getElementById('cp-create-pack-btn').addEventListener('click', async function() {
+      var statusEl = document.getElementById('cp-status');
+      statusEl.style.color = '#c62828';
+      var name = document.getElementById('cp-pack-name').value.trim();
+      var cost = parseInt(document.getElementById('cp-pack-cost').value, 10);
+      var color = document.getElementById('cp-pack-color').value.trim() || '#4b0082';
+      if(!name) { statusEl.textContent = 'Pack name required.'; return; }
+      if(!cost || cost <= 0) { statusEl.textContent = 'Valid cost required.'; return; }
+      var rows = document.querySelectorAll('#cp-blook-rows > div');
+      if(rows.length === 0) { statusEl.textContent = 'Add at least one blook.'; return; }
+      var blooks = [];
+      var totalChance = 0;
+      for(var i=0;i<rows.length;i++) {
+        var bn = rows[i].querySelector('.cp-bname').value.trim();
+        var bc = parseFloat(rows[i].querySelector('.cp-bchance').value);
+        var br = rows[i].querySelector('.cp-brarity').value;
+        if(!bn) { statusEl.textContent = 'All blooks need a name.'; return; }
+        if(isNaN(bc) || bc <= 0) { statusEl.textContent = 'All blooks need a valid chance.'; return; }
+        blooks.push({ name: bn, chance: bc, rarity: RARITY_MAP_CP[br] });
+        totalChance += bc;
+      }
+      if(Math.abs(totalChance - 100) > 0.5) {
+        statusEl.textContent = 'Chances should total ~100% (currently ' + totalChance.toFixed(2) + '%).';
+        return;
+      }
+      var packId = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,30) + '_' + Date.now().toString(36);
+      var packData = { id: packId, name: name, color: color, cost: cost, blooks: blooks, custom: true, createdAt: Date.now() };
+      try {
+        await set(ref(db, 'customPacks/' + packId), packData);
+        statusEl.style.color = '#2e7d32';
+        statusEl.textContent = 'Pack "' + name + '" created! It now appears in the Market.';
+        document.getElementById('cp-pack-name').value = '';
+        document.getElementById('cp-pack-cost').value = '';
+        document.getElementById('cp-blook-rows').innerHTML = '';
+        cpUpdateTotal();
+        await loadCustomPacks();
+        buildPacks();
+        cpRenderExistingList();
+      } catch(e) {
+        statusEl.textContent = 'Failed to create pack: ' + e.message;
+      }
+    });
+
+    // Load custom packs from Firebase into runtime array
+    var CUSTOM_PACKS_RUNTIME = [];
+    async function loadCustomPacks() {
+      try {
+        var snap = await get(ref(db, 'customPacks'));
+        CUSTOM_PACKS_RUNTIME = snap.exists() ? Object.values(snap.val()) : [];
+      } catch(e) { CUSTOM_PACKS_RUNTIME = []; }
+    }
+
+    function cpRenderExistingList() {
+      var listEl = document.getElementById('cp-existing-list');
+      if(!listEl) return;
+      listEl.innerHTML = '';
+      if(!CUSTOM_PACKS_RUNTIME.length) {
+        listEl.innerHTML = "<div style='font-size:11px;color:#888;'>No custom packs yet.</div>";
+        return;
+      }
+      CUSTOM_PACKS_RUNTIME.forEach(function(pk) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:12px;background:#fff;border-radius:6px;padding:5px 8px;';
+        row.innerHTML = '<span>' + pk.name + ' (' + pk.blooks.length + ' blooks, ' + pk.cost + ' coins)</span>';
+        var delBtn = document.createElement('button');
+        delBtn.textContent = 'Delete';
+        delBtn.style.cssText = 'font-size:10px;padding:3px 8px;background:#c62828;';
+        delBtn.addEventListener('click', async function() {
+          if(!confirm('Delete pack "' + pk.name + '"?')) return;
+          await remove(ref(db, 'customPacks/' + pk.id));
+          await loadCustomPacks();
+          buildPacks();
+          cpRenderExistingList();
+        });
+        row.appendChild(delBtn);
+        listEl.appendChild(row);
+      });
+    }
+
+    // Patch allPacksForMarket to include custom packs
+    var _origAllPacksForMarket = allPacksForMarket;
+    allPacksForMarket = function() {
+      return _origAllPacksForMarket().concat(CUSTOM_PACKS_RUNTIME);
+    };
+
+    // Patch getPackById to find custom packs too
+    var _origGetPackById = getPackById;
+    getPackById = function(id) {
+      var found = _origGetPackById(id);
+      if(found) return found;
+      return CUSTOM_PACKS_RUNTIME.find(function(p){ return p.id === id; }) || null;
+    };
+
+    // Patch ALL_PACKS_FOR_OWNER lookups used elsewhere (messedup claim etc. unaffected)
+    // Load custom packs + render list at startup
+    cpAddBlookRow(); // start with one empty row
+    loadCustomPacks().then(function(){ cpRenderExistingList(); if(typeof buildPacks==="function") buildPacks(); });
+
+
+
+    function renderRivalryCard(byCoins, myIndex) {
+      let container = document.getElementById("rivalry-card");
+      if(!container) {
+        container = document.createElement("div");
+        container.id = "rivalry-card";
+        container.style.cssText = "margin-top:12px;padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,#1565c022,#7b1fa222);font-size:13px;";
+        const lbParent = leaderboardList.parentElement;
+        if(lbParent) lbParent.appendChild(container);
+      }
+      if(myIndex < 0 || !userData) { container.innerHTML = ""; container.style.display="none"; return; }
+      container.style.display = "block";
+      const me = byCoins[myIndex];
+      const ahead = myIndex > 0 ? byCoins[myIndex-1] : null;
+      const behind = myIndex < byCoins.length-1 ? byCoins[myIndex+1] : null;
+      let html = "<strong>\u2694\uFE0F Rivalry Watch</strong><br>";
+      if(ahead) {
+        const gap = ahead.coins - me.coins;
+        html += "<span style='color:#1565c0;'>" + ahead.username + "</span> is ahead by " + gap.toLocaleString() + " coins. Catch up!<br>";
+      } else {
+        html += "<span style='color:#7b1fa2;'>You're #1!</span> Defend your spot.<br>";
+      }
+      if(behind) {
+        const gap2 = me.coins - behind.coins;
+        html += "<span style='color:#c62828;'>" + behind.username + "</span> is closing in, only " + gap2.toLocaleString() + " coins behind!";
+      }
+      container.innerHTML = html;
+    }
+
+
+    // (handled via onAuthStateChanged below — stop stream on state change)
+
+
+    // ═══════════════════════════════════════════
+    // STREAM CHAT + DONATIONS
+    // Firebase path: liveChat/<hostUid>/messages  liveChat/<hostUid>/donations
+    // Only tiny text records — no video data
+    // ═══════════════════════════════════════════
+
+    let _liveChatUnsub = null;
+    let _currentStreamHostUid = null;
+
+    // ── Subscribe to chat for a stream ──
+    function subscribeStreamChat(hostUid) {
+      _currentStreamHostUid = hostUid;
+      if (_liveChatUnsub) { _liveChatUnsub(); _liveChatUnsub = null; }
+      const chatEl = document.getElementById('live-chat-messages');
+      if (!chatEl) return;
+      _liveChatUnsub = onValue(ref(db, 'liveChat/' + hostUid + '/messages'), snap => {
+        chatEl.innerHTML = '';
+        if (!snap.exists()) return;
+        const msgs = Object.values(snap.val()).sort((a,b) => a.t - b.t).slice(-40);
+        msgs.forEach(m => {
+          const row = document.createElement('div');
+          row.style.cssText = 'font-size:11px;color:#fff;background:rgba(0,0,0,.45);border-radius:6px;padding:3px 7px;word-break:break-word;line-height:1.4;';
+          row.innerHTML = '<span style="font-weight:700;color:#81d4fa;">' + escHtml(m.u) + ':</span> ' + escHtml(m.msg);
+          chatEl.appendChild(row);
+        });
+        chatEl.scrollTop = chatEl.scrollHeight;
+      });
+      // Subscribe to donations
+      subscribeDonations(hostUid);
+    }
+
+    function escHtml(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Send chat message ──
+    async function sendStreamChat() {
+      if (!currentUser || !userData || !_currentStreamHostUid) return;
+      const input = document.getElementById('live-chat-input');
+      if (!input) return;
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      const msgRef = push(ref(db, 'liveChat/' + _currentStreamHostUid + '/messages'));
+      await set(msgRef, { u: userData.username || 'user', msg, t: Date.now() });
+    }
+
+    document.getElementById('live-chat-send').addEventListener('click', sendStreamChat);
+    document.getElementById('live-chat-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendStreamChat();
+    });
+
+    // ── Donations ──
+    let _donationAlertTimeout = null;
+
+    function subscribeDonations(hostUid) {
+      onValue(ref(db, 'liveChat/' + hostUid + '/lastDonation'), snap => {
+        if (!snap.exists()) return;
+        const d = snap.val();
+        // Only show if recent (last 6 seconds)
+        if (Date.now() - d.t > 6000) return;
+        showDonationAlert(d);
+      });
+    }
+
+    function showDonationAlert(d) {
+      const el = document.getElementById('live-donation-alert');
+      if (!el) return;
+      let line = '';
+      if (d.coins > 0 && d.blook) line = d.coins + ' coins + ' + d.blook;
+      else if (d.coins > 0) line = d.coins + ' coins';
+      else if (d.blook) line = d.blook;
+      el.innerHTML = '<div style="font-size:10px;opacity:.8;margin-bottom:3px;">&#127873; DONATION</div>'
+        + '<div style="font-size:15px;font-weight:700;">' + escHtml(d.sender) + '</div>'
+        + '<div style="font-size:12px;opacity:.9;margin-top:2px;">gave ' + escHtml(line) + '</div>';
+      el.style.display = 'block';
+      if (_donationAlertTimeout) clearTimeout(_donationAlertTimeout);
+      _donationAlertTimeout = setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+
+    // ── Donate coins ──
+    document.getElementById('live-donate-coins-btn').addEventListener('click', async () => {
+      if (!currentUser || !userData || !_currentStreamHostUid) return;
+      if (_currentStreamHostUid === currentUser.uid) { alert("You can't donate to yourself!"); return; }
+      const amtStr = prompt('How many coins to donate?');
+      if (!amtStr) return;
+      const amt = parseInt(amtStr, 10);
+      if (isNaN(amt) || amt <= 0) { alert('Enter a valid amount.'); return; }
+      if ((userData.coins || 0) < amt) { alert('Not enough coins!'); return; }
+      if (!confirm('Donate ' + amt + ' coins to this stream?')) return;
+      // Deduct from sender
+      userData.coins = (userData.coins || 0) - amt;
+      await saveUserData();
+      // Credit host
+      const hostSnap = await get(ref(db, 'users/' + _currentStreamHostUid));
+      if (hostSnap.exists()) {
+        const hd = hostSnap.val();
+        await update(ref(db, 'users/' + _currentStreamHostUid), { coins: (parseInt(hd.coins||0,10)) + amt });
+      }
+      // Record donation
+      const don = { sender: userData.username||'user', coins: amt, blook: '', t: Date.now() };
+      const donRef = push(ref(db, 'liveChat/' + _currentStreamHostUid + '/messages'));
+      await set(donRef, { u: '&#127873; ' + (userData.username||'user'), msg: 'donated ' + amt + ' coins!', t: Date.now() });
+      await set(ref(db, 'liveChat/' + _currentStreamHostUid + '/lastDonation'), don);
+    });
+
+    // ── Donate blook ──
+    document.getElementById('live-donate-blook-btn').addEventListener('click', async () => {
+      if (!currentUser || !userData || !_currentStreamHostUid) return;
+      if (_currentStreamHostUid === currentUser.uid) { alert("You can't donate to yourself!"); return; }
+      const owned = userData.blooks || {};
+      const names = Object.keys(owned).filter(n => (owned[n]||0) > 0);
+      if (!names.length) { alert('You have no blooks to donate!'); return; }
+      const blookName = prompt('Which blook to donate?\n\nYour blooks:\n' + names.join(', '));
+      if (!blookName) return;
+      const trimmed = blookName.trim();
+      if (!owned[trimmed] || owned[trimmed] <= 0) { alert('You do not own that blook.'); return; }
+      if (!confirm('Donate 1x ' + trimmed + ' to this stream?')) return;
+      // Deduct
+      userData.blooks[trimmed] = (owned[trimmed] || 1) - 1;
+      if (userData.blooks[trimmed] <= 0) delete userData.blooks[trimmed];
+      await saveUserData();
+      renderBlooks();
+      // Give to host
+      const hostSnap = await get(ref(db, 'users/' + _currentStreamHostUid));
+      if (hostSnap.exists()) {
+        const hd = hostSnap.val();
+        const hb = hd.blooks || {};
+        hb[trimmed] = (hb[trimmed] || 0) + 1;
+        await update(ref(db, 'users/' + _currentStreamHostUid), { blooks: hb });
+      }
+      // Record
+      const don = { sender: userData.username||'user', coins: 0, blook: trimmed, t: Date.now() };
+      const donRef = push(ref(db, 'liveChat/' + _currentStreamHostUid + '/messages'));
+      await set(donRef, { u: '&#127183; ' + (userData.username||'user'), msg: 'donated ' + trimmed + '!', t: Date.now() });
+      await set(ref(db, 'liveChat/' + _currentStreamHostUid + '/lastDonation'), don);
+    });
+
+    // ── Wire chat into watchStream (called after watchStream sets _currentStreamHostUid) ──
+    // Patch closeViewer to also stop chat
+    const _origCloseViewer = closeViewer;
+    closeViewer = function() {
+      _origCloseViewer();
+      if (_liveChatUnsub) { _liveChatUnsub(); _liveChatUnsub = null; }
+      _currentStreamHostUid = null;
+      const chatEl = document.getElementById('live-chat-messages');
+      if (chatEl) chatEl.innerHTML = '';
+      const alertEl = document.getElementById('live-donation-alert');
+      if (alertEl) alertEl.style.display = 'none';
+    };
+
+    // ── Clean up stream chat on stream stop ──
+    const _origStopLive = stopLiveStream;
+    stopLiveStream = async function() {
+      await _origStopLive();
+      // Remove chat messages from Firebase on stream end
+      if (currentUser) {
+        remove(ref(db, 'liveChat/' + currentUser.uid)).catch(()=>{});
+      }
+      // Close studio
+      const studioEl = document.getElementById('live-studio-overlay');
+      if(studioEl) studioEl.style.display = 'none';
+      const previewEl = document.getElementById('studio-screen-preview');
+      if(previewEl) previewEl.srcObject = null;
+      const camVidEl = document.getElementById('studio-cam-video');
+      if(camVidEl) camVidEl.srcObject = null;
+    };
+
+
+  </script>
 </body>
 </html>
