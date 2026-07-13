@@ -597,6 +597,10 @@
         <div id="view-market" class="card">
           <div class="section-title">Market</div>
           <div class="section-sub">Special shop blooks first, then packs.</div>
+          <div id="login-warning-bar" style="display:none;background:#e65100;color:#fff;padding:10px 16px;border-radius:10px;font-size:12px;margin-bottom:8px;align-items:center;gap:10px;">
+            <span>&#9888;&#65039; <strong>Heads up:</strong> Some stats may be inaccurate — global pack opens and personal open counts are being reset and recalculated. Sorry for the inconvenience!</span>
+            <button onclick="this.parentElement.style.display='none';localStorage.setItem('dismissed_stat_warn','1');" style="background:rgba(255,255,255,.25);font-size:11px;padding:3px 10px;flex-shrink:0;">Dismiss</button>
+          </div>
           <div id="broadcast-bar" style="display:none;background:linear-gradient(90deg,#1a237e,#311b92);border-radius:12px;padding:10px 14px;color:#fff;margin-bottom:10px;align-items:center;gap:10px;flex-wrap:wrap;">
             <span style="font-size:13px;font-weight:700;">&#127911; Community Broadcast</span>
             <span id="broadcast-label" style="font-size:12px;opacity:.85;flex:1;"></span>
@@ -606,7 +610,7 @@
           </div>
           <div id="broadcast-upload-box" style="background:#e8eaf6;border-radius:12px;padding:12px 14px;margin-bottom:10px;">
             <div style="font-weight:700;font-size:13px;margin-bottom:4px;">&#127911; Broadcast to Everyone — 500,000 coins</div>
-            <div style="font-size:11px;color:#555;margin-bottom:8px;">Upload an MP3 or MP4. It plays for all online users until it ends, then disappears.</div>
+            <div style="font-size:11px;color:#555;margin-bottom:8px;">Upload an MP3 or MP4 (max 8MB, max 5 min video). Plays for all online users until it ends, then disappears.</div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <input id="broadcast-file-input" type="file" accept="audio/mp3,audio/mpeg,video/mp4" style="font-size:12px;flex:1;">
               <button id="broadcast-send-btn" style="font-size:12px;padding:6px 14px;background:#7b1fa2;color:#fff;font-weight:700;">&#9654; Broadcast</button>
@@ -973,6 +977,115 @@
             <button id="settings-change-pass-btn" style="margin-top:10px;background:#1976d2;">Change Password</button>
             <div id="settings-pass-status" class="err-small" style="margin-top:6px;"></div>
           </div>
+          
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🎨 Display Name Color</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Pick a color for your name in chat and leaderboard.</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <input type="color" id="settings-name-color" value="#0d47a1" style="width:44px;height:36px;padding:2px;border-radius:6px;border:1px solid #ccc;cursor:pointer;">
+              <span id="settings-name-preview" style="font-weight:700;font-size:15px;color:#0d47a1;">Preview Name</span>
+              <button id="settings-save-color-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;">Save Color</button>
+            </div>
+            <div id="settings-color-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>💬 Chat Settings</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-compact-chat"> Compact chat (smaller text, tighter spacing)
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-show-timestamps"> Show timestamps on messages
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-hide-bots"> Hide bot messages
+              </label>
+              <button id="settings-save-chat-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;align-self:flex-start;margin-top:4px;">Save Chat Settings</button>
+              <div id="settings-chat-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🔊 Sound Effects</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-sfx-pack"> Play sound when opening a pack
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-sfx-rare"> Extra sound on Epic+ pull
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-sfx-chat"> Ping sound on new chat message
+              </label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label style="font-size:12px;">Volume:</label>
+                <input type="range" id="settings-sfx-volume" min="0" max="100" value="60" style="flex:1;max-width:120px;">
+                <span id="settings-sfx-vol-label" style="font-size:12px;color:#888;">60%</span>
+              </div>
+              <button id="settings-save-sfx-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;align-self:flex-start;">Save Sound Settings</button>
+              <div id="settings-sfx-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🃏 Pack Opening Style</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Choose how blooks are revealed when you open a pack.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="pack-anim" value="default" checked> Classic pop</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="pack-anim" value="fast"> Instant reveal</label>
+              <label style="font-size:13px;display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="pack-anim" value="spin"> Spin reveal</label>
+            </div>
+            <button id="settings-save-anim-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;margin-top:8px;">Save Style</button>
+            <div id="settings-anim-status" class="err-small"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🌙 Theme</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="theme-btn" data-theme="default" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#b3e5ff,#e0f4ff);color:#0d47a1;border:2px solid #0d47a1;">☀️ Default Blue</button>
+              <button class="theme-btn" data-theme="dark" style="font-size:12px;padding:7px 14px;background:#1a1a2e;color:#e0e0e0;border:2px solid #7b1fa2;">🌙 Dark Mode</button>
+              <button class="theme-btn" data-theme="sunset" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#ff9a9e,#fad0c4);color:#c62828;border:2px solid #e65100;">🌅 Sunset</button>
+              <button class="theme-btn" data-theme="forest" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#a8edea,#fed6e3);color:#1b5e20;border:2px solid #2e7d32;">🌿 Forest</button>
+              <button class="theme-btn" data-theme="galaxy" style="font-size:12px;padding:7px 14px;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#e0e0e0;border:2px solid #7b1fa2;">🌌 Galaxy</button>
+            </div>
+            <div id="settings-theme-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🔒 Privacy</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-hide-stats"> Hide my stats from other players
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-hide-blooks"> Hide my blooks from other players
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-hide-online"> Appear offline (hide presence)
+              </label>
+              <button id="settings-save-privacy-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;align-self:flex-start;margin-top:4px;">Save Privacy Settings</button>
+              <div id="settings-privacy-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>📊 My Stats Snapshot</h3>
+            <div id="settings-stats-snap" style="font-size:13px;color:#555;display:flex;flex-direction:column;gap:4px;">
+              <span>Loading...</span>
+            </div>
+            <button id="settings-refresh-stats" style="font-size:12px;padding:5px 12px;background:#78909c;margin-top:8px;">↻ Refresh</button>
+          </div>
+
+          <div class="settings-box" style="background:#fff3e0;margin-bottom:12px;">
+            <h3>🗑️ Clear My Data</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Permanently delete specific parts of your data. Cannot be undone.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="settings-clear-chat-history" style="font-size:12px;padding:6px 12px;background:#e65100;">Clear my chat history</button>
+              <button id="settings-clear-quest-progress" style="font-size:12px;padding:6px 12px;background:#e65100;">Reset quest progress</button>
+            </div>
+            <div id="settings-clear-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
           <div class="settings-box" style="background:#fff3e0;">
             <h3>⚠️ Report a User</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Reports are reviewed by admins and owners. Misuse of the report system may result in a ban.</div>
@@ -1068,6 +1181,33 @@
             </div>
           </div>
 
+
+          <!-- Owner Broadcast to Player -->
+          <div class="owner-single-box" style="background:#e3f2fd;margin-bottom:14px;">
+            <strong>&#128226; Broadcast to Player</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Send a message a specific player will see next time they log in.</div>
+            <input id="ob-username" placeholder="Player username" style="width:100%;margin-bottom:6px;">
+            <textarea id="ob-message" placeholder="Your message..." style="width:100%;height:60px;border-radius:8px;border:1px solid #90caf9;padding:6px;font-family:inherit;font-size:12px;resize:vertical;margin-bottom:6px;"></textarea>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              <select id="ob-type" style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #90caf9;">
+                <option value="info">ℹ️ Info</option>
+                <option value="warning">⚠️ Warning</option>
+                <option value="ban-warning">🔴 Ban Warning</option>
+                <option value="reward">🎁 Reward Notice</option>
+              </select>
+            </div>
+            <button id="ob-send-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;font-weight:700;">&#9993; Send Message</button>
+            <div id="ob-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
+          <!-- Reload All Players -->
+          <div class="owner-single-box" style="background:#fce4ec;margin-bottom:14px;">
+            <strong>&#128260; Force Reload All Players</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Reloads every online player's game. They'll see a message explaining why. Use after major updates.</div>
+            <input id="reload-reason-input" placeholder="Reason (e.g. 'New update deployed!')" style="width:100%;margin-bottom:6px;">
+            <button id="force-reload-btn" style="font-size:12px;padding:6px 14px;background:#c62828;font-weight:700;">&#128260; Reload Everyone</button>
+            <div id="reload-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
 
           <!-- Custom Pack Creator -->
           <div class="owner-single-box" style="background:#e8f0fe;margin-bottom:14px;">
@@ -2317,7 +2457,8 @@
 
     function groupBlooksByPack(){
       const map={};
-      ALL_PACKS_FOR_OWNER.forEach(pack=>{ pack.blooks.forEach(b=>{ map[b.name]={packId:pack.id,packName:pack.name,rarity:b.rarity,chance:b.chance}; }); });
+      const allPacksList=[...ALL_PACKS_FOR_OWNER,...(CUSTOM_PACKS_RUNTIME||[])];
+      allPacksList.forEach(pack=>{ pack.blooks.forEach(b=>{ map[b.name]={packId:pack.id,packName:pack.name,rarity:b.rarity,chance:b.chance}; }); });
       Object.values(singleShopBlooks).forEach(item=>{ if(!map[item.name]) map[item.name]={packId:"other",packName:"Other Blooks",rarity:item.rarity,chance:0}; });
       if(userData&&userData.blooks){ Object.keys(userData.blooks).forEach(name=>{ if(!map[name]) map[name]={packId:"other",packName:"Other Blooks",rarity:R.COMMON,chance:0}; }); }
       return map;
@@ -2403,6 +2544,7 @@
 
     // ── SubletBot chat announce for rare pulls (< 0.1%) ──
     async function announceRarePull(username, blookName, chance){
+      if(chance<0.1) playSfxRare();
       showNotif("\uD83C\uDF1F Rare Pull!", username + " just got " + blookName + "!", "\uD83C\uDF1F");
       if(chance>=0.1) return;
       try{
@@ -2459,6 +2601,8 @@
       checkLuckyStreak(chosen.rarity);
       tickQuest("packsToday");
       if(["Epic","Legendary","Supreeme","Chroma","Mystical","Unique"].includes(chosen.rarity)) tickQuest("raresToday");
+      playSfxPack();
+      if(isShiny) playSfxRare();
       packOpenBlook.textContent=(isShiny?"\u2728 ":"")+chosen.name;
       packOpenBlook.style.background=isShiny?"linear-gradient(135deg,#fff176,#fff9c4,#fff176)":rarityColor(chosen.rarity);
       packOpenBlook.style.color=isShiny?"#7b1fa2":"#fff";
@@ -2509,7 +2653,8 @@
       const owned=userData.blooks||{}; const byPack={};
       Object.keys(BLOOK_INFO).forEach(name=>{ const info=BLOOK_INFO[name]; if(!byPack[info.packId]) byPack[info.packId]={packName:info.packName,items:[]}; byPack[info.packId].items.push(name); });
       const packOrder=[];
-      ALL_PACKS_FOR_OWNER.forEach(p=>{ if(byPack[p.id]) packOrder.push(p.id); });
+      const allPacksOrdered=[...ALL_PACKS_FOR_OWNER,...(CUSTOM_PACKS_RUNTIME||[])];
+      allPacksOrdered.forEach(p=>{ if(byPack[p.id]) packOrder.push(p.id); });
       if(byPack["other"]) packOrder.push("other");
       blooksContainer.innerHTML="";
       packOrder.forEach(pid=>{
@@ -2655,6 +2800,8 @@
         arr.forEach(msg=>{
           const div=document.createElement("div"); div.style.marginBottom="4px";
           if(msg.isBot) div.className="chat-bot-msg";
+          const isRealOther = !msg.isBot && (msg.username||"") !== (userData?.username||"");
+          if(isRealOther){ div.style.borderLeft="3px solid #43a047"; div.style.paddingLeft="5px"; div.style.borderRadius="4px"; }
           const name=document.createElement("span"); name.style.fontWeight="700";
           if(msg.isBot) name.style.color="#7c4dff";
           name.textContent=(msg.username||"user")+": "; div.appendChild(name);
@@ -2663,6 +2810,7 @@
           chatMessages.appendChild(div);
         });
         chatMessages.scrollTop=chatMessages.scrollHeight;
+        playSfxChat();
       });
     }
 
@@ -3260,6 +3408,9 @@
       startPresenceUpdates();
       updatePresence("market");
       setTimeout(()=>checkDailyStreak(), 2000);
+      setTimeout(applyUserSettings, 800);
+      listenForPlayerMessage();
+      checkLoginWarning();
       setTimeout(initNotifications, 1000);
       setTimeout(()=>renderDailyQuests(), 3000);
       setTimeout(checkAndDrawGiveaways, 3000);
@@ -4060,6 +4211,11 @@
       { id:"cryptohack",   name:"Crypto Hack",      emoji:"💻",  color:"#43a047", desc:"Spin bots to earn crypto. Hack other players to steal their stash!" },
       { id:"dinos",         name:"Deceptive Dinos",  emoji:"🦕",  color:"#8d6e63", desc:"Excavate fossils or investigate cheaters. Use multipliers to dominate!" },
       { id:"monsterbrawl",  name:"Monster Brawl",    emoji:"⚔️",  color:"#7b1fa2", desc:"Survive waves of monsters! Upgrade your weapons and fight to level 60!" },
+      { id:"blookracing",   name:"Blook Racing",     emoji:"🏎️",  color:"#ef5350", desc:"Race your blook to the finish! Dodge obstacles and use powerups!" },
+      { id:"heist",         name:"The Heist",        emoji:"💎",  color:"#37474f", desc:"Plan and execute a vault heist! Split the loot or betray your crew." },
+      { id:"spacemine",     name:"Space Mine",       emoji:"🚀",  color:"#1a237e", desc:"Mine asteroids in zero gravity. Sell ore, upgrade your ship, dodge meteors!" },
+      { id:"cardduels",     name:"Card Duels",       emoji:"🃏",  color:"#880e4f", desc:"Collect and play cards to defeat opponents. Build the best deck!" },
+      { id:"foodfight",     name:"Food Fight",       emoji:"🍕",  color:"#f57f17", desc:"Throw food at opponents! Land hits to steal their points. Last one standing wins!" },
     ];
 
     // ══════════════════════════════════════════════════════════════
@@ -4546,6 +4702,7 @@
       else if(currentGame.modeId==="cryptohack") renderCryptoHack(code);
       else if(currentGame.modeId==="dinos")     renderDeceptiveDinos(code);
       else if(currentGame.modeId==="monsterbrawl") renderMonsterBrawl(code);
+      else if(routeNewGameMode(currentGame.modeId, currentGame)) {}
     }
 
     // ── FISHING FRENZY ──
@@ -6892,7 +7049,7 @@
               sender: userData.username || 'user',
               type: file.type,
               createdAt: Date.now(),
-              expiresAt: Date.now() + 10 * 60 * 1000, // auto expire after 10 min
+              expiresAt: Date.now() + 5 * 60 * 1000, // auto expire after 5 min
             });
             statusEl.style.color = '#2e7d32';
             statusEl.textContent = 'Broadcasting! Everyone can hear/see it now.';
@@ -7156,6 +7313,629 @@
         statusEl.textContent = 'Failed: ' + e.message;
       }
     });
+
+
+
+    // ═══════════════════════════════════════════
+    // SETTINGS JS
+    // ═══════════════════════════════════════════
+
+    // ── Load settings from userData on login ──
+    function applyUserSettings() {
+      if(!userData) return;
+      const s = userData.settings || {};
+
+      // Name color
+      const colorInput = document.getElementById('settings-name-color');
+      if(colorInput && s.nameColor) colorInput.value = s.nameColor;
+      updateNameColorPreview();
+
+      // Chat settings
+      if(document.getElementById('settings-compact-chat'))
+        document.getElementById('settings-compact-chat').checked = !!s.compactChat;
+      if(document.getElementById('settings-show-timestamps'))
+        document.getElementById('settings-show-timestamps').checked = !!s.showTimestamps;
+      if(document.getElementById('settings-hide-bots'))
+        document.getElementById('settings-hide-bots').checked = !!s.hideBots;
+
+      // Sound settings
+      if(document.getElementById('settings-sfx-pack'))
+        document.getElementById('settings-sfx-pack').checked = s.sfxPack !== false;
+      if(document.getElementById('settings-sfx-rare'))
+        document.getElementById('settings-sfx-rare').checked = s.sfxRare !== false;
+      if(document.getElementById('settings-sfx-chat'))
+        document.getElementById('settings-sfx-chat').checked = !!s.sfxChat;
+      const volSlider = document.getElementById('settings-sfx-volume');
+      if(volSlider) { volSlider.value = s.sfxVolume !== undefined ? s.sfxVolume : 60; updateVolLabel(); }
+
+      // Pack anim
+      const animVal = s.packAnim || 'default';
+      const animRadio = document.querySelector('input[name="pack-anim"][value="'+animVal+'"]');
+      if(animRadio) animRadio.checked = true;
+
+      // Privacy
+      if(document.getElementById('settings-hide-stats'))
+        document.getElementById('settings-hide-stats').checked = !!s.hideStats;
+      if(document.getElementById('settings-hide-blooks'))
+        document.getElementById('settings-hide-blooks').checked = !!s.hideBlooks;
+      if(document.getElementById('settings-hide-online'))
+        document.getElementById('settings-hide-online').checked = !!s.hideOnline;
+
+      // Theme
+      if(s.theme) applyTheme(s.theme);
+
+      // Stats snap
+      refreshSettingsStats();
+    }
+
+    function updateNameColorPreview() {
+      const colorInput = document.getElementById('settings-name-color');
+      const preview = document.getElementById('settings-name-preview');
+      if(colorInput && preview) {
+        preview.style.color = colorInput.value;
+        preview.textContent = userData ? (userData.username || 'Preview Name') : 'Preview Name';
+      }
+    }
+    document.getElementById('settings-name-color').addEventListener('input', updateNameColorPreview);
+
+    document.getElementById('settings-save-color-btn').addEventListener('click', async function() {
+      if(!userData) return;
+      const color = document.getElementById('settings-name-color').value;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.nameColor = color;
+      await saveUserData();
+      const statusEl = document.getElementById('settings-color-status');
+      statusEl.style.color = '#2e7d32'; statusEl.textContent = 'Color saved!';
+      setTimeout(() => { statusEl.textContent = ''; }, 2000);
+    });
+
+    document.getElementById('settings-save-chat-btn').addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.compactChat = document.getElementById('settings-compact-chat').checked;
+      userData.settings.showTimestamps = document.getElementById('settings-show-timestamps').checked;
+      userData.settings.hideBots = document.getElementById('settings-hide-bots').checked;
+      await saveUserData();
+      applyChatSettingsNow();
+      const s = document.getElementById('settings-chat-status');
+      s.style.color = '#2e7d32'; s.textContent = 'Saved!'; setTimeout(() => { s.textContent=''; }, 2000);
+    });
+
+    function applyChatSettingsNow() {
+      if(!userData || !userData.settings) return;
+      const s = userData.settings;
+      const chatMsgs = document.getElementById('chat-messages');
+      if(chatMsgs) {
+        chatMsgs.style.fontSize = s.compactChat ? '11px' : '';
+        chatMsgs.style.lineHeight = s.compactChat ? '1.3' : '';
+      }
+    }
+
+    function updateVolLabel() {
+      const vol = document.getElementById('settings-sfx-volume');
+      const lbl = document.getElementById('settings-sfx-vol-label');
+      if(vol && lbl) lbl.textContent = vol.value + '%';
+    }
+    document.getElementById('settings-sfx-volume').addEventListener('input', updateVolLabel);
+
+    document.getElementById('settings-save-sfx-btn').addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.sfxPack = document.getElementById('settings-sfx-pack').checked;
+      userData.settings.sfxRare = document.getElementById('settings-sfx-rare').checked;
+      userData.settings.sfxChat = document.getElementById('settings-sfx-chat').checked;
+      userData.settings.sfxVolume = parseInt(document.getElementById('settings-sfx-volume').value, 10);
+      await saveUserData();
+      const s = document.getElementById('settings-sfx-status');
+      s.style.color = '#2e7d32'; s.textContent = 'Saved!'; setTimeout(() => { s.textContent=''; }, 2000);
+    });
+
+    document.getElementById('settings-save-anim-btn').addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      const val = document.querySelector('input[name="pack-anim"]:checked');
+      userData.settings.packAnim = val ? val.value : 'default';
+      await saveUserData();
+      const s = document.getElementById('settings-anim-status');
+      s.style.color = '#2e7d32'; s.textContent = 'Saved!'; setTimeout(() => { s.textContent=''; }, 2000);
+    });
+
+    // Themes
+    const THEMES = {
+      default: { body: 'linear-gradient(135deg,#b3e5ff,#e0f4ff)', card: '#fff', text: '#123', accent: '#0d47a1' },
+      dark:    { body: '#1a1a2e', card: '#16213e', text: '#e0e0e0', accent: '#bb86fc' },
+      sunset:  { body: 'linear-gradient(135deg,#ff9a9e,#fad0c4,#ffecd2)', card: '#fff8f5', text: '#4a1a0a', accent: '#e65100' },
+      forest:  { body: 'linear-gradient(135deg,#a8edea,#fed6e3)', card: '#f0fff4', text: '#1b5e20', accent: '#2e7d32' },
+      galaxy:  { body: 'linear-gradient(135deg,#0f0c29,#302b63,#24243e)', card: '#1a1a3e', text: '#e0e0e0', accent: '#a78bfa' },
+    };
+
+    function applyTheme(name) {
+      const t = THEMES[name] || THEMES.default;
+      document.body.style.background = t.body;
+      document.querySelectorAll('.card').forEach(function(el) {
+        el.style.background = t.card;
+        el.style.color = t.text;
+      });
+      document.querySelectorAll('.settings-box').forEach(function(el) {
+        el.style.background = t.card === '#fff' ? '#f5f5f5' : t.card;
+      });
+    }
+
+    document.querySelectorAll('.theme-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const theme = btn.dataset.theme;
+        applyTheme(theme);
+        if(!userData) return;
+        if(!userData.settings) userData.settings = {};
+        userData.settings.theme = theme;
+        await saveUserData();
+        const s = document.getElementById('settings-theme-status');
+        if(s) { s.style.color = '#2e7d32'; s.textContent = 'Theme applied!'; setTimeout(() => { s.textContent=''; }, 2000); }
+      });
+    });
+
+    document.getElementById('settings-save-privacy-btn').addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.hideStats = document.getElementById('settings-hide-stats').checked;
+      userData.settings.hideBlooks = document.getElementById('settings-hide-blooks').checked;
+      userData.settings.hideOnline = document.getElementById('settings-hide-online').checked;
+      await saveUserData();
+      const s = document.getElementById('settings-privacy-status');
+      s.style.color = '#2e7d32'; s.textContent = 'Privacy settings saved!'; setTimeout(() => { s.textContent=''; }, 2500);
+    });
+
+    function refreshSettingsStats() {
+      const el = document.getElementById('settings-stats-snap');
+      if(!el || !userData) return;
+      const blooks = userData.blooks || {};
+      const totalBlooks = Object.values(blooks).reduce((a,b) => a+b, 0);
+      const uniqueBlooks = Object.keys(blooks).filter(k => (blooks[k]||0) > 0).length;
+      el.innerHTML =
+        '<span>💰 Coins: <b>' + (userData.coins||0).toLocaleString() + '</b></span>' +
+        '<span>🪙 Total earned: <b>' + (userData.totalCoinsCollected||0).toLocaleString() + '</b></span>' +
+        '<span>📦 Packs opened: <b>' + (userData.totalPacksOpened||0).toLocaleString() + '</b></span>' +
+        '<span>🃏 Total blooks: <b>' + totalBlooks + '</b> (' + uniqueBlooks + ' unique)</span>' +
+        '<span>🔥 Login streak: <b>' + (userData.loginStreak||0) + ' days</b></span>' +
+        '<span>⭐ VIP: <b>' + (isVip ? (isVip() ? 'Active (' + vipDaysLeft() + ' days left)' : 'Inactive') : 'Inactive') + '</b></span>';
+    }
+    document.getElementById('settings-refresh-stats').addEventListener('click', refreshSettingsStats);
+
+    // Clear chat history
+    document.getElementById('settings-clear-chat-history').addEventListener('click', async function() {
+      if(!currentUser || !userData) return;
+      if(!confirm('Clear your chat history? This removes all messages you sent (cannot be undone).')) return;
+      // We can only remove from the global chat what we own — not possible with current schema
+      // Instead clear locally and show a note
+      const s = document.getElementById('settings-clear-status');
+      s.style.color = '#e65100'; s.textContent = 'Note: Chat messages are shared — individual deletion not supported. Your new messages will appear fresh.';
+    });
+
+    // Reset quest progress
+    document.getElementById('settings-clear-quest-progress').addEventListener('click', async function() {
+      if(!currentUser || !userData) return;
+      if(!confirm('Reset your quest progress for today?')) return;
+      userData.questProgress = { day: new Date().toDateString(), packsToday:0, coinsToday:0, chatToday:0, wheelToday:0, raresToday:0, claimed:{} };
+      await saveUserData();
+      renderDailyQuests();
+      const s = document.getElementById('settings-clear-status');
+      s.style.color = '#2e7d32'; s.textContent = 'Quest progress reset!'; setTimeout(() => { s.textContent=''; }, 2500);
+    });
+
+    // ── Play sound effects on events ──
+    function playBeep(freq, dur, vol) {
+      if(!userData || !userData.settings) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = freq || 440;
+        gain.gain.value = ((userData.settings.sfxVolume || 60) / 100) * (vol || 0.3);
+        osc.start(); osc.stop(ctx.currentTime + (dur || 0.15));
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (dur || 0.15));
+        setTimeout(() => ctx.close(), (dur || 0.15) * 1000 + 100);
+      } catch(e) {}
+    }
+
+    function playSfxPack() {
+      if(!userData || !userData.settings || userData.settings.sfxPack === false) return;
+      playBeep(523, 0.1); setTimeout(() => playBeep(659, 0.1), 110); setTimeout(() => playBeep(784, 0.15), 220);
+    }
+
+    function playSfxRare() {
+      if(!userData || !userData.settings || userData.settings.sfxRare === false) return;
+      [392,494,587,698,784].forEach((f,i) => setTimeout(() => playBeep(f,0.1,0.4), i*80));
+    }
+
+    function playSfxChat() {
+      if(!userData || !userData.settings || !userData.settings.sfxChat) return;
+      playBeep(880, 0.07, 0.15);
+    }
+
+
+
+    // ═══════════════════════════════════════════
+    // NEW GAME MODES LOGIC
+    // ═══════════════════════════════════════════
+
+    // ── Blook Racing ──
+    function startBlookRacing(gameData) {
+      const screen = document.getElementById('game-screen');
+      const center = document.getElementById('game-center');
+      if(!center) return;
+      let pos = 0, speed = 0, obstacle = Math.floor(Math.random()*80)+10;
+      let score = 0, finished = false;
+      center.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:22px;font-weight:700;margin-bottom:8px;">🏎️ Blook Racing</div>
+          <div style="background:#e0e0e0;border-radius:999px;height:28px;width:90%;margin:0 auto 12px;overflow:hidden;position:relative;">
+            <div id="race-track-fill" style="height:100%;background:linear-gradient(90deg,#ef5350,#ff7043);border-radius:999px;width:0%;transition:width .1s;"></div>
+            <div id="race-car" style="position:absolute;top:2px;left:0%;font-size:20px;transition:left .1s;">🏎️</div>
+            <div id="race-obstacle" style="position:absolute;top:2px;font-size:20px;">🪨</div>
+          </div>
+          <div style="font-size:14px;margin-bottom:10px;">Speed: <b id="race-speed">0</b> | Score: <b id="race-score">0</b></div>
+          <button id="race-boost-btn" style="font-size:18px;padding:14px 32px;background:#ef5350;color:#fff;border-radius:12px;font-weight:700;">⚡ BOOST (Space/Tap)</button>
+          <div id="race-status" style="font-size:13px;color:#666;margin-top:8px;"></div>
+        </div>`;
+      const fill = document.getElementById('race-track-fill');
+      const car = document.getElementById('race-car');
+      const obs = document.getElementById('race-obstacle');
+      const speedEl = document.getElementById('race-speed');
+      const scoreEl = document.getElementById('race-score');
+      const statusEl = document.getElementById('race-status');
+      obs.style.left = obstacle + '%';
+      function boost() {
+        if(finished) return;
+        speed = Math.min(speed + 8, 30);
+        score += 10;
+      }
+      document.getElementById('race-boost-btn').addEventListener('click', boost);
+      document.addEventListener('keydown', function onKey(e){ if(e.code==='Space'){ e.preventDefault(); boost(); } });
+      const iv = setInterval(function() {
+        if(finished) return;
+        speed = Math.max(0, speed - 0.5);
+        pos = Math.min(100, pos + speed * 0.1);
+        if(fill) fill.style.width = pos + '%';
+        if(car) car.style.left = pos + '%';
+        if(speedEl) speedEl.textContent = Math.round(speed);
+        if(scoreEl) scoreEl.textContent = score;
+        // Obstacle collision
+        const carPos = pos, obsPos = obstacle;
+        if(Math.abs(carPos - obsPos) < 3 && carPos > obsPos - 3) {
+          speed = Math.max(0, speed - 15);
+          score = Math.max(0, score - 30);
+          obstacle = Math.min(98, obstacle + Math.random()*20+5);
+          if(obs) obs.style.left = obstacle + '%';
+          if(statusEl) { statusEl.textContent = '💥 Hit! Slowing down!'; setTimeout(()=>{ if(statusEl) statusEl.textContent=''; },800); }
+        }
+        score += Math.round(speed * 0.05);
+        if(pos >= 100) {
+          finished = true; clearInterval(iv);
+          center.innerHTML = `<div style="text-align:center;padding:30px;"><div style="font-size:48px;">🏆</div><div style="font-size:24px;font-weight:700;">You finished!</div><div style="font-size:16px;margin:8px 0;">Score: ${score}</div><div style="font-size:13px;color:#666;">Coins earned: +${Math.round(score/2)}</div></div>`;
+          if(userData){ userData.coins=(parseInt(userData.coins,10)||0)+Math.round(score/2); saveUserData().catch(()=>{}); }
+        }
+      }, 50);
+    }
+
+    // ── The Heist ──
+    function startHeist(gameData) {
+      const center = document.getElementById('game-center');
+      if(!center) return;
+      let loot = 0, caught = false, phase = 0;
+      const phases = ['🔓 Crack the safe','📸 Dodge the cameras','💼 Grab the loot','🚗 Escape!'];
+      const maxPhase = phases.length;
+      function renderHeist() {
+        center.innerHTML = `<div style="text-align:center;padding:24px;max-width:400px;margin:0 auto;">
+          <div style="font-size:22px;font-weight:700;margin-bottom:6px;">💎 The Heist</div>
+          <div style="font-size:14px;color:#555;margin-bottom:16px;">Phase ${phase+1}/${maxPhase}: <b>${phases[phase]}</b></div>
+          <div style="font-size:13px;margin-bottom:14px;">Loot so far: <b>💰 ${loot}</b></div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;" id="heist-choices"></div>
+          <div id="heist-result" style="font-size:13px;margin-top:10px;min-height:20px;font-weight:700;"></div>
+        </div>`;
+        const choices = [
+          {label:'🐱 Sneak quietly', successChance:.75, lootMult:1},
+          {label:'💨 Run fast',       successChance:.5,  lootMult:2},
+          {label:'🎭 Disguise',       successChance:.85, lootMult:0.8},
+        ];
+        const choicesEl = document.getElementById('heist-choices');
+        choices.forEach(function(c) {
+          const btn = document.createElement('button');
+          btn.textContent = c.label;
+          btn.style.cssText = 'font-size:13px;padding:10px 16px;background:#37474f;color:#fff;border-radius:10px;';
+          btn.addEventListener('click', function() {
+            const success = Math.random() < c.successChance;
+            const gain = success ? Math.round((50 + Math.random()*100) * c.lootMult) : 0;
+            loot += gain;
+            const resultEl = document.getElementById('heist-result');
+            if(!resultEl) return;
+            if(success) {
+              resultEl.style.color='#2e7d32'; resultEl.textContent='✅ Success! +'+gain+' loot';
+            } else {
+              resultEl.style.color='#c62828'; resultEl.textContent='❌ Caught! No loot this phase.';
+            }
+            phase++;
+            setTimeout(function() {
+              if(phase >= maxPhase) {
+                const coins = Math.round(loot * 0.5);
+                center.innerHTML = `<div style="text-align:center;padding:30px;"><div style="font-size:48px;">💎</div><div style="font-size:22px;font-weight:700;">Heist Complete!</div><div style="font-size:15px;margin:8px 0;">Total loot: ${loot} | Coins earned: +${coins}</div></div>`;
+                if(userData){ userData.coins=(parseInt(userData.coins,10)||0)+coins; saveUserData().catch(()=>{}); }
+              } else { renderHeist(); }
+            }, 1200);
+          });
+          choicesEl.appendChild(btn);
+        });
+      }
+      renderHeist();
+    }
+
+    // ── Space Mine ──
+    function startSpaceMine(gameData) {
+      const center = document.getElementById('game-center');
+      if(!center) return;
+      let ore=0, fuel=100, ship=1, meteors=0;
+      const UPGRADES=[{name:'Engine',cost:50,desc:'Mine faster'},{name:'Shield',cost:80,desc:'Survive 1 meteor'},{name:'Drill',cost:120,desc:'2x ore per mine'}];
+      let hasShield=false, hasDrill=false, drillMult=1;
+      let interval=null;
+      function render(){
+        center.innerHTML=`<div style="text-align:center;padding:16px;max-width:420px;margin:0 auto;">
+          <div style="font-size:20px;font-weight:700;margin-bottom:4px;">🚀 Space Mine</div>
+          <div style="font-size:13px;margin-bottom:10px;">⛽ Fuel: <b>${fuel}%</b> | 🪨 Ore: <b>${ore}</b> | ☄️ Meteors dodged: <b>${meteors}</b></div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+            <button id="sm-mine" style="padding:10px 20px;background:#1a237e;color:#fff;border-radius:10px;font-weight:700;">⛏️ Mine (${Math.round(5*drillMult)} ore)</button>
+            <button id="sm-dodge" style="padding:10px 20px;background:#c62828;color:#fff;border-radius:10px;font-weight:700;">💨 Dodge Meteor</button>
+            <button id="sm-sell" style="padding:10px 20px;background:#2e7d32;color:#fff;border-radius:10px;font-weight:700;">💰 Sell All</button>
+          </div>
+          <div style="font-size:12px;margin-bottom:8px;color:#555;">Upgrades (buy with ore):</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;" id="sm-upgrades"></div>
+          <div id="sm-msg" style="font-size:13px;margin-top:10px;min-height:18px;font-weight:700;"></div>
+        </div>`;
+        const msg=e=>{ const el=document.getElementById('sm-msg'); if(el){ el.textContent=e; } };
+        document.getElementById('sm-mine').onclick=function(){
+          if(fuel<=0){ msg('⚠️ No fuel!'); return; }
+          const gain=Math.round((3+Math.random()*5)*drillMult);
+          ore+=gain; fuel=Math.max(0,fuel-5);
+          msg('⛏️ Mined '+gain+' ore! Fuel -5%');
+          render();
+        };
+        document.getElementById('sm-dodge').onclick=function(){
+          const success=Math.random()<(hasShield?0.9:0.6);
+          if(success){ meteors++; fuel=Math.max(0,fuel-10); msg('💨 Dodged! Fuel -10%'); }
+          else{ fuel=Math.max(0,fuel-25); msg('☄️ Hit! Fuel -25%'); }
+          if(fuel<=0){ const c=ore*3; if(userData){userData.coins=(parseInt(userData.coins,10)||0)+c;saveUserData().catch(()=>{});} center.innerHTML=`<div style="text-align:center;padding:30px;"><div style="font-size:48px;">💀</div><div style="font-size:20px;">Out of fuel!</div><div>Coins earned: +${c}</div></div>`; return; }
+          render();
+        };
+        document.getElementById('sm-sell').onclick=function(){
+          if(!ore){ msg('No ore to sell!'); return; }
+          const c=ore*3; ore=0; fuel=Math.min(100,fuel+20);
+          if(userData){userData.coins=(parseInt(userData.coins,10)||0)+c;saveUserData().catch(()=>{});}
+          showToast('💰 Sold ore for +'+c+' coins!','#2e7d32',2500);
+          msg('+'+c+' coins! Fuel +20%'); render();
+        };
+        const upgEl=document.getElementById('sm-upgrades');
+        UPGRADES.forEach(function(u){
+          const b=document.createElement('button');
+          b.textContent=u.name+' ('+u.cost+' ore)';
+          b.style.cssText='font-size:11px;padding:5px 10px;background:#78909c;color:#fff;border-radius:7px;';
+          b.title=u.desc;
+          b.onclick=function(){
+            if(ore<u.cost){ msg('Not enough ore!'); return; }
+            ore-=u.cost;
+            if(u.name==='Shield') hasShield=true;
+            if(u.name==='Drill') { hasDrill=true; drillMult=2; }
+            msg('✅ Upgraded: '+u.name+'!');
+            render();
+          };
+          if(upgEl) upgEl.appendChild(b);
+        });
+      }
+      render();
+    }
+
+    // ── Card Duels ──
+    function startCardDuels(gameData) {
+      const center = document.getElementById('game-center');
+      if(!center) return;
+      const CARDS=[
+        {name:'⚡ Lightning',atk:8,def:2,cost:2},{name:'🛡️ Wall',atk:1,def:9,cost:2},
+        {name:'🐉 Dragon',atk:12,def:5,cost:5},{name:'🧙 Wizard',atk:6,def:6,cost:3},
+        {name:'🗡️ Rogue',atk:10,def:1,cost:3},{name:'🏹 Archer',atk:7,def:3,cost:2},
+        {name:'🔥 Fireball',atk:15,def:0,cost:6},{name:'❄️ Frost',atk:5,def:8,cost:3},
+      ];
+      function randCard(){ return CARDS[Math.floor(Math.random()*CARDS.length)]; }
+      let myHP=20, enemyHP=20, myHand=Array.from({length:4},randCard), turn=0, coins=0;
+      function render(){
+        center.innerHTML=`<div style="padding:14px;max-width:440px;margin:0 auto;">
+          <div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:6px;">🃏 Card Duels</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span>❤️ You: <b>${myHP}</b></span><span>Turn ${turn+1}</span><span>🤖 Enemy: <b>${enemyHP}</b></span>
+          </div>
+          <div style="font-size:12px;color:#555;margin-bottom:8px;">Your hand — click a card to play:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;" id="cd-hand"></div>
+          <div id="cd-log" style="font-size:12px;margin-top:10px;color:#333;min-height:36px;background:#f5f5f5;border-radius:8px;padding:6px;"></div>
+        </div>`;
+        const handEl=document.getElementById('cd-hand');
+        const logEl=document.getElementById('cd-log');
+        myHand.forEach(function(card,idx){
+          const btn=document.createElement('button');
+          btn.style.cssText='display:flex;flex-direction:column;align-items:center;padding:8px 10px;background:linear-gradient(135deg,#880e4f,#1a237e);color:#fff;border-radius:10px;font-size:12px;min-width:70px;';
+          btn.innerHTML='<span style="font-size:18px;">'+card.name.split(' ')[0]+'</span><span>'+card.name.split(' ').slice(1).join(' ')+'</span><span style="font-size:10px;">⚔️'+card.atk+' 🛡️'+card.def+'</span>';
+          btn.onclick=function(){
+            const enemyCard=randCard();
+            const myNet=card.atk-enemyCard.def;
+            const enemyNet=enemyCard.atk-card.def;
+            if(myNet>0) enemyHP=Math.max(0,enemyHP-myNet);
+            if(enemyNet>0) myHP=Math.max(0,myHP-enemyNet);
+            if(logEl) logEl.innerHTML='You played <b>'+card.name+'</b>, enemy played <b>'+enemyCard.name+'</b>.<br>You dealt <b>'+Math.max(0,myNet)+'</b> dmg, took <b>'+Math.max(0,enemyNet)+'</b> dmg.';
+            myHand.splice(idx,1,randCard());
+            turn++;
+            coins+=5;
+            if(myHP<=0||enemyHP<=0){
+              const won=enemyHP<=0;
+              const bonus=won?200:50;
+              if(userData){userData.coins=(parseInt(userData.coins,10)||0)+coins+bonus;saveUserData().catch(()=>{});}
+              center.innerHTML='<div style="text-align:center;padding:30px;"><div style="font-size:48px;">'+(won?'🏆':'💀')+'</div><div style="font-size:22px;font-weight:700;">'+(won?'Victory!':'Defeated!')+'</div><div style="font-size:14px;margin-top:8px;">Coins earned: +'+(coins+bonus)+'</div></div>';
+              return;
+            }
+            render();
+          };
+          handEl.appendChild(btn);
+        });
+      }
+      render();
+    }
+
+    // ── Food Fight ──
+    function startFoodFight(gameData) {
+      const center = document.getElementById('game-center');
+      if(!center) return;
+      const FOODS=['🍕','🍔','🌮','🍣','🍰','🥦','🍩','🍟'];
+      let myPoints=50, bots=[{name:'Bot A',pts:50},{name:'Bot B',pts:50},{name:'Bot C',pts:50}];
+      let round=0, maxRounds=8;
+      function render(){
+        const allPlayers=[{name:'You',pts:myPoints},...bots].sort((a,b)=>b.pts-a.pts);
+        center.innerHTML=`<div style="padding:14px;max-width:420px;margin:0 auto;">
+          <div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:6px;">🍕 Food Fight! Round ${round+1}/${maxRounds}</div>
+          <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">
+            ${allPlayers.map(p=>'<div style="background:'+(p.name==='You'?'#f57f17':'#78909c')+';color:#fff;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;">'+p.name+': '+p.pts+'</div>').join('')}
+          </div>
+          <div style="font-size:13px;text-align:center;margin-bottom:8px;">Choose a target to throw food at:</div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;" id="ff-targets"></div>
+          <div id="ff-log" style="font-size:12px;margin-top:10px;color:#333;min-height:30px;background:#fff8e1;border-radius:8px;padding:6px;"></div>
+        </div>`;
+        const targEl=document.getElementById('ff-targets');
+        const logEl=document.getElementById('ff-log');
+        bots.forEach(function(bot){
+          const btn=document.createElement('button');
+          const food=FOODS[Math.floor(Math.random()*FOODS.length)];
+          btn.textContent='Throw '+food+' at '+bot.name;
+          btn.style.cssText='font-size:13px;padding:8px 14px;background:#f57f17;color:#fff;border-radius:10px;';
+          btn.onclick=function(){
+            const hit=Math.random()<0.7;
+            const dmg=Math.round(5+Math.random()*15);
+            let log='';
+            if(hit){ bot.pts=Math.max(0,bot.pts-dmg); log='🎯 Hit '+bot.name+' for -'+dmg+' points!'; }
+            else { log='💨 Missed '+bot.name+'!'; }
+            // Bots attack back
+            bots.forEach(function(b){
+              if(Math.random()<0.5){ const d=Math.round(3+Math.random()*10); myPoints=Math.max(0,myPoints-d); log+=' | '+b.name+' hit you for -'+d+'!'; }
+            });
+            if(logEl) logEl.textContent=log;
+            round++;
+            if(round>=maxRounds){
+              const won=myPoints===Math.max(myPoints,...bots.map(b=>b.pts));
+              const coins=won?150+myPoints:Math.round(myPoints*0.5);
+              if(userData){userData.coins=(parseInt(userData.coins,10)||0)+coins;saveUserData().catch(()=>{});}
+              center.innerHTML='<div style="text-align:center;padding:30px;"><div style="font-size:48px;">'+(won?'🏆':'💀')+'</div><div style="font-size:22px;font-weight:700;">'+(won?'You Win!':'Game Over!')+'</div><div style="font-size:14px;margin-top:8px;">Final score: '+myPoints+' | Coins: +'+coins+'</div></div>';
+              return;
+            }
+            render();
+          };
+          targEl.appendChild(btn);
+        });
+      }
+      render();
+    }
+
+    // Route new game modes to their handlers
+    const _origStartGame = typeof startGame !== 'undefined' ? startGame : null;
+    function routeNewGameMode(gmId, gameData) {
+      if(gmId==='blookracing') { startBlookRacing(gameData); return true; }
+      if(gmId==='heist')       { startHeist(gameData);       return true; }
+      if(gmId==='spacemine')   { startSpaceMine(gameData);   return true; }
+      if(gmId==='cardduels')   { startCardDuels(gameData);   return true; }
+      if(gmId==='foodfight')   { startFoodFight(gameData);   return true; }
+      return false;
+    }
+
+
+    // ── Owner: broadcast to player ──
+    document.getElementById('ob-send-btn').addEventListener('click', async function() {
+      const statusEl = document.getElementById('ob-status');
+      const username = document.getElementById('ob-username').value.trim();
+      const message = document.getElementById('ob-message').value.trim();
+      const type = document.getElementById('ob-type').value;
+      if(!username || !message) { statusEl.textContent = 'Fill in both fields.'; return; }
+      statusEl.textContent = 'Sending...';
+      // Find user by username in Firebase
+      try {
+        const usersSnap = await get(ref(db,'users'));
+        if(!usersSnap.exists()) { statusEl.textContent = 'No users found.'; return; }
+        let targetUid = null;
+        usersSnap.forEach(function(child) {
+          if((child.val().username||'').toLowerCase() === username.toLowerCase()) targetUid = child.key;
+        });
+        if(!targetUid) { statusEl.textContent = 'Player not found.'; return; }
+        await set(ref(db,'playerMessages/'+targetUid), {
+          message, type, from: userData.username||'Owner', sentAt: Date.now(), read: false
+        });
+        statusEl.style.color = '#2e7d32';
+        statusEl.textContent = 'Message sent to ' + username + '!';
+        document.getElementById('ob-username').value = '';
+        document.getElementById('ob-message').value = '';
+      } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
+    });
+
+    // ── Force reload all players ──
+    document.getElementById('force-reload-btn').addEventListener('click', async function() {
+      const reason = document.getElementById('reload-reason-input').value.trim() || 'A new update has been deployed.';
+      if(!confirm('Force-reload ALL online players? They will see: "' + reason + '"')) return;
+      const statusEl = document.getElementById('reload-status');
+      statusEl.textContent = 'Sending reload signal...';
+      try {
+        await set(ref(db,'forceReload'), { reason, sentAt: Date.now(), by: userData.username||'Owner' });
+        statusEl.style.color = '#2e7d32';
+        statusEl.textContent = 'Reload signal sent!';
+      } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
+    });
+
+    // ── Listen for force reload signal ──
+    onValue(ref(db,'forceReload'), function(snap) {
+      if(!snap.exists()) return;
+      const fr = snap.val();
+      // Don't reload if it's older than 10 seconds (already handled)
+      if(Date.now() - fr.sentAt > 10000) return;
+      // Show overlay then reload
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 2.0</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      document.body.appendChild(overlay);
+      setTimeout(function() { window.location.reload(); }, 3000);
+    });
+
+    // ── Listen for player-specific message ──
+    function listenForPlayerMessage() {
+      if(!currentUser) return;
+      onValue(ref(db,'playerMessages/'+currentUser.uid), async function(snap) {
+        if(!snap.exists()) return;
+        const msg = snap.val();
+        if(msg.read) return;
+        const colors = { info:'#1976d2', warning:'#e65100', 'ban-warning':'#c62828', reward:'#2e7d32' };
+        const icons  = { info:'ℹ️', warning:'⚠️', 'ban-warning':'🔴', reward:'🎁' };
+        // Show modal
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:8000;';
+        overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:360px;box-shadow:0 8px 30px rgba(0,0,0,.3);text-align:center;">'
+          + '<div style="font-size:32px;margin-bottom:8px;">' + (icons[msg.type]||'ℹ️') + '</div>'
+          + '<div style="font-family:\'Titan One\',system-ui;font-size:18px;color:' + (colors[msg.type]||'#0d47a1') + ';margin-bottom:10px;">Message from Owner</div>'
+          + '<div style="font-size:14px;color:#333;margin-bottom:16px;">' + msg.message + '</div>'
+          + '<button id="player-msg-dismiss" style="background:' + (colors[msg.type]||'#1976d2') + ';color:#fff;padding:8px 24px;border-radius:8px;">OK</button>'
+          + '</div>';
+        document.body.appendChild(overlay);
+        document.getElementById('player-msg-dismiss').onclick = async function() {
+          overlay.remove();
+          await update(ref(db,'playerMessages/'+currentUser.uid), { read: true });
+        };
+      });
+    }
+
+    // ── Show login warning banner (stat accuracy) ──
+    function checkLoginWarning() {
+      if(!localStorage.getItem('dismissed_stat_warn')) {
+        const bar = document.getElementById('login-warning-bar');
+        if(bar) bar.style.display = 'flex';
+      }
+    }
 
 
     // (handled via onAuthStateChanged below — stop stream on state change)
