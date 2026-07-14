@@ -238,6 +238,7 @@
 
     .err-small{color:#c62828;font-size:12px;margin-top:4px;min-height:16px}
     @keyframes pulse-live{from{opacity:1;transform:scale(1)}to{opacity:.4;transform:scale(.8)}}
+    @keyframes notif-pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
     @keyframes pulse-wheel{from{box-shadow:0 0 0 0 rgba(230,81,0,.4)}to{box-shadow:0 0 0 8px rgba(230,81,0,0);}}
     @keyframes slide-in-right{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
     #live-chat-input::placeholder{color:rgba(255,255,255,.5)}
@@ -583,6 +584,16 @@
           <div class="top-left">
             <div class="pill" id="top-user">Logged out</div>
             <div class="pill" id="top-coins">Coins: 0</div>
+            <div style="position:relative;display:inline-block;">
+              <button id="notif-bell-btn" style="background:none;border:none;font-size:20px;cursor:pointer;padding:0 2px;position:relative;" title="Notifications">&#128276;<span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#c62828;color:#fff;font-size:9px;border-radius:999px;padding:1px 4px;font-weight:700;"></span></button>
+              <div id="notif-dropdown" style="display:none;position:absolute;top:32px;right:0;width:300px;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);z-index:1000;max-height:360px;overflow-y:auto;border:1px solid #e0e0e0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #f0f0f0;">
+                  <span style="font-weight:700;font-size:13px;">&#128276; Notifications</span>
+                  <button id="notif-clear-btn" style="font-size:11px;padding:2px 8px;background:#78909c;">Clear all</button>
+                </div>
+                <div id="notif-list" style="padding:8px 0;"></div>
+              </div>
+            </div>
             <div class="pill" id="streak-display" style="background:linear-gradient(90deg,#e65100,#f9a825);color:#fff;cursor:help;">&#128293; 0 day streak</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
@@ -601,22 +612,18 @@
             <span>&#9888;&#65039; <strong>Heads up:</strong> Some stats may be inaccurate — global pack opens and personal open counts are being reset and recalculated. Sorry for the inconvenience!</span>
             <button onclick="this.parentElement.style.display='none';localStorage.setItem('dismissed_stat_warn','1');" style="background:rgba(255,255,255,.25);font-size:11px;padding:3px 10px;flex-shrink:0;">Dismiss</button>
           </div>
-          <div id="broadcast-bar" style="display:none;background:linear-gradient(90deg,#1a237e,#311b92);border-radius:12px;padding:10px 14px;color:#fff;margin-bottom:10px;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div id="broadcast-bar" style="display:none;background:linear-gradient(90deg,#1a237e,#311b92);border-radius:12px;padding:10px 14px;color:#fff;margin-bottom:10px;align-items:center;gap:10px;">
             <span style="font-size:13px;font-weight:700;">&#127911; Community Broadcast</span>
             <span id="broadcast-label" style="font-size:12px;opacity:.85;flex:1;"></span>
-            <audio id="broadcast-audio" controls style="height:32px;flex:1;min-width:180px;max-width:320px;"></audio>
-            <video id="broadcast-video" controls style="max-height:120px;border-radius:8px;display:none;"></video>
-            <button id="broadcast-close-btn" style="background:rgba(255,255,255,.15);font-size:11px;padding:3px 10px;">&#10005;</button>
+            <!-- Audio: no controls, auto-plays, cannot be stopped -->
+            <audio id="broadcast-audio" autoplay style="display:none;"></audio>
           </div>
-          <div id="broadcast-upload-box" style="background:#e8eaf6;border-radius:12px;padding:12px 14px;margin-bottom:10px;">
-            <div style="font-weight:700;font-size:13px;margin-bottom:4px;">&#127911; Broadcast to Everyone — 500,000 coins</div>
-            <div style="font-size:11px;color:#555;margin-bottom:8px;">Upload an MP3 or MP4 (max 8MB, max 5 min video). Plays for all online users until it ends, then disappears.</div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <input id="broadcast-file-input" type="file" accept="audio/mp3,audio/mpeg,video/mp4" style="font-size:12px;flex:1;">
-              <button id="broadcast-send-btn" style="font-size:12px;padding:6px 14px;background:#7b1fa2;color:#fff;font-weight:700;">&#9654; Broadcast</button>
-            </div>
-            <div id="broadcast-status" style="font-size:12px;color:#555;margin-top:6px;min-height:16px;"></div>
+          <!-- Video broadcast: fullscreen overlay, no close button -->
+          <div id="broadcast-video-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;">
+            <video id="broadcast-video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>
+            <div id="broadcast-video-label" style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-size:13px;padding:6px 18px;border-radius:999px;font-weight:700;"></div>
           </div>
+
           <div id="booster-market-banner"></div>
           <div id="special-shop" class="special-shop-container" style="display:none;">
             <div class="special-shop-title">Special Shop Blooks</div>
@@ -668,6 +675,12 @@
         </div>
 
         <div id="view-blooks" class="card" style="display:none;">
+          <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+            <button class="blook-filter-btn active" data-filter="all" style="font-size:12px;padding:5px 14px;border-radius:999px;background:#0d47a1;color:#fff;">All Blooks</button>
+            <button class="blook-filter-btn" data-filter="normal" style="font-size:12px;padding:5px 14px;border-radius:999px;background:#e0e0e0;color:#333;">Regular</button>
+            <button class="blook-filter-btn" data-filter="shiny" style="font-size:12px;padding:5px 14px;border-radius:999px;background:#e0e0e0;color:#333;">&#10024; Shiny</button>
+            <button class="blook-filter-btn" data-filter="golden" style="font-size:12px;padding:5px 14px;border-radius:999px;background:#e0e0e0;color:#333;">&#11088; Golden</button>
+          </div>
           <div class="section-title">My Blooks</div>
           <div class="section-sub">Blooks sorted by pack. "Other Blooks" at the bottom.</div>
           <button id="sell-duplicates-btn" style="align-self:flex-start;font-size:12px;margin-bottom:8px;">Sell all duplicates</button>
@@ -676,6 +689,11 @@
         </div>
 
         <div id="view-trading" class="card" style="display:none;">
+          <!-- Active trade session banner -->
+          <div id="trade-active-banner" style="display:none;background:linear-gradient(90deg,#1565c022,#7b1fa222);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:13px;font-weight:700;">
+            &#129309; Trade in progress with <span id="trade-partner-name"></span>...
+            <button id="trade-cancel-active-btn" style="font-size:11px;padding:3px 10px;background:#c62828;margin-left:8px;">Cancel</button>
+          </div>
           <div class="section-title">Trading</div>
           <div class="section-sub">Send trade requests to other players. You can offer blooks, coins, or both.</div>
           <div style="margin-bottom:10px;"><label style="font-size:12px;">Target username</label><input id="trade-target-user" placeholder="username"></div>
@@ -1077,6 +1095,27 @@
             <button id="settings-refresh-stats" style="font-size:12px;padding:5px 12px;background:#78909c;margin-top:8px;">↻ Refresh</button>
           </div>
 
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>&#127911; Community Broadcast — 500,000 coins</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Upload an MP3 or MP4 (max 8MB, max 5 min). It plays for ALL online users. MP3 auto-plays with no controls. MP4 takes over everyone's full screen. No way to stop it — it plays until it ends.</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+              <input id="broadcast-file-input" type="file" accept="audio/mp3,audio/mpeg,video/mp4" style="font-size:12px;flex:1;">
+              <button id="broadcast-send-btn" style="font-size:12px;padding:6px 14px;background:#7b1fa2;color:#fff;font-weight:700;">&#9654; Broadcast</button>
+            </div>
+            <div id="broadcast-status" style="font-size:12px;color:#555;min-height:16px;"></div>
+          </div>
+
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>&#127800; Coin Shop — Special Purchases</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:10px;">Spend coins on exclusive perks and cosmetics.</div>
+            <div style="display:flex;flex-direction:column;gap:8px;" id="coin-shop-list">
+              <!-- Populated by JS -->
+            </div>
+            <div id="coin-shop-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
           <div class="settings-box" style="background:#fff3e0;margin-bottom:12px;">
             <h3>🗑️ Clear My Data</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Permanently delete specific parts of your data. Cannot be undone.</div>
@@ -1181,6 +1220,39 @@
             </div>
           </div>
 
+
+          <!-- Maintenance Mode -->
+          <div class="owner-single-box" style="background:#fce4ec;margin-bottom:14px;">
+            <strong>&#128683; Maintenance / Downtime</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">All players (except owner) are shown a maintenance screen. Set a duration and reason.</div>
+            <input id="maint-reason" placeholder="Reason (e.g. 'Fixing packs')" style="width:100%;margin-bottom:6px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+              <input id="maint-hours" type="number" min="0" max="23" value="0" placeholder="Hours" style="width:80px;">
+              <input id="maint-mins" type="number" min="0" max="59" value="30" placeholder="Minutes" style="width:80px;">
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button id="maint-start-btn" style="font-size:12px;padding:6px 14px;background:#c62828;font-weight:700;">&#128683; Start Maintenance</button>
+              <button id="maint-end-btn" style="font-size:12px;padding:6px 14px;background:#2e7d32;font-weight:700;">&#10003; End Maintenance</button>
+            </div>
+            <div id="maint-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
+          <!-- Owner: Send notification to all -->
+          <div class="owner-single-box" style="background:#e8f5e9;margin-bottom:14px;">
+            <strong>&#128276; Send Notification to All Players</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Shows up in every player's notification centre immediately.</div>
+            <input id="owner-notif-msg" placeholder="Notification message..." style="width:100%;margin-bottom:6px;">
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <select id="owner-notif-type" style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid #a5d6a7;">
+                <option value="info">ℹ️ Info</option>
+                <option value="event">🎉 Event</option>
+                <option value="warning">⚠️ Warning</option>
+                <option value="reward">🎁 Reward</option>
+              </select>
+            </div>
+            <button id="owner-notif-send-btn" style="font-size:12px;padding:6px 14px;background:#2e7d32;font-weight:700;">&#128276; Send to All</button>
+            <div id="owner-notif-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
 
           <!-- Owner Broadcast to Player -->
           <div class="owner-single-box" style="background:#e3f2fd;margin-bottom:14px;">
@@ -1334,8 +1406,13 @@
         </div>
 
         <div id="admin-panel" class="card">
-          <div class="section-title">Admin Panel</div>
-          <div class="section-sub">Set coins (max 1,000,000 at a time), give blooks, and control next pack open.</div>
+          <div class="section-title" style="margin-bottom:4px;">Admin Panel</div>
+          <div style="background:#e8f5e9;border-radius:10px;padding:10px;margin-bottom:12px;">
+            <div style="font-weight:700;font-size:13px;margin-bottom:6px;">&#128100; Online Players</div>
+            <div id="admin-online-players" style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;">Loading...</div>
+            <button id="admin-refresh-players" style="font-size:11px;padding:4px 10px;background:#78909c;margin-top:6px;">&#8635; Refresh</button>
+          </div>
+          <div class="section-sub" style="margin-top:-8px;margin-bottom:12px;">Set coins, give blooks, view online players, and control pack opens.</div>
           <div style="margin-bottom:10px;">
             <label style="font-size:12px;">Set coins for current user (max 1,000,000)</label>
             <input id="admin-coins" type="number" min="0" max="1000000" value="0">
@@ -2299,6 +2376,7 @@
       viewLeaderboard.style.display=name==="leaderboard"?"flex":"none";
       ownerPanel.style.display=name==="owner"?"flex":"none";
       adminPanel.style.display=name==="admin"?"flex":"none";
+      if(name==="admin") setTimeout(loadAdminOnlinePlayers, 400);
       const _rngPanel=document.getElementById("view-rng"); if(_rngPanel) _rngPanel.style.display=name==="rng"?"flex":"none";
       const _livesPanel=document.getElementById("view-lives"); if(_livesPanel) _livesPanel.style.display=name==="lives"?"flex":"none";
       const vBazaar=document.getElementById("view-bazaar"); if(vBazaar) vBazaar.style.display=name==="bazaar"?"flex":"none";
@@ -2565,11 +2643,13 @@
       const forced=userData.nextPackId?getPackById(userData.nextPackId):null;
       const actualPack=forced||pack;
       const currentCoins=parseInt(userData.coins,10)||0;
-      if(currentCoins<actualPack.cost){
-        alert(`Not enough coins! You need ${actualPack.cost} but have ${currentCoins}.`);
+      var discountedPackCost = actualPack.cost;
+      if(userData.packDiscountLeft > 0) { discountedPackCost = Math.round(actualPack.cost * 0.75); userData.packDiscountLeft--; showToast('🏷️ 25% discount! ' + userData.packDiscountLeft + ' left', '#1976d2', 2000); }
+      if(currentCoins<discountedPackCost){
+        alert(`Not enough coins! You need ${discountedPackCost} but have ${currentCoins}.`);
         return;
       }
-      userData.coins=currentCoins-actualPack.cost;
+      userData.coins=currentCoins-discountedPackCost;
       let chosen;
       try{ chosen=pickFromPack(actualPack); }
       catch(err){ userData.coins=currentCoins; console.error("pickFromPack crashed:",err); alert("Pack error - coins refunded!"); return; }
@@ -2652,6 +2732,15 @@
       BLOOK_INFO=groupBlooksByPack();
       const owned=userData.blooks||{}; const byPack={};
       Object.keys(BLOOK_INFO).forEach(name=>{ const info=BLOOK_INFO[name]; if(!byPack[info.packId]) byPack[info.packId]={packName:info.packName,items:[]}; byPack[info.packId].items.push(name); });
+      // Sort each pack's blooks by rarity order
+      const RARITY_ORDER = {'Common':0,'Rare':1,'Epic':2,'Legendary':3,'Supreeme':4,'Chroma':5,'Mystical':6,'Unique':7};
+      Object.values(byPack).forEach(function(pg){
+        pg.items.sort(function(a,b){
+          const ra = RARITY_ORDER[BLOOK_INFO[a]&&BLOOK_INFO[a].rarity] ?? 99;
+          const rb = RARITY_ORDER[BLOOK_INFO[b]&&BLOOK_INFO[b].rarity] ?? 99;
+          return ra - rb;
+        });
+      });
       const packOrder=[];
       const allPacksOrdered=[...ALL_PACKS_FOR_OWNER,...(CUSTOM_PACKS_RUNTIME||[])];
       allPacksOrdered.forEach(p=>{ if(byPack[p.id]) packOrder.push(p.id); });
@@ -2801,9 +2890,14 @@
           const div=document.createElement("div"); div.style.marginBottom="4px";
           if(msg.isBot) div.className="chat-bot-msg";
           const isRealOther = !msg.isBot && (msg.username||"") !== (userData?.username||"");
-          if(isRealOther){ div.style.borderLeft="3px solid #43a047"; div.style.paddingLeft="5px"; div.style.borderRadius="4px"; }
+          if(isRealOther){ div.style.borderLeft="3px solid #43a047"; div.style.paddingLeft="5px"; div.style.borderRadius="4px"; checkNameMention(msg.text||'', msg.username||''); }
           const name=document.createElement("span"); name.style.fontWeight="700";
           if(msg.isBot) name.style.color="#7c4dff";
+          if(!msg.isBot && msg.username && msg.username===(userData?.username||'')) {
+            if(userData.chatBadgeExpires && Date.now() < userData.chatBadgeExpires) {
+              name.textContent = '⭐ ' + name.textContent;
+            }
+          }
           name.textContent=(msg.username||"user")+": "; div.appendChild(name);
           if(msg.text){const t=document.createElement("span");t.textContent=msg.text;div.appendChild(t);}
           if(msg.imageUrl){const img=document.createElement("img");img.src=msg.imageUrl;img.className="chat-image";div.appendChild(document.createElement("br"));div.appendChild(img);}
@@ -2864,17 +2958,33 @@
     let subletBotInterval = null;
     function startSubletBotInterval(){
       if(subletBotInterval) clearInterval(subletBotInterval);
+      const BOT_MESSAGES = [
+        "📢 Go to Subzero32715's description for a reward! Don't miss out! 🎁",
+        "💡 Tip: Open packs back-to-back for a Hot Streak bonus! 🔥",
+        "🎯 Did you know? Daily Quests reset every midnight. Check them out!",
+        "⭐ VIP members get a free Messed Up Pack every day! Check out the VIP tab.",
+        "🏆 Check the leaderboard — can you make it to the top 3?",
+        "🎰 Spin the Daily Wheel for free coins every day! Don't forget!",
+        "💎 Rare tip: Epic+ blooks have under 5% chance. Keep opening!",
+        "🔔 Enable notifications in Settings to never miss a giveaway!",
+        "🤝 Trading is open! Swap blooks with other players in the Trade tab.",
+        "✨ Any pack open has a 2% shiny chance — bonus coins if you land it!",
+        "🎲 Try the new game modes! Heist, Card Duels, Space Mine and more.",
+        "📦 Custom packs from the owner can appear in Market any time — keep an eye out!",
+        "🌟 Login every day to build your streak for bigger coin bonuses!",
+        "🎁 Type codes in chat when a giveaway drops — winner gets free coins!",
+      ];
       subletBotInterval = setInterval(async()=>{
         try{
-          // ~12% chance to fire a surprise giveaway instead of the normal message
           if(Math.random() < 0.12) {
             await fireChatGiveawayEvent();
             return;
           }
+          const text = BOT_MESSAGES[Math.floor(Math.random()*BOT_MESSAGES.length)];
           const msgRef=push(chatRef());
           await set(msgRef,{
             username:"🤖 SubletBot",
-            text:"📢 Go to Subzero32715's description for a reward! Don't miss out! 🎁",
+            text,
             imageUrl:"",
             createdAt:Date.now(),
             isBot:true
@@ -2955,6 +3065,7 @@
         if(p.isOwner) tag=` <span style="background:#7b1fa2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">👑 owner</span>`;
         else if(p.isAdmin) tag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">⚡ admin</span>`;
         if(isMe) tag+=` <span style="background:#43a047;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">YOU</span>`;
+        if(p.goldBorder) tag+=' <span style="background:#FFD700;color:#000;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">&#127885;</span>';
         left.innerHTML=`${i+1}. ${p.username}${tag}${rankBadgeHTML(p.subscore,true)}`;
         const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
         row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row);
@@ -3024,11 +3135,14 @@
       ownerPackList.innerHTML="";
       ALL_PACKS_FOR_OWNER.forEach(pack=>{
         const row=document.createElement("div"); row.className="owner-pack-row";
-        const left=document.createElement("div"); left.style.flex="1";
+        const left=document.createElement("div"); left.style.flex="1"; left.style.fontSize="12px";
         left.textContent=pack.name+(pack.id==="lucky"?" (March only)":pack.id==="valentine"?" (Valentine week)":pack.id==="easter"?" (Easter weeks)":pack.id==="baahumbug"?" (April 1st only)":"");
+        const editBtn=document.createElement("button");
+        editBtn.textContent="Edit"; editBtn.style.cssText="font-size:10px;padding:2px 8px;background:#1976d2;margin-right:4px;";
+        editBtn.addEventListener("click",function(){ openPackEditorForBase(pack); });
         const right=document.createElement("input"); right.type="checkbox"; right.checked=packAvailability[pack.id]!==false;
         right.addEventListener("change",async()=>{ packAvailability[pack.id]=right.checked; await update(packAvailabilityRef(),{[pack.id]:right.checked}); buildPacks(); });
-        row.appendChild(left); row.appendChild(right); ownerPackList.appendChild(row);
+        row.appendChild(left); row.appendChild(editBtn); row.appendChild(right); ownerPackList.appendChild(row);
       });
       // Custom packs with edit/delete buttons
       if(CUSTOM_PACKS_RUNTIME.length) {
@@ -3409,6 +3523,8 @@
       updatePresence("market");
       setTimeout(()=>checkDailyStreak(), 2000);
       setTimeout(applyUserSettings, 800);
+      loadBasePackOverrides();
+      setTimeout(applyCoinInterest, 1500);
       listenForPlayerMessage();
       checkLoginWarning();
       setTimeout(initNotifications, 1000);
@@ -3949,6 +4065,7 @@
       if(name==="quests") renderDailyQuests();
       const vVip=document.getElementById("view-vip"); if(vVip) vVip.style.display=name==="vip"?"flex":"none";
       if(name==="vip") loadVipView();
+      if(name==="settings") { setTimeout(renderCoinShop, 100); }
       const vLives=document.getElementById("view-lives"); if(vLives) vLives.style.display=name==="lives"?"flex":"none";
       if(name==="lives") loadLivesList();
       // Show/hide joingame view
@@ -6648,8 +6765,10 @@
         if(!userData||!currentUser) return;
         var pack = getPackById(packId); if(!pack) return;
         var coins = parseInt(userData.coins,10)||0;
-        if(coins < pack.cost) { alert("Not enough coins!"); return; }
-        userData.coins = coins - pack.cost;
+        var packCost = pack.cost;
+        if(userData.packDiscountLeft > 0) { packCost = Math.round(packCost * 0.75); userData.packDiscountLeft--; showToast('🏷️ 25% discount applied! ' + userData.packDiscountLeft + ' left', '#1976d2', 2000); }
+        if(coins < packCost) { alert("Not enough coins!"); return; }
+        userData.coins = coins - packCost;
         var chosen;
         try { chosen = pickFromPack(pack); } catch(e) { userData.coins = coins; return; }
         if(!chosen) { userData.coins = coins; return; }
@@ -6677,6 +6796,7 @@
     var _origRenderBlooks2 = renderBlooks;
     renderBlooks = function() {
       _origRenderBlooks2();
+      setTimeout(applyBlookFilter, 50);
       if(!userData||!userData.blooks) return;
       Object.keys(userData.blooks).forEach(function(name) {
         if(name.indexOf("⭐ ") !== 0) return;
@@ -7068,48 +7188,55 @@
       }
     });
 
-    // Listen for broadcasts
+    // Listen for broadcasts — audio: no controls, video: fullscreen, nothing can stop it
+    let _bcActive = false;
     onValue(ref(db, 'broadcast'), function(snap) {
       const bar = document.getElementById('broadcast-bar');
       const audio = document.getElementById('broadcast-audio');
       const video = document.getElementById('broadcast-video');
+      const videoOverlay = document.getElementById('broadcast-video-overlay');
       const label = document.getElementById('broadcast-label');
       if(!snap.exists()) {
+        _bcActive = false;
         if(bar) bar.style.display = 'none';
-        if(audio) { audio.pause(); audio.src = ''; }
-        if(video) { video.pause(); video.src = ''; }
+        if(audio) { audio.src = ''; }
+        if(videoOverlay) videoOverlay.style.display = 'none';
+        if(video) { video.src = ''; }
         return;
       }
       const bc = snap.val();
       if(Date.now() > bc.expiresAt) { remove(ref(db,'broadcast')).catch(function(){}); return; }
-      if(!bar) return;
-      bar.style.display = 'flex';
-      if(label) label.textContent = bc.sender + ' is broadcasting:';
+      if(_bcActive) return; // already playing
+      _bcActive = true;
+      if(label) label.textContent = bc.sender + ' is broadcasting';
       if(bc.isVideo) {
-        if(video) { video.style.display='block'; video.src=bc.dataUrl; video.play().catch(function(){}); }
-        if(audio) { audio.style.display='none'; audio.src=''; }
+        // Fullscreen video — no close, no controls
+        if(videoOverlay) videoOverlay.style.display = 'block';
+        const vidLabel = document.getElementById('broadcast-video-label');
+        if(vidLabel) vidLabel.textContent = '\uD83D\uDCF9 ' + bc.sender + ' is broadcasting';
+        if(video) {
+          video.src = bc.dataUrl;
+          video.play().catch(function(){});
+          video.onended = function() {
+            remove(ref(db,'broadcast')).catch(function(){});
+            if(videoOverlay) videoOverlay.style.display = 'none';
+            _bcActive = false;
+          };
+        }
       } else {
-        if(audio) { audio.style.display='block'; audio.src=bc.dataUrl; audio.play().catch(function(){}); }
-        if(video) { video.style.display='none'; video.src=''; }
+        // Audio — plays invisibly, no controls
+        if(bar) bar.style.display = 'flex';
+        if(audio) {
+          audio.src = bc.dataUrl;
+          audio.play().catch(function(){});
+          audio.onended = function() {
+            remove(ref(db,'broadcast')).catch(function(){});
+            if(bar) bar.style.display = 'none';
+            _bcActive = false;
+          };
+        }
       }
       showNotif('\uD83C\uDF99 Community Broadcast', bc.sender + ' is broadcasting to everyone!', '\uD83C\uDF99');
-      // Auto-remove when media ends
-      const mediaEl = bc.isVideo ? video : audio;
-      if(mediaEl) {
-        mediaEl.onended = function() {
-          remove(ref(db, 'broadcast')).catch(function(){});
-          bar.style.display = 'none';
-        };
-      }
-    });
-
-    document.getElementById('broadcast-close-btn').addEventListener('click', function() {
-      const bar = document.getElementById('broadcast-bar');
-      const audio = document.getElementById('broadcast-audio');
-      const video = document.getElementById('broadcast-video');
-      if(audio) { audio.pause(); audio.src=''; }
-      if(video) { video.pause(); video.src=''; }
-      if(bar) bar.style.display = 'none';
     });
 
     // ═══════════════════════════════════════════
@@ -7188,7 +7315,6 @@
       const questNav = document.querySelector('[data-view="quests"]');
       if(questNav) questNav.textContent = '\uD83C\uDFAF Quests' + (unclaimedDone > 0 ? ' ('+unclaimedDone+')' : '');
     }
-
     // ═══════════════════════════════════════════
     // HOT STREAK MULTIPLIER (more addicting)
     // Back-to-back pack opens within 8s get a coin bonus
@@ -7857,20 +7983,27 @@
       const type = document.getElementById('ob-type').value;
       if(!username || !message) { statusEl.textContent = 'Fill in both fields.'; return; }
       statusEl.textContent = 'Sending...';
-      // Find user by username in Firebase
       try {
         const usersSnap = await get(ref(db,'users'));
         if(!usersSnap.exists()) { statusEl.textContent = 'No users found.'; return; }
-        let targetUid = null;
-        usersSnap.forEach(function(child) {
-          if((child.val().username||'').toLowerCase() === username.toLowerCase()) targetUid = child.key;
-        });
-        if(!targetUid) { statusEl.textContent = 'Player not found.'; return; }
-        await set(ref(db,'playerMessages/'+targetUid), {
-          message, type, from: userData.username||'Owner', sentAt: Date.now(), read: false
-        });
-        statusEl.style.color = '#2e7d32';
-        statusEl.textContent = 'Message sent to ' + username + '!';
+        const msgPayload = { message, type, from: userData.username||'Owner', sentAt: Date.now(), read: false };
+        if(username.toLowerCase() === 'all') {
+          // Send to ALL players
+          const updates = {};
+          usersSnap.forEach(function(child) { updates['playerMessages/'+child.key] = msgPayload; });
+          await update(ref(db), updates);
+          statusEl.style.color = '#2e7d32';
+          statusEl.textContent = 'Broadcast sent to ALL ' + Object.keys(updates).length + ' players!';
+        } else {
+          let targetUid = null;
+          usersSnap.forEach(function(child) {
+            if((child.val().username||'').toLowerCase() === username.toLowerCase()) targetUid = child.key;
+          });
+          if(!targetUid) { statusEl.textContent = 'Player not found. Type "all" to send to everyone.'; return; }
+          await set(ref(db,'playerMessages/'+targetUid), msgPayload);
+          statusEl.style.color = '#2e7d32';
+          statusEl.textContent = 'Message sent to ' + username + '!';
+        }
         document.getElementById('ob-username').value = '';
         document.getElementById('ob-message').value = '';
       } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
@@ -7890,12 +8023,16 @@
     });
 
     // ── Listen for force reload signal ──
+    let _lastReloadSignalAt = 0;
     onValue(ref(db,'forceReload'), function(snap) {
       if(!snap.exists()) return;
       const fr = snap.val();
-      // Don't reload if it's older than 10 seconds (already handled)
-      if(Date.now() - fr.sentAt > 10000) return;
-      // Show overlay then reload
+      // Skip owner
+      if(ownerMode) return;
+      // Only fire once per signal (debounce)
+      if(fr.sentAt === _lastReloadSignalAt) return;
+      if(Date.now() - fr.sentAt > 15000) return; // ignore stale signals
+      _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
       overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 2.0</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
@@ -7936,6 +8073,448 @@
         if(bar) bar.style.display = 'flex';
       }
     }
+
+
+
+    // ═══════════════════════════════════════════
+    // MAINTENANCE MODE
+    // ═══════════════════════════════════════════
+    document.getElementById('maint-start-btn').addEventListener('click', async function() {
+      const reason = document.getElementById('maint-reason').value.trim() || 'Down for maintenance.';
+      const hours = parseInt(document.getElementById('maint-hours').value, 10) || 0;
+      const mins  = parseInt(document.getElementById('maint-mins').value, 10)  || 0;
+      const totalMs = (hours * 60 + mins) * 60 * 1000;
+      if(totalMs <= 0) { document.getElementById('maint-status').textContent = 'Set a duration > 0.'; return; }
+      const endsAt = Date.now() + totalMs;
+      await set(ref(db,'maintenance'), { active: true, reason, endsAt, by: userData.username||'Owner', startedAt: Date.now() });
+      document.getElementById('maint-status').style.color = '#c62828';
+      document.getElementById('maint-status').textContent = 'Maintenance started! Ends in ' + hours + 'h ' + mins + 'm.';
+    });
+
+    document.getElementById('maint-end-btn').addEventListener('click', async function() {
+      await remove(ref(db,'maintenance'));
+      document.getElementById('maint-status').style.color = '#2e7d32';
+      document.getElementById('maint-status').textContent = 'Maintenance ended!';
+    });
+
+    // Listen for maintenance — show screen to non-owners
+    let _maintOverlay = null;
+    let _maintTimer = null;
+    onValue(ref(db,'maintenance'), function(snap) {
+      if(!snap.exists() || !snap.val().active) {
+        // Clear maintenance screen
+        if(_maintOverlay) { _maintOverlay.remove(); _maintOverlay = null; }
+        if(_maintTimer) { clearInterval(_maintTimer); _maintTimer = null; }
+        return;
+      }
+      if(ownerMode) return; // owner never sees maintenance screen
+      const m = snap.val();
+      if(Date.now() > m.endsAt) { remove(ref(db,'maintenance')).catch(()=>{}); return; }
+      if(_maintOverlay) return; // already showing
+      _maintOverlay = document.createElement('div');
+      _maintOverlay.style.cssText = 'position:fixed;inset:0;background:linear-gradient(135deg,#1a237e,#311b92);display:flex;align-items:center;justify-content:center;z-index:9998;color:#fff;text-align:center;';
+      _maintOverlay.innerHTML = '<div style="padding:32px;">'
+        + '<div style="font-size:64px;margin-bottom:16px;">🔧</div>'
+        + '<div style="font-family:\'Titan One\',system-ui;font-size:30px;margin-bottom:10px;">Under Maintenance</div>'
+        + '<div style="font-size:16px;opacity:.85;margin-bottom:10px;">' + m.reason + '</div>'
+        + '<div style="font-size:14px;opacity:.7;" id="maint-countdown">Computing time remaining...</div>'
+        + '</div>';
+      document.body.appendChild(_maintOverlay);
+      function updateCountdown() {
+        const remaining = Math.max(0, m.endsAt - Date.now());
+        const h = Math.floor(remaining/3600000), mn = Math.floor((remaining%3600000)/60000), s = Math.floor((remaining%60000)/1000);
+        const el = document.getElementById('maint-countdown');
+        if(el) el.textContent = 'Estimated time remaining: ' + h + 'h ' + mn + 'm ' + s + 's';
+        if(remaining <= 0) { remove(ref(db,'maintenance')).catch(()=>{}); }
+      }
+      updateCountdown();
+      _maintTimer = setInterval(updateCountdown, 1000);
+    });
+
+    // ── Admin: load online players ── (defined earlier)
+    document.getElementById('admin-refresh-players').addEventListener('click', loadAdminOnlinePlayers);
+
+
+
+    // ═══════════════════════════════════════════
+    // COIN SHOP — extra ways to spend coins
+    // ═══════════════════════════════════════════
+    const COIN_SHOP_ITEMS = [
+      { id:'name_color',    name:'Custom Name Color',       cost:5000,   desc:'Pick any color for your name in chat/leaderboard (also in Settings).', icon:'🎨', action:'name_color' },
+      { id:'chat_badge',    name:'Chat Badge',              cost:10000,  desc:'Show a ⭐ badge next to your name in chat for 7 days.',                icon:'⭐', action:'chat_badge' },
+      { id:'profile_border',name:'Gold Profile Border',     cost:25000,  desc:'Gold border around your name in the leaderboard permanently.',          icon:'🏅', action:'profile_border' },
+      { id:'extra_wheel',   name:'Extra Wheel Spin',        cost:15000,  desc:'Get one bonus Daily Wheel spin right now.',                             icon:'🎡', action:'extra_wheel' },
+      { id:'luck_boost',    name:'Luck Boost (24h)',        cost:30000,  desc:'Increase your Epic+ pull chance by 10% for 24 hours.',                  icon:'🍀', action:'luck_boost' },
+      { id:'pack_discount', name:'Pack Discount (3 opens)', cost:20000,  desc:'Next 3 pack opens cost 25% less.',                                      icon:'🏷️', action:'pack_discount' },
+      { id:'blook_dupe',    name:'Duplicate Shield',        cost:50000,  desc:'Next duplicate blook gives double coins instead.',                       icon:'🛡️', action:'blook_dupe' },
+      { id:'mystery_box2',  name:'Premium Mystery Box',     cost:75000,  desc:'Guaranteed Epic+ blook OR 10,000–50,000 coins.',                        icon:'🎁', action:'mystery_box2' },
+      { id:'rename',        name:'Username Change',         cost:100000, desc:'Change your display name once.',                                        icon:'✏️', action:'rename' },
+      { id:'coin_interest', name:'Coin Interest (1 week)',  cost:200000, desc:'Earn 2% of your coins daily for 7 days (auto-credited on login).',      icon:'💹', action:'coin_interest' },
+    ];
+
+    function renderCoinShop() {
+      const listEl = document.getElementById('coin-shop-list');
+      if(!listEl || !userData) return;
+      listEl.innerHTML = '';
+      COIN_SHOP_ITEMS.forEach(function(item) {
+        const canAfford = (userData.coins||0) >= item.cost;
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;background:' + (canAfford?'#fff':'#fafafa') + ';border-radius:10px;padding:10px 12px;border:1px solid ' + (canAfford?'#e0e0e0':'#eeeeee') + ';';
+        row.innerHTML = '<span style="font-size:22px;">' + item.icon + '</span>'
+          + '<div style="flex:1;">'
+          + '<div style="font-weight:700;font-size:13px;">' + item.name + '</div>'
+          + '<div style="font-size:11px;color:#666;">' + item.desc + '</div>'
+          + '</div>'
+          + '<button class="cs-buy-btn" data-id="' + item.id + '" style="font-size:12px;padding:6px 12px;background:' + (canAfford?'#1976d2':'#bdbdbd') + ';color:#fff;border-radius:8px;white-space:nowrap;"' + (canAfford?'':' disabled') + '>'
+          + item.cost.toLocaleString() + ' coins</button>';
+        listEl.appendChild(row);
+      });
+      // Wire buy buttons
+      listEl.querySelectorAll('.cs-buy-btn').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+          const itemId = btn.dataset.id;
+          const item = COIN_SHOP_ITEMS.find(function(i){ return i.id===itemId; });
+          if(!item || !userData) return;
+          if((userData.coins||0) < item.cost) { document.getElementById('coin-shop-status').textContent='Not enough coins!'; return; }
+          if(!confirm('Buy "' + item.name + '" for ' + item.cost.toLocaleString() + ' coins?')) return;
+          await doCoinShopPurchase(item);
+        });
+      });
+    }
+
+    async function doCoinShopPurchase(item) {
+      const statusEl = document.getElementById('coin-shop-status');
+      userData.coins = (userData.coins||0) - item.cost;
+      const action = item.action;
+
+      if(action === 'extra_wheel') {
+        userData.lastWheel = 0; // reset so wheel is available now
+        await saveUserData(); updateWheelButtonState();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='🎡 Wheel spin ready!';
+
+      } else if(action === 'luck_boost') {
+        userData.luckBoostExpires = Date.now() + 24*60*60*1000;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='🍀 Luck boost active for 24 hours!';
+
+      } else if(action === 'pack_discount') {
+        userData.packDiscountLeft = (userData.packDiscountLeft||0) + 3;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='🏷️ Next 3 packs cost 25% less!';
+
+      } else if(action === 'chat_badge') {
+        userData.chatBadgeExpires = Date.now() + 7*24*60*60*1000;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='⭐ Chat badge active for 7 days!';
+
+      } else if(action === 'profile_border') {
+        userData.goldBorder = true;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='🏅 Gold border added to your leaderboard name!';
+
+      } else if(action === 'blook_dupe') {
+        userData.dupShield = (userData.dupShield||0) + 1;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='🛡️ Next duplicate blook gives double coins!';
+
+      } else if(action === 'mystery_box2') {
+        // Premium mystery box — guaranteed Epic+ or big coins
+        const roll = Math.random();
+        if(roll < 0.6) {
+          const goodRarities = ['Epic','Legendary','Supreeme','Chroma'];
+          const rarity = goodRarities[Math.floor(Math.random()*goodRarities.length)];
+          // Find a blook of that rarity from any pack
+          const allB = allPacksForMarket().flatMap(function(pk){ return pk.blooks.filter(function(b){ return b.rarity===R[rarity.toUpperCase()]||b.rarity===rarity; }); });
+          const chosen = allB.length ? allB[Math.floor(Math.random()*allB.length)] : null;
+          if(chosen) {
+            if(!userData.blooks) userData.blooks={};
+            userData.blooks[chosen.name]=(userData.blooks[chosen.name]||0)+1;
+            await saveUserData(); renderBlooks();
+            showToast('🎁 Premium Box: Got ' + chosen.name + ' (' + rarity + ')!', '#7b1fa2', 4000);
+            statusEl.style.color='#7b1fa2'; statusEl.textContent='Got: ' + chosen.name + ' (' + rarity + ')!';
+          }
+        } else {
+          const bonus = 10000 + Math.floor(Math.random()*40000);
+          userData.coins = (userData.coins||0) + bonus;
+          await saveUserData();
+          showToast('🎁 Premium Box: +' + bonus.toLocaleString() + ' coins!', '#43a047', 4000);
+          statusEl.style.color='#43a047'; statusEl.textContent='+' + bonus.toLocaleString() + ' coins from Premium Box!';
+        }
+
+      } else if(action === 'rename') {
+        const newName = prompt('Enter your new username (3-16 characters, letters/numbers/underscores only):');
+        if(!newName || !/^[a-zA-Z0-9_]{3,16}$/.test(newName)) {
+          userData.coins = (userData.coins||0) + item.cost; // refund
+          statusEl.textContent='Invalid username. Refunded.'; return;
+        }
+        userData.username = newName;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='✏️ Username changed to: ' + newName;
+
+      } else if(action === 'coin_interest') {
+        userData.coinInterestExpires = Date.now() + 7*24*60*60*1000;
+        userData.coinInterestRate = 0.02;
+        await saveUserData();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='💹 2% daily interest active for 7 days!';
+
+      } else if(action === 'name_color') {
+        // Just direct to settings name color
+        await saveUserData();
+        showView('settings');
+        statusEl.style.color='#1976d2'; statusEl.textContent='Go to Settings → Display Name Color to pick!';
+      }
+
+      renderCoinShop();
+    }
+
+    // Apply coin interest on login
+    async function applyCoinInterest() {
+      if(!userData || !userData.coinInterestExpires) return;
+      if(Date.now() > userData.coinInterestExpires) { userData.coinInterestExpires = null; userData.coinInterestRate = null; await saveUserData(); return; }
+      const today = new Date().toDateString();
+      if(userData.lastInterestDay === today) return;
+      const interest = Math.floor((userData.coins||0) * (userData.coinInterestRate||0.02));
+      if(interest > 0) {
+        userData.coins = (userData.coins||0) + interest;
+        userData.lastInterestDay = today;
+        await saveUserData();
+        showToast('💹 Daily interest: +' + interest.toLocaleString() + ' coins!', '#43a047', 4000);
+      }
+    }
+
+    // Apply pack discount in openPack
+    // (wired below into openPack cost check)
+
+
+
+    // ═══════════════════════════════════════════
+    // NOTIFICATION CENTRE
+    // ═══════════════════════════════════════════
+    let _notifications = [];
+
+    function addNotification(msg, type, icon) {
+      const n = { msg, type: type||'info', icon: icon||'🔔', time: Date.now(), id: Date.now()+Math.random() };
+      _notifications.unshift(n);
+      if(_notifications.length > 50) _notifications.pop();
+      renderNotifList();
+      // Animate bell
+      const bell = document.getElementById('notif-bell-btn');
+      if(bell) { bell.style.animation='notif-pop .3s ease'; setTimeout(()=>{ bell.style.animation=''; },350); }
+    }
+
+    function renderNotifList() {
+      const listEl = document.getElementById('notif-list');
+      const badge = document.getElementById('notif-badge');
+      if(!listEl) return;
+      const unread = _notifications.filter(n=>!n.read).length;
+      if(badge) { badge.textContent = unread||''; badge.style.display = unread ? 'block' : 'none'; }
+      if(!_notifications.length) {
+        listEl.innerHTML = '<div style="padding:16px;text-align:center;font-size:13px;color:#aaa;">No notifications yet.</div>';
+        return;
+      }
+      listEl.innerHTML = '';
+      _notifications.forEach(function(n) {
+        const el = document.createElement('div');
+        el.style.cssText = 'padding:9px 14px;border-bottom:1px solid #f5f5f5;cursor:pointer;background:' + (n.read?'#fff':'#f3f8ff') + ';font-size:12px;display:flex;gap:8px;align-items:flex-start;';
+        const ago = Math.round((Date.now()-n.time)/60000);
+        el.innerHTML = '<span style="font-size:16px;flex-shrink:0;">' + n.icon + '</span>'
+          + '<div style="flex:1;"><div style="color:#222;">' + n.msg + '</div>'
+          + '<div style="font-size:10px;color:#aaa;margin-top:2px;">' + (ago<1?'just now':ago+'m ago') + '</div></div>';
+        el.addEventListener('click', function(){ n.read=true; renderNotifList(); });
+        listEl.appendChild(el);
+      });
+    }
+
+    // Bell toggle
+    document.getElementById('notif-bell-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dd = document.getElementById('notif-dropdown');
+      if(!dd) return;
+      const open = dd.style.display !== 'none';
+      dd.style.display = open ? 'none' : 'block';
+      if(!open) { _notifications.forEach(n=>n.read=true); renderNotifList(); }
+    });
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('notif-dropdown');
+      if(dd && !dd.contains(e.target) && e.target.id !== 'notif-bell-btn') dd.style.display='none';
+    });
+    document.getElementById('notif-clear-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      _notifications = []; renderNotifList();
+    });
+
+    // ── Hook: show notif when your name is mentioned in chat ──
+    // Patched into subscribeChat render loop
+    function checkNameMention(msgText, senderUsername) {
+      if(!userData || !userData.username) return;
+      if(senderUsername === userData.username) return;
+      if((msgText||'').toLowerCase().indexOf(userData.username.toLowerCase()) >= 0) {
+        addNotification(senderUsername + ' mentioned you: "' + msgText.slice(0,60) + (msgText.length>60?'…':'') + '"', 'mention', '💬');
+        showToast('💬 ' + senderUsername + ' mentioned you!', '#1976d2', 3000);
+      }
+    }
+
+    // ── Owner: send global notification ──
+    document.getElementById('owner-notif-send-btn').addEventListener('click', async function() {
+      const msg = document.getElementById('owner-notif-msg').value.trim();
+      const type = document.getElementById('owner-notif-type').value;
+      const statusEl = document.getElementById('owner-notif-status');
+      if(!msg) { statusEl.textContent = 'Enter a message.'; return; }
+      const icons = { info:'ℹ️', event:'🎉', warning:'⚠️', reward:'🎁' };
+      try {
+        await set(ref(db,'globalNotif'), { msg, type, icon: icons[type]||'🔔', sentAt: Date.now() });
+        statusEl.style.color = '#2e7d32';
+        statusEl.textContent = 'Notification sent to all players!';
+        document.getElementById('owner-notif-msg').value = '';
+      } catch(e) { statusEl.textContent = 'Error: ' + e.message; }
+    });
+
+    // ── Listen for global notifications ──
+    let _lastGlobalNotifAt = 0;
+    onValue(ref(db,'globalNotif'), function(snap) {
+      if(!snap.exists()) return;
+      const n = snap.val();
+      if(n.sentAt === _lastGlobalNotifAt) return;
+      if(Date.now() - n.sentAt > 30000) return;
+      _lastGlobalNotifAt = n.sentAt;
+      addNotification(n.msg, n.type, n.icon||'🔔');
+      showToast((n.icon||'🔔') + ' ' + n.msg, '#1565c0', 5000);
+    });
+
+    // ═══════════════════════════════════════════
+    // BLOOK FILTER (All / Regular / Shiny / Golden)
+    // ═══════════════════════════════════════════
+    let _blookFilter = 'all';
+
+    document.querySelectorAll('.blook-filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        _blookFilter = btn.dataset.filter;
+        document.querySelectorAll('.blook-filter-btn').forEach(function(b) {
+          b.style.background = '#e0e0e0'; b.style.color = '#333'; b.classList.remove('active');
+        });
+        btn.style.background = '#0d47a1'; btn.style.color = '#fff'; btn.classList.add('active');
+        applyBlookFilter();
+      });
+    });
+
+    function applyBlookFilter() {
+      const cards = document.querySelectorAll('.bcard');
+      cards.forEach(function(card) {
+        const nameEl = card.querySelector('.bname');
+        if(!nameEl) return;
+        const name = nameEl.textContent || '';
+        const isGolden = name.startsWith('⭐ ');
+        const isShiny = name.startsWith('✨ ');
+        let show = true;
+        if(_blookFilter === 'golden') show = isGolden;
+        else if(_blookFilter === 'shiny') show = isShiny;
+        else if(_blookFilter === 'normal') show = !isGolden && !isShiny;
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    // ═══════════════════════════════════════════
+    // EDIT BASE PACKS (store overrides in Firebase customPackOverrides/<packId>)
+    // ═══════════════════════════════════════════
+    let _basePackOverrides = {};
+
+    async function loadBasePackOverrides() {
+      try {
+        const snap = await get(ref(db,'customPackOverrides'));
+        _basePackOverrides = snap.exists() ? snap.val() : {};
+        // Apply overrides to packs at runtime
+        applyPackOverrides();
+      } catch(e) {}
+    }
+
+    function applyPackOverrides() {
+      Object.keys(_basePackOverrides).forEach(function(packId) {
+        const ov = _basePackOverrides[packId];
+        const pack = ALL_PACKS_FOR_OWNER.find(function(p){ return p.id===packId; });
+        if(!pack) return;
+        if(ov.name)   pack.name   = ov.name;
+        if(ov.cost)   pack.cost   = ov.cost;
+        if(ov.color)  pack.color  = ov.color;
+        if(ov.blooks) pack.blooks = ov.blooks;
+      });
+    }
+
+    function openPackEditorForBase(pack) {
+      // Use the existing pack editor modal, but save to customPackOverrides instead
+      _editingPackId = '__base__' + pack.id;
+      _editingBasePackOriginal = JSON.parse(JSON.stringify(pack)); // deep copy for reset
+      peRowCount = 0;
+      document.getElementById('pe-pack-name').value  = pack.name;
+      document.getElementById('pe-pack-cost').value  = pack.cost;
+      document.getElementById('pe-pack-color').value = pack.color || '#4b0082';
+      document.getElementById('pe-status').textContent = '';
+      const rowsEl = document.getElementById('pe-blook-rows');
+      rowsEl.innerHTML = '';
+      pack.blooks.forEach(function(b) { peAddBlookRow(b.name, b.chance, b.rarity); });
+      peUpdateTotal();
+      // Show reset button
+      let resetBtn = document.getElementById('pe-reset-btn');
+      if(!resetBtn) {
+        resetBtn = document.createElement('button');
+        resetBtn.id = 'pe-reset-btn';
+        resetBtn.textContent = '↩ Reset to Base';
+        resetBtn.style.cssText = 'background:#e65100;color:#fff;font-size:12px;padding:5px 12px;border-radius:8px;margin-right:6px;';
+        document.getElementById('pe-save-btn').parentElement.insertBefore(resetBtn, document.getElementById('pe-save-btn'));
+        resetBtn.addEventListener('click', async function() {
+          if(!confirm('Reset "' + _editingBasePackOriginal.name + '" to its original blooks and settings?')) return;
+          const basePackId = _editingPackId.replace('__base__','');
+          await remove(ref(db,'customPackOverrides/'+basePackId));
+          delete _basePackOverrides[basePackId];
+          // Reload original from BASE_PACKS
+          const orig = BASE_PACKS.find(function(p){ return p.id===basePackId; })
+            || ALL_PACKS_FOR_OWNER.find(function(p){ return p.id===basePackId; });
+          if(orig && _editingBasePackOriginal) {
+            const pack2 = ALL_PACKS_FOR_OWNER.find(function(p){ return p.id===basePackId; });
+            if(pack2) { pack2.name=_editingBasePackOriginal.name; pack2.cost=_editingBasePackOriginal.cost; pack2.color=_editingBasePackOriginal.color; pack2.blooks=_editingBasePackOriginal.blooks; }
+          }
+          buildPacks(); buildOwnerPanel();
+          document.getElementById('pack-editor-overlay').style.display='none';
+          document.getElementById('pe-status').style.color='#2e7d32';
+          document.getElementById('pe-status').textContent='Reset to original!';
+        });
+      }
+      document.getElementById('pack-editor-overlay').style.display = 'flex';
+    }
+    let _editingBasePackOriginal = null;
+
+    // Patch pe-save-btn to handle base pack saves
+    const _origPeSaveBtn = document.getElementById('pe-save-btn').onclick;
+    document.getElementById('pe-save-btn').addEventListener('click', async function() {
+      if(!_editingPackId || !_editingPackId.startsWith('__base__')) return; // handled by existing listener
+      const basePackId = _editingPackId.replace('__base__','');
+      const statusEl = document.getElementById('pe-status');
+      statusEl.style.color='#c62828'; statusEl.textContent='';
+      const name  = document.getElementById('pe-pack-name').value.trim();
+      const cost  = parseInt(document.getElementById('pe-pack-cost').value,10);
+      const color = document.getElementById('pe-pack-color').value.trim()||'#4b0082';
+      if(!name||!cost||cost<=0) { statusEl.textContent='Name and cost required.'; return; }
+      const rows = document.querySelectorAll('#pe-blook-rows > div');
+      if(!rows.length) { statusEl.textContent='Add at least one blook.'; return; }
+      const RARITY_MAP_PE2={Common:R.COMMON,Rare:R.RARE,Epic:R.EPIC,Legendary:R.LEG,Supreeme:R.SUP,Chroma:R.CHR,Mystical:R.MYS};
+      const blooks=[]; let tot=0;
+      for(let i=0;i<rows.length;i++){
+        const bn=rows[i].querySelector('.pe-bname').value.trim();
+        const bc=parseFloat(rows[i].querySelector('.pe-bchance').value);
+        const br=rows[i].querySelector('.pe-brarity').value;
+        if(!bn||isNaN(bc)||bc<=0){statusEl.textContent='All blooks need a name and valid chance.';return;}
+        blooks.push({name:bn,chance:bc,rarity:RARITY_MAP_PE2[br]||R.COMMON}); tot+=bc;
+      }
+      if(Math.abs(tot-100)>0.5){statusEl.textContent='Chances must total ~100% (got '+tot.toFixed(2)+'%).';return;}
+      const override={name,cost,color,blooks};
+      try {
+        await set(ref(db,'customPackOverrides/'+basePackId),override);
+        _basePackOverrides[basePackId]=override;
+        applyPackOverrides();
+        buildPacks(); buildOwnerPanel();
+        statusEl.style.color='#2e7d32'; statusEl.textContent='Pack updated!';
+        setTimeout(function(){ document.getElementById('pack-editor-overlay').style.display='none'; },800);
+      } catch(e2) { statusEl.textContent='Failed: '+e2.message; }
+    }, true); // capture=true so runs before existing listener but only for base packs
 
 
     // (handled via onAuthStateChanged below — stop stream on state change)
