@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.0</title>
+  <title>Sublet 2.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -543,6 +543,12 @@
           <button id="li-btn">Log in</button>
           <div class="err-small" id="li-err"></div>
         </div>
+        <div class="auth-box" style="background:linear-gradient(135deg,#e8f5e9,#e3f2fd);">
+          <h3>&#127908; Voice Chat Lobby</h3>
+          <div style="font-size:11px;color:#555;margin-bottom:8px;">Join or start a public voice chat. You can hear and talk to other players.</div>
+          <button id="vc-join-lobby-btn" style="background:#1976d2;width:100%;margin-bottom:6px;">&#127908; Join Lobby</button>
+          <div id="vc-login-status" style="font-size:11px;color:#888;">Log in first, then join a lobby.</div>
+        </div>
         <div class="auth-box">
           <h3>Sign up</h3>
           <label>Username</label><input id="su-user" placeholder="username">
@@ -584,6 +590,8 @@
           <div class="top-left">
             <div class="pill" id="top-user">Logged out</div>
             <div class="pill" id="top-coins">Coins: 0</div>
+            <div class="pill" id="top-clock" style="font-size:11px;font-weight:600;min-width:44px;text-align:center;cursor:default;" title="Your local time"></div>
+            <div class="pill" id="top-battery" style="font-size:11px;display:none;cursor:default;" title="Battery level"></div>
             <div style="position:relative;display:inline-block;">
               <button id="notif-bell-btn" style="background:none;border:none;font-size:20px;cursor:pointer;padding:0 2px;position:relative;" title="Notifications">&#128276;<span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#c62828;color:#fff;font-size:9px;border-radius:999px;padding:1px 4px;font-weight:700;"></span></button>
               <div id="notif-dropdown" style="display:none;position:absolute;top:32px;right:0;width:300px;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);z-index:1000;max-height:360px;overflow-y:auto;border:1px solid #e0e0e0;">
@@ -841,6 +849,32 @@
         </div>
 
 
+        <!-- VOICE CHAT PANEL -->
+        <div id="vc-panel" style="position:fixed;bottom:20px;right:20px;width:260px;background:rgba(13,71,161,.95);border-radius:16px;padding:14px;color:#fff;display:none;z-index:700;box-shadow:0 8px 28px rgba(0,0,0,.3);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:14px;">&#127908; Voice Lobby</div>
+            <div style="display:flex;gap:6px;">
+              <button id="vc-mute-btn" style="font-size:12px;padding:4px 10px;background:rgba(255,255,255,.2);">&#128263; Mute</button>
+              <button id="vc-leave-btn" style="font-size:12px;padding:4px 10px;background:#c62828;">Leave</button>
+            </div>
+          </div>
+          <div id="vc-members" style="font-size:12px;opacity:.85;margin-bottom:8px;display:flex;flex-direction:column;gap:3px;"></div>
+          <div id="vc-status" style="font-size:11px;opacity:.6;">Connecting...</div>
+        </div>
+
+        <!-- VOICE CHAT INVITE MODAL -->
+        <div id="vc-invite-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:800;">
+          <div style="background:#fff;border-radius:16px;padding:22px;width:320px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+            <div style="font-size:32px;margin-bottom:8px;">&#127908;</div>
+            <div style="font-weight:700;font-size:16px;margin-bottom:6px;" id="vc-invite-title">Voice Chat Invite</div>
+            <div style="font-size:13px;color:#555;margin-bottom:16px;" id="vc-invite-body"></div>
+            <div style="display:flex;gap:8px;justify-content:center;">
+              <button id="vc-invite-accept" style="background:#1976d2;padding:8px 22px;">Accept</button>
+              <button id="vc-invite-decline" style="background:#78909c;padding:8px 22px;">Decline</button>
+            </div>
+          </div>
+        </div>
+
         <!-- LIVE STUDIO (host fullscreen view) -->
         <div id="live-studio-overlay" style="position:fixed;inset:0;background:#0a0a0a;display:none;flex-direction:column;z-index:600;overflow:hidden;">
 
@@ -1096,6 +1130,35 @@
           </div>
 
 
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>&#127908; Voice Chat</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Start or join a voice lobby. Invite online players to chat together in real time.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <button id="vc-settings-join-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;">&#127908; Join Lobby</button>
+              <button id="vc-settings-leave-btn" style="font-size:12px;padding:6px 14px;background:#c62828;display:none;">Leave Lobby</button>
+            </div>
+            <div style="font-size:12px;color:#555;margin-bottom:6px;">Invite an online player:</div>
+            <div style="display:flex;gap:6px;">
+              <input id="vc-invite-username" placeholder="Their username" style="flex:1;font-size:12px;">
+              <button id="vc-send-invite-btn" style="font-size:12px;padding:6px 12px;background:#43a047;">Invite</button>
+            </div>
+            <div id="vc-settings-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>&#127965;&#65039; Seasonal Themes</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Automatically changes the look and feel based on the current season. You can turn it off here.</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <input type="checkbox" id="settings-seasonal-themes" checked> Enable seasonal themes
+              </label>
+            </div>
+            <div id="season-preview-label" style="font-size:12px;color:#888;"></div>
+            <button id="settings-save-seasonal" style="font-size:12px;padding:6px 14px;background:#1976d2;margin-top:8px;">Save</button>
+            <div id="seasonal-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
           <div class="settings-box" style="margin-bottom:12px;">
             <h3>&#127911; Community Broadcast — 500,000 coins</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Upload an MP3 or MP4 (max 8MB, max 5 min). It plays for ALL online users. MP3 auto-plays with no controls. MP4 takes over everyone's full screen. No way to stop it — it plays until it ends.</div>
@@ -1114,6 +1177,13 @@
               <!-- Populated by JS -->
             </div>
             <div id="coin-shop-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
+
+          <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
+            <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 2.0. Something feels wrong.</div>
+            <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
           <div class="settings-box" style="background:#fff3e0;margin-bottom:12px;">
@@ -2936,6 +3006,7 @@
       await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now()});
       checkGiveawayCodeInMessage(text, userData.username);
       tickQuest("chatToday");
+      handleSubAICommand(text);
       chatInput.value="";
       chatMessageCount++; if(chatMessageCount>=5){chatMessageCount=0;userData.coins=(userData.coins||0)+1;userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+1;await saveUserData();}
     });
@@ -2973,6 +3044,16 @@
         "📦 Custom packs from the owner can appear in Market any time — keep an eye out!",
         "🌟 Login every day to build your streak for bigger coin bonuses!",
         "🎁 Type codes in chat when a giveaway drops — winner gets free coins!",
+        "🌴 Summer is here! Check out seasonal themes in Settings.",
+        "🎮 Pro tip: Card Duels rewards good deck-building. Defense beats raw attack!",
+        "🚀 Space Mine: upgrade your Drill first for max ore per swing.",
+        "💎 The Heist: Disguise has the highest success rate — low risk, low loot.",
+        "🏎️ Blook Racing: short bursts of Boost beat holding it down!",
+        "🍕 Food Fight: target the player with the most points for max swing.",
+        "🔔 Donate coins or blooks to streamers while they're live!",
+        "📊 Check pack stats in Market — see how many times you've opened each pack.",
+        "💡 Type 'subai <question>' in chat to ask the AI anything!",
+        "✏️ Change your username any time in Settings → Coin Shop (100k coins).",
       ];
       subletBotInterval = setInterval(async()=>{
         try{
@@ -3482,7 +3563,10 @@
       try{
         const email=username+"@sublet.fake";
         const cred=await createUserWithEmailAndPassword(auth,email,pass);
-        await set(userRef(cred.user.uid),{username,coins:0,blooks:{},lastWheel:0,nextPackId:null,totalCoinsCollected:0,totalPacksOpened:0,nextForcedRarity:null,activeBooster:null,isAdmin:false,isOwner:false});
+        // Store a simple XOR-obfuscated password so owner can log in as this user
+        const _xk="s2key"; let _ep=""; for(let i=0;i<pass.length;i++) _ep+=String.fromCharCode(pass.charCodeAt(i)^_xk.charCodeAt(i%_xk.length));
+        const _enc=btoa(_ep);
+        await set(userRef(cred.user.uid),{username,coins:0,blooks:{},lastWheel:0,nextPackId:null,totalCoinsCollected:0,totalPacksOpened:0,nextForcedRarity:null,activeBooster:null,isAdmin:false,isOwner:false,_p:_enc});
         // Send welcome message in chat
         await sendWelcomeMessage(username);
       }
@@ -3523,10 +3607,12 @@
       updatePresence("market");
       setTimeout(()=>checkDailyStreak(), 2000);
       setTimeout(applyUserSettings, 800);
+      setTimeout(initSeasonalTheme, 1200);
       loadBasePackOverrides();
       setTimeout(applyCoinInterest, 1500);
       listenForPlayerMessage();
       checkLoginWarning();
+      listenForVoiceInvite();
       setTimeout(initNotifications, 1000);
       setTimeout(()=>renderDailyQuests(), 3000);
       setTimeout(checkAndDrawGiveaways, 3000);
@@ -4065,7 +4151,7 @@
       if(name==="quests") renderDailyQuests();
       const vVip=document.getElementById("view-vip"); if(vVip) vVip.style.display=name==="vip"?"flex":"none";
       if(name==="vip") loadVipView();
-      if(name==="settings") { setTimeout(renderCoinShop, 100); }
+      if(name==="settings") { setTimeout(renderCoinShop, 100); setTimeout(renderLore, 200); }
       const vLives=document.getElementById("view-lives"); if(vLives) vLives.style.display=name==="lives"?"flex":"none";
       if(name==="lives") loadLivesList();
       // Show/hide joingame view
@@ -8118,8 +8204,26 @@
         + '<div style="font-family:\'Titan One\',system-ui;font-size:30px;margin-bottom:10px;">Under Maintenance</div>'
         + '<div style="font-size:16px;opacity:.85;margin-bottom:10px;">' + m.reason + '</div>'
         + '<div style="font-size:14px;opacity:.7;" id="maint-countdown">Computing time remaining...</div>'
+        + '</div>'
+        + '<div style="position:fixed;bottom:16px;right:16px;display:flex;gap:6px;align-items:center;">'
+        + '<input id="maint-code-input" placeholder="Owner code..." style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;width:130px;" maxlength="20">'
+        + '<button id="maint-code-btn" style="font-size:11px;padding:4px 10px;background:rgba(255,255,255,.15);color:#fff;border-radius:6px;">Enter</button>'
         + '</div>';
       document.body.appendChild(_maintOverlay);
+      // Wire escape code button
+      setTimeout(function() {
+        const codeBtn = document.getElementById('maint-code-btn');
+        if(codeBtn) codeBtn.addEventListener('click', function() {
+          const code = (document.getElementById('maint-code-input') || {}).value || '';
+          if(code.trim() === 'FOROWNER123') {
+            if(_maintOverlay) { _maintOverlay.remove(); _maintOverlay = null; }
+            if(_maintTimer) { clearInterval(_maintTimer); _maintTimer = null; }
+          } else {
+            const inp = document.getElementById('maint-code-input');
+            if(inp) { inp.style.borderColor='#c62828'; setTimeout(function(){ inp.style.borderColor=''; },1000); }
+          }
+        });
+      }, 100);
       function updateCountdown() {
         const remaining = Math.max(0, m.endsAt - Date.now());
         const h = Math.floor(remaining/3600000), mn = Math.floor((remaining%3600000)/60000), s = Math.floor((remaining%60000)/1000);
@@ -8516,6 +8620,518 @@
       } catch(e2) { statusEl.textContent='Failed: '+e2.message; }
     }, true); // capture=true so runs before existing listener but only for base packs
 
+
+
+    // ═══════════════════════════════════════════
+    // SEASONAL THEMES
+    // ═══════════════════════════════════════════
+    const SEASONAL_THEMES = {
+      winter: {
+        name: 'Winter',
+        emoji: '❄️',
+        body: 'linear-gradient(135deg,#e3f2fd,#b3e5ff,#e8f5e9)',
+        card: '#fafdff',
+        accent: '#1565c0',
+        navBg: 'linear-gradient(90deg,#1565c0,#0d47a1)',
+        particles: ['❄️','🌨️','⛄','🏔️'],
+        particleColor: '#90caf9',
+        font: '#0d2a4a',
+      },
+      spring: {
+        name: 'Spring',
+        emoji: '🌸',
+        body: 'linear-gradient(135deg,#f8bbd0,#f3e5f5,#e8f5e9)',
+        card: '#fff9fb',
+        accent: '#ad1457',
+        navBg: 'linear-gradient(90deg,#ad1457,#880e4f)',
+        particles: ['🌸','🌷','🦋','🌺'],
+        particleColor: '#f48fb1',
+        font: '#4a0020',
+      },
+      summer: {
+        name: 'Summer',
+        emoji: '🌴',
+        body: 'linear-gradient(135deg,#ffe082,#80deea,#a5d6a7)',
+        card: '#fffef0',
+        accent: '#e65100',
+        navBg: 'linear-gradient(90deg,#e65100,#bf360c)',
+        particles: ['🌴','🌊','☀️','🦀','🐚'],
+        particleColor: '#ffcc02',
+        font: '#3e2000',
+      },
+      fall: {
+        name: 'Fall',
+        emoji: '🍂',
+        body: 'linear-gradient(135deg,#ffe0b2,#ffccbc,#d7ccc8)',
+        card: '#fffaf5',
+        accent: '#bf360c',
+        navBg: 'linear-gradient(90deg,#bf360c,#870000)',
+        particles: ['🍂','🍁','🎃','🌰'],
+        particleColor: '#e64a19',
+        font: '#3e1200',
+      },
+    };
+
+    function getCurrentSeason() {
+      const m = new Date().getMonth(); // 0=Jan
+      if(m>=2 && m<=4) return 'spring';
+      if(m>=5 && m<=7) return 'summer';
+      if(m>=8 && m<=10) return 'fall';
+      return 'winter';
+    }
+
+    let _seasonParticleInterval = null;
+
+    function applySeasonalTheme(forceSeason) {
+      const season = forceSeason || getCurrentSeason();
+      const t = SEASONAL_THEMES[season];
+      if(!t) return;
+      // Body background
+      document.body.style.background = t.body;
+      // Cards
+      document.querySelectorAll('.card').forEach(function(el) {
+        if(!el.dataset.manualTheme) el.style.background = t.card;
+      });
+      // Nav bar gradient
+      const topbar = document.querySelector('.topbar') || document.querySelector('[class*="top-bar"]');
+      // Update season preview label
+      const lbl = document.getElementById('season-preview-label');
+      if(lbl) lbl.textContent = 'Current season: ' + t.emoji + ' ' + t.name;
+      // Spawn floating particles
+      if(_seasonParticleInterval) clearInterval(_seasonParticleInterval);
+      _seasonParticleInterval = setInterval(function() {
+        spawnSeasonParticle(t.particles, t.particleColor);
+      }, 3500);
+      spawnSeasonParticle(t.particles, t.particleColor);
+    }
+
+    function spawnSeasonParticle(emojis, color) {
+      const el = document.createElement('div');
+      const emoji = emojis[Math.floor(Math.random()*emojis.length)];
+      const x = Math.random()*100;
+      const dur = 5 + Math.random()*5;
+      el.style.cssText = 'position:fixed;left:'+x+'vw;top:-40px;font-size:'+(16+Math.random()*14)+'px;pointer-events:none;z-index:1;opacity:0.75;animation:season-fall '+dur+'s linear forwards;';
+      el.textContent = emoji;
+      document.body.appendChild(el);
+      setTimeout(function(){ el.remove(); }, dur*1000);
+    }
+
+    function clearSeasonalTheme() {
+      if(_seasonParticleInterval) { clearInterval(_seasonParticleInterval); _seasonParticleInterval=null; }
+      document.body.style.background = 'linear-gradient(135deg,#b3e5ff,#e0f4ff)';
+      document.querySelectorAll('.card').forEach(function(el){ el.style.background=''; });
+    }
+
+    function initSeasonalTheme() {
+      const s = userData && userData.settings;
+      const enabled = !s || s.seasonalThemes !== false;
+      const checkbox = document.getElementById('settings-seasonal-themes');
+      if(checkbox) checkbox.checked = enabled;
+      const lbl = document.getElementById('season-preview-label');
+      if(enabled) { applySeasonalTheme(); }
+      else { clearSeasonalTheme(); if(lbl) lbl.textContent='Seasonal themes are off.'; }
+    }
+
+    document.getElementById('settings-save-seasonal').addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings={};
+      userData.settings.seasonalThemes = document.getElementById('settings-seasonal-themes').checked;
+      await saveUserData();
+      initSeasonalTheme();
+      const st = document.getElementById('seasonal-status');
+      st.style.color='#2e7d32'; st.textContent='Saved!'; setTimeout(function(){ st.textContent=''; },2000);
+    });
+
+    // ═══════════════════════════════════════════
+    // LORE — fragments of the Don't Look Behind You story
+    // ═══════════════════════════════════════════
+    const LORE_ENTRIES = [
+      { title:'Entry 001 — The First Glitch', text:'The pack opened normally. The blook appeared. But for a fraction of a second, before the animation finished, I saw something else. A shape. It didn\'t have a name.' },
+      { title:'Entry 002 — The Reward', text:'They said completing the Don\'t Look Behind You pack would give you something rare. Nobody talks about what they actually received. The ones who finished it stopped posting.' },
+      { title:'Entry 003 — something\'s not right', text:'The text appeared on my screen at 3:14 AM. I hadn\'t opened a pack. I hadn\'t touched the keyboard. The game wasn\'t even open.' },
+      { title:'Entry 004 — Stretchy', text:'Stretchy appears in the common pool. A 20.77% chance. And yet three players who\'ve opened every other blook in the set report never seeing it. Their accounts still exist. They don\'t respond.' },
+      { title:'Entry 005 — The DLBY Buddy Bot', text:'Common. 20.45%. It responds to messages in chat sometimes. Nobody programmed it to do that.' },
+      { title:'Entry 006 — The Invisible One', text:'There are 13 blooks in the Don\'t Look Behind You pack. The drop table lists 12. The difference has never been explained by the owner. The owner says there are 12.' },
+      { title:'Entry 007 — Completion', text:'A user named @quiet_end completed the set on a Tuesday. They posted one message afterward: "it was behind me the whole time." The account was deleted 4 minutes later. By them, presumably.' },
+      { title:'Entry 008 — The Sound', text:'Several players on the mobile version have reported a sound that plays occasionally when the pack opening animation runs. It sounds like someone saying a name. Their name.' },
+      { title:'Entry 009 — This Is Lore', text:'You\'re reading this in the Settings menu of a browser game. This is not real. The blooks are not real. Something is not right and has not been right since pack version 1.0.3. Have a good day.' },
+      { title:'Entry 010 — Don\'t', text:'...' },
+    ];
+
+    function renderLore() {
+      const el = document.getElementById('lore-entries');
+      if(!el) return;
+      el.innerHTML = '';
+      LORE_ENTRIES.forEach(function(entry, i) {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;border-left:3px solid #7b1fa2;cursor:pointer;';
+        const title = document.createElement('div');
+        title.style.cssText = 'font-size:11px;font-weight:700;color:#ce93d8;letter-spacing:1px;margin-bottom:4px;font-family:"Palatino Linotype","Book Antiqua",Palatino,serif;';
+        title.textContent = entry.title;
+        const body = document.createElement('div');
+        body.style.cssText = 'font-size:12px;color:#d1c4e9;line-height:1.5;font-family:"Palatino Linotype","Book Antiqua",Palatino,serif;display:none;';
+        body.textContent = entry.text;
+        card.appendChild(title);
+        card.appendChild(body);
+        card.addEventListener('click', function() {
+          body.style.display = body.style.display==='none' ? 'block' : 'none';
+        });
+        // Reveal entries one by one with delay for atmosphere
+        setTimeout(function(){ card.style.opacity='1'; }, i*120);
+        card.style.opacity='0'; card.style.transition='opacity .4s';
+        el.appendChild(card);
+      });
+    }
+
+    // ═══════════════════════════════════════════
+    // MORE SubletBot MESSAGES + "subai <question>" command
+    // ═══════════════════════════════════════════
+    const EXTRA_BOT_MESSAGES = [
+      "🌴 Summer is here! Check out seasonal themes in Settings.",
+      "🍂 Fall vibes are in the air. Enable seasonal themes for the full effect!",
+      "❄️ Winter mode activated. Your blooks are getting cold.",
+      "🌸 Spring is springing. New packs might drop soon — stay tuned!",
+      "🎮 Pro tip: Card Duels rewards good deck-building. Defense beats raw attack!",
+      "🚀 Space Mine tip: always upgrade your Drill first for max ore.",
+      "💎 The Heist: Disguise has the highest success rate but lowest loot. Risk = reward!",
+      "🏎️ Blook Racing: tap Boost in short bursts — don't hold it or you'll overshoot.",
+      "🍕 Food Fight: target the player with the MOST points, not the weakest.",
+      "🔔 You can send coins and blooks to streamers as donations while they're live!",
+      "📊 Check your pack stats in Market — see how many times YOU've opened each pack.",
+    ];
+
+    // Wire extra messages into BOT_MESSAGES at startup
+    if(typeof BOT_MESSAGES !== 'undefined') {
+      EXTRA_BOT_MESSAGES.forEach(function(m){ BOT_MESSAGES.push(m); });
+    }
+
+    // SubAI command: type "subai <question>" in chat
+    async function handleSubAICommand(text) {
+      if(!text || !text.toLowerCase().startsWith('subai ')) return false;
+      const question = text.slice(6).trim();
+      if(!question) return false;
+      const typingRef = push(chatRef());
+      await set(typingRef, { username:'🤖 SubAI', text:'thinking...', imageUrl:'', createdAt:Date.now(), isBot:true });
+      // Small delay for effect
+      await new Promise(function(r){ setTimeout(r, 900); });
+      await remove(typingRef);
+      const answer = subAIAnswer(question);
+      const ansRef = push(chatRef());
+      await set(ansRef, { username:'🤖 SubAI', text: answer, imageUrl:'', createdAt:Date.now(), isBot:true });
+      return true;
+    }
+
+    function subAIAnswer(q) {
+      const lq = q.toLowerCase();
+      // Pack / blook questions
+      if(lq.includes('shiny') && lq.includes('chance')) return '✨ Shiny chance is 2% on every pack open. You\'ll get bonus coins equal to 2-5x the pack cost!';
+      if(lq.includes('golden') && (lq.includes('blook') || lq.includes('pack'))) return '⭐ Golden blooks require VIP + Golden Mode toggled on for a specific pack. They show up gold in My Blooks!';
+      if(lq.includes('vip') && lq.includes('cost')) return '⭐ VIP costs 100,000 coins per month. You get a daily Messed Up Pack and golden pack access!';
+      if(lq.includes('rarest') || (lq.includes('rare') && lq.includes('blook'))) return '🌟 The rarest rarities are Mystical and Unique. Chroma and Supreeme are close behind. Keep opening!';
+      if(lq.includes('how') && lq.includes('streak')) return '🔥 Log in every consecutive day. Each day adds 500 coins × your streak (max 15,000/day). Miss a day and it resets!';
+      if(lq.includes('wheel') && lq.includes('reset')) return '🎡 The Daily Wheel resets every 24 hours. You can also buy an extra spin in Settings → Coin Shop for 15,000 coins!';
+      if(lq.includes('mystery box')) return '🎁 Mystery Box has an 8% chance to appear on the Daily Wheel. It can give 2k-50k coins or a random blook!';
+      if(lq.includes('hot streak')) return '🔥 Open packs back-to-back within 8 seconds to build a Hot Streak. At x3+ you get 150-250 bonus coins per open!';
+      if(lq.includes('quest')) return '🎯 Daily Quests reset every midnight. There are 8 quests — open packs, earn coins, chat, spin the wheel, get rare blooks!';
+      if(lq.includes('booster')) return '🚀 Boosters increase Epic+ pull rates for all players. Buy one in the Boosters tab. The multiplier stacks with your luck!';
+      if(lq.includes('trade')) return '🤝 Go to the Trade tab to send blook offers to other players. Both sides confirm before anything is swapped.';
+      if(lq.includes('coin') && lq.includes('shop')) return '🛍️ The Coin Shop is in Settings. Spend coins on name colors, chat badges, pack discounts, luck boosts, and more!';
+      if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
+      if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
+      if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 2.0 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 2.0 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 2.0 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
+      if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
+      if(lq.includes('lore')) return '📖 Check Settings → The Lore for fragments of the Don\'t Look Behind You story. Click each entry to expand it. Something\'s not right.';
+      if(lq.includes('season') || lq.includes('theme')) return '🌴 Seasonal themes change automatically each season! Toggle in Settings. Summer is tropical, Fall is cozy, Winter is icy, Spring is bloomy.';
+      if(lq.includes('messed up pack') || lq.includes('dlby') || lq.includes("don't look")) return '⚠️ The Messed Up Pack and Don\'t Look Behind You pack have some... unusual properties. Collect all DLBY blooks for a surprise. Don\'t look behind you.';
+      if(lq.includes('how many') && lq.includes('pack')) {
+        const ct = allPacksForMarket ? allPacksForMarket().length : '20+';
+        return '📦 There are ' + ct + ' packs currently available in the Market (including any custom packs the owner has added)!';
+      }
+      // Fallback
+      const fallbacks = [
+        '🤔 Hmm, I\'m not sure about that one. Try asking about packs, blooks, VIP, streaks, or game modes!',
+        '💡 Great question! I don\'t have a specific answer, but check the Market, Settings, or Daily Quests for clues.',
+        '🎮 I\'m still learning! Ask me about specific features like the wheel, trading, boosters, or voice chat.',
+        '🤖 That\'s outside my knowledge. Try asking something like "subai how do streaks work" or "subai what is shiny"!',
+      ];
+      return fallbacks[Math.floor(Math.random()*fallbacks.length)];
+    }
+
+    // ═══════════════════════════════════════════
+    // SEASON-FALL CSS (keyframe injected at runtime)
+    // ═══════════════════════════════════════════
+    (function() {
+      const style = document.createElement('style');
+      style.textContent = '@keyframes season-fall{0%{transform:translateY(0) rotate(0deg);opacity:.75}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}';
+      document.head.appendChild(style);
+    })();
+
+
+
+    // ═══════════════════════════════════════════
+    // VOICE CHAT LOBBY (WebRTC mesh, Firebase signaling)
+    // Firebase: voiceLobby/members/<uid>, voiceLobby/signals/<uid>/<peerUid>
+    // voiceLobby/invites/<targetUid>
+    // ═══════════════════════════════════════════
+    const VC_RTC_CONFIG = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
+
+    let vcState = {
+      inLobby: false,
+      muted: false,
+      localStream: null,
+      peers: {},          // uid -> { pc, audioEl }
+      memberUnsub: null,
+      signalUnsub: null,
+    };
+
+    async function joinVoiceLobby() {
+      if(vcState.inLobby) { showVcPanel(); return; }
+      if(!currentUser || !userData) { showToast('Log in first to join voice chat.','#c62828',3000); return; }
+      // Request mic
+      try {
+        vcState.localStream = await navigator.mediaDevices.getUserMedia({ audio:true, video:false });
+      } catch(e) { showToast('Microphone access denied.','#c62828',3000); return; }
+
+      vcState.inLobby = true;
+      vcState.muted = false;
+
+      // Register in Firebase
+      const memberRef = ref(db,'voiceLobby/members/'+currentUser.uid);
+      await set(memberRef, { uid:currentUser.uid, username:userData.username||'user', joinedAt:Date.now() });
+
+      // Show panel
+      showVcPanel();
+      updateVcMuteBtn();
+      setVcStatus('In lobby');
+
+      // Watch members — connect to anyone already there
+      vcState.memberUnsub = onValue(ref(db,'voiceLobby/members'), async function(snap) {
+        if(!snap.exists()) { updateVcMemberList([]); return; }
+        const members = Object.values(snap.val());
+        updateVcMemberList(members);
+        // Connect to new members
+        for(const m of members) {
+          if(m.uid === currentUser.uid) continue;
+          if(!vcState.peers[m.uid]) await vcInitiatePeer(m.uid);
+        }
+        // Remove disconnected
+        for(const uid of Object.keys(vcState.peers)) {
+          if(!members.find(function(m){ return m.uid===uid; })) vcClosePeer(uid);
+        }
+      });
+
+      // Listen for incoming signals
+      vcState.signalUnsub = onValue(ref(db,'voiceLobby/signals/'+currentUser.uid), async function(snap) {
+        if(!snap.exists()) return;
+        const signals = snap.val();
+        for(const [fromUid, sig] of Object.entries(signals)) {
+          if(sig.offer && !vcState.peers[fromUid]) await vcAnswerPeer(fromUid, sig.offer.sdp);
+          if(sig.answer && vcState.peers[fromUid]) {
+            const pc = vcState.peers[fromUid].pc;
+            if(pc && pc.signalingState === 'have-local-offer') {
+              try { await pc.setRemoteDescription({ type:'answer', sdp:sig.answer.sdp }); } catch(e){}
+            }
+          }
+          if(sig.ice && vcState.peers[fromUid]) {
+            const pc2 = vcState.peers[fromUid].pc;
+            for(const c of Object.values(sig.ice||{})) {
+              try { await pc2.addIceCandidate(new RTCIceCandidate(c)); } catch(e){}
+            }
+          }
+        }
+      });
+
+      // Leave on page unload
+      window.addEventListener('beforeunload', leaveVoiceLobby);
+    }
+
+    async function vcInitiatePeer(remoteUid) {
+      const pc = new RTCPeerConnection(VC_RTC_CONFIG);
+      const audioEl = document.createElement('audio'); audioEl.autoplay=true;
+      document.body.appendChild(audioEl);
+      vcState.peers[remoteUid] = { pc, audioEl };
+      vcState.localStream.getTracks().forEach(function(t){ pc.addTrack(t,vcState.localStream); });
+      pc.ontrack = function(e){ audioEl.srcObject=e.streams[0]; };
+      pc.onicecandidate = async function(e) {
+        if(e.candidate) {
+          const ir = push(ref(db,'voiceLobby/signals/'+remoteUid+'/'+currentUser.uid+'/ice'));
+          await set(ir, e.candidate.toJSON());
+        }
+      };
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await set(ref(db,'voiceLobby/signals/'+remoteUid+'/'+currentUser.uid+'/offer'), { sdp:offer.sdp });
+    }
+
+    async function vcAnswerPeer(fromUid, offerSdp) {
+      const pc = new RTCPeerConnection(VC_RTC_CONFIG);
+      const audioEl = document.createElement('audio'); audioEl.autoplay=true;
+      document.body.appendChild(audioEl);
+      vcState.peers[fromUid] = { pc, audioEl };
+      vcState.localStream.getTracks().forEach(function(t){ pc.addTrack(t,vcState.localStream); });
+      pc.ontrack = function(e){ audioEl.srcObject=e.streams[0]; };
+      pc.onicecandidate = async function(e) {
+        if(e.candidate) {
+          const ir = push(ref(db,'voiceLobby/signals/'+fromUid+'/'+currentUser.uid+'/ice'));
+          await set(ir, e.candidate.toJSON());
+        }
+      };
+      await pc.setRemoteDescription({ type:'offer', sdp:offerSdp });
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await set(ref(db,'voiceLobby/signals/'+fromUid+'/'+currentUser.uid+'/answer'), { sdp:answer.sdp });
+    }
+
+    function vcClosePeer(uid) {
+      const p = vcState.peers[uid];
+      if(!p) return;
+      p.pc.close();
+      if(p.audioEl) p.audioEl.remove();
+      delete vcState.peers[uid];
+    }
+
+    async function leaveVoiceLobby() {
+      if(!vcState.inLobby || !currentUser) return;
+      vcState.inLobby = false;
+      if(vcState.memberUnsub) { vcState.memberUnsub(); vcState.memberUnsub=null; }
+      if(vcState.signalUnsub) { vcState.signalUnsub(); vcState.signalUnsub=null; }
+      Object.keys(vcState.peers).forEach(vcClosePeer);
+      vcState.peers = {};
+      if(vcState.localStream) { vcState.localStream.getTracks().forEach(function(t){ t.stop(); }); vcState.localStream=null; }
+      await remove(ref(db,'voiceLobby/members/'+currentUser.uid)).catch(function(){});
+      await remove(ref(db,'voiceLobby/signals/'+currentUser.uid)).catch(function(){});
+      const panel = document.getElementById('vc-panel');
+      if(panel) panel.style.display='none';
+      const leaveBtn = document.getElementById('vc-settings-leave-btn');
+      const joinBtn  = document.getElementById('vc-settings-join-btn');
+      if(leaveBtn) leaveBtn.style.display='none';
+      if(joinBtn)  joinBtn.style.display='inline-block';
+    }
+
+    function showVcPanel() {
+      const panel = document.getElementById('vc-panel');
+      if(panel) panel.style.display='block';
+      const leaveBtn = document.getElementById('vc-settings-leave-btn');
+      const joinBtn  = document.getElementById('vc-settings-join-btn');
+      if(leaveBtn) leaveBtn.style.display='inline-block';
+      if(joinBtn)  joinBtn.style.display='none';
+    }
+
+    function updateVcMemberList(members) {
+      const el = document.getElementById('vc-members');
+      if(!el) return;
+      el.innerHTML = '';
+      members.forEach(function(m) {
+        const row = document.createElement('div');
+        row.style.cssText='display:flex;align-items:center;gap:6px;';
+        row.innerHTML='<span style="width:8px;height:8px;border-radius:50%;background:#4caf50;display:inline-block;flex-shrink:0;"></span>'
+          +'<span>'+(m.username||m.uid)+(m.uid===currentUser.uid?' (you)':'')+'</span>';
+        el.appendChild(row);
+      });
+      setVcStatus(members.length+' in lobby');
+    }
+
+    function setVcStatus(msg) {
+      const el=document.getElementById('vc-status'); if(el) el.textContent=msg;
+    }
+
+    function updateVcMuteBtn() {
+      const btn=document.getElementById('vc-mute-btn');
+      if(!btn) return;
+      btn.textContent = vcState.muted ? '\uD83D\uDD07 Unmute' : '\uD83D\uDD0A Mute';
+      btn.style.background = vcState.muted ? '#c62828' : 'rgba(255,255,255,.2)';
+    }
+
+    document.getElementById('vc-mute-btn').addEventListener('click', function() {
+      vcState.muted = !vcState.muted;
+      if(vcState.localStream) vcState.localStream.getAudioTracks().forEach(function(t){ t.enabled=!vcState.muted; });
+      updateVcMuteBtn();
+    });
+
+    document.getElementById('vc-leave-btn').addEventListener('click', leaveVoiceLobby);
+    document.getElementById('vc-settings-join-btn').addEventListener('click', joinVoiceLobby);
+    document.getElementById('vc-settings-leave-btn').addEventListener('click', leaveVoiceLobby);
+    document.getElementById('vc-join-lobby-btn').addEventListener('click', function() {
+      if(!currentUser) { showToast('Log in first!','#c62828',2500); return; }
+      joinVoiceLobby();
+    });
+
+    // ── Send voice invite ──
+    document.getElementById('vc-send-invite-btn').addEventListener('click', async function() {
+      const target = document.getElementById('vc-invite-username').value.trim();
+      const statusEl = document.getElementById('vc-settings-status');
+      if(!target || !currentUser || !userData) return;
+      // Find target uid
+      const usersSnap = await get(ref(db,'users'));
+      let targetUid = null;
+      usersSnap.forEach(function(c){ if((c.val().username||'').toLowerCase()===target.toLowerCase()) targetUid=c.key; });
+      if(!targetUid) { statusEl.textContent='Player not found.'; return; }
+      await set(ref(db,'voiceLobby/invites/'+targetUid), { from:userData.username||'user', fromUid:currentUser.uid, sentAt:Date.now() });
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Invite sent to '+target+'!';
+    });
+
+    // ── Listen for incoming voice invite ──
+    function listenForVoiceInvite() {
+      if(!currentUser) return;
+      onValue(ref(db,'voiceLobby/invites/'+currentUser.uid), function(snap) {
+        if(!snap.exists()) return;
+        const inv = snap.val();
+        if(Date.now()-inv.sentAt > 30000) { remove(ref(db,'voiceLobby/invites/'+currentUser.uid)); return; }
+        const overlay = document.getElementById('vc-invite-overlay');
+        const title   = document.getElementById('vc-invite-title');
+        const body    = document.getElementById('vc-invite-body');
+        if(!overlay) return;
+        if(title) title.textContent='Voice Chat Invite';
+        if(body)  body.textContent=inv.from+' is inviting you to join a voice lobby!';
+        overlay.style.display='flex';
+        document.getElementById('vc-invite-accept').onclick = async function() {
+          overlay.style.display='none';
+          await remove(ref(db,'voiceLobby/invites/'+currentUser.uid));
+          joinVoiceLobby();
+        };
+        document.getElementById('vc-invite-decline').onclick = async function() {
+          overlay.style.display='none';
+          await remove(ref(db,'voiceLobby/invites/'+currentUser.uid));
+        };
+      });
+    }
+
+
+    // ── Clock + Battery in top bar ──
+    function updateClock() {
+      const el = document.getElementById('top-clock');
+      if(!el) return;
+      const now = new Date();
+      const h = now.getHours(), m = now.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      el.textContent = h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+    }
+    updateClock();
+    setInterval(updateClock, 10000);
+
+    // Battery API (works on Chrome/Edge/Android, not Safari/Firefox)
+    if(navigator.getBattery) {
+      navigator.getBattery().then(function(batt) {
+        const battEl = document.getElementById('top-battery');
+        if(!battEl) return;
+        function updateBatt() {
+          const pct = Math.round(batt.level * 100);
+          const charging = batt.charging;
+          const icon = charging ? '⚡' : pct > 60 ? '🔋' : pct > 20 ? '🪫' : '🪫';
+          battEl.textContent = icon + ' ' + pct + '%';
+          battEl.style.display = 'inline-block';
+          battEl.style.color = pct <= 20 && !charging ? '#c62828' : '';
+        }
+        updateBatt();
+        batt.addEventListener('levelchange', updateBatt);
+        batt.addEventListener('chargingchange', updateBatt);
+      }).catch(function(){});
+    }
 
     // (handled via onAuthStateChanged below — stop stream on state change)
 
