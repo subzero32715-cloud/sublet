@@ -229,6 +229,7 @@
     .owner-single-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
     .owner-single-row input[type="text"]{flex:1;min-width:120px}
     .owner-single-row input[type="number"]{width:90px}
+    #pet-egg-cost{width:160px !important;}
     .owner-single-row select{min-width:120px}
     .owner-single-list{margin-top:10px;max-height:160px;overflow-y:auto;}
     .owner-single-item{
@@ -289,6 +290,12 @@
       font-size:13px;display:none;max-width:260px;
     }
     #trade-popup-buttons{margin-top:8px;display:flex;gap:6px;justify-content:flex-end;}
+    #pet-trade-popup{
+      position:fixed;right:16px;bottom:96px;z-index:80;
+      background:#ffffff;border-radius:12px;padding:10px 12px;
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      font-size:13px;display:none;max-width:260px;
+    }
 
     #admin-panel{display:none;overflow-y:auto;max-height:calc(100vh - 180px);}
     #admin-panel-btn{display:none;font-size:12px;padding:6px 10px;}
@@ -528,6 +535,27 @@
     .report-broadcast-buttons{display:flex;gap:10px;justify-content:center;}
     .report-ban-btn{background:#fff;color:#b71c1c;font-weight:700;padding:8px 24px;border-radius:999px;}
     .report-pass-btn{background:rgba(255,255,255,.25);color:#fff;border:2px solid rgba(255,255,255,.5);font-weight:700;padding:8px 24px;border-radius:999px;}
+    /* ── Responsive: fit any screen size ── */
+    html,body{height:100%;}
+    @media (max-width:900px){
+      .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+      .sidebar{flex-direction:row;flex-wrap:wrap;gap:6px;padding:8px;overflow-x:auto;}
+      .sidebar-title{display:none;}
+      .nav{width:auto;white-space:nowrap;font-size:12px;padding:6px 8px;}
+      .side-foot{display:none;}
+      .main{padding:8px;gap:8px;}
+      .pack-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
+    }
+    @media (max-width:600px){
+      .start-title{font-size:34px;}
+      .auth-row{flex-direction:column;}
+      .auth-box{width:100%;}
+      #start{padding:14px;flex-direction:column;height:auto;min-height:100vh;overflow-y:auto;}
+      .start-right{display:none;}
+      body{overflow-y:auto;}
+      #app{overflow-y:auto;min-height:100vh;}
+      .top{flex-wrap:wrap;gap:6px;}
+    }
   </style>
 </head>
 <body>
@@ -577,6 +605,7 @@
         <button class="nav" data-view="news">📰 News</button>
         <button class="nav" data-view="giveaway">🎉 Giveaways</button>
         <button class="nav" data-view="joingame">🕹️ Join Game</button>
+        <button class="nav" data-view="pets">🐾 Pets</button>
         <button class="nav" data-view="rng">🎲 RNG</button>
         <button class="nav" data-view="quests">&#127919; Quests</button>
         <button class="nav" data-view="vip">&#11088; VIP</button>
@@ -749,18 +778,42 @@
         <!-- Settings View -->
         <div id="view-joingame" class="card" style="display:none;">
           <div class="section-title">🕹️ Join Game</div>
-          <div class="section-sub">Enter a 6-digit code to join an active game.</div>
-          <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-            <input id="join-game-code" placeholder="000000" maxlength="6" style="font-size:28px;font-weight:700;width:160px;text-align:center;letter-spacing:4px;border:2px solid #1976d2;border-radius:10px;padding:8px;">
-            <button id="join-game-btn" style="background:#e65100;font-size:15px;padding:10px 24px;">Join →</button>
+          <div class="section-sub">Enter a 6-digit code to join an active game, or pick one below.</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:16px;">
+            <input id="join-game-code" placeholder="000000" maxlength="6" style="font-size:32px;font-weight:700;width:220px;text-align:center;letter-spacing:6px;border:2px solid #1976d2;border-radius:10px;padding:10px;">
+            <button id="join-game-btn" style="background:#e65100;font-size:15px;padding:10px 30px;">Join →</button>
           </div>
-          <div id="join-game-err" class="err-small"></div>
+          <div id="join-game-err" class="err-small" style="text-align:center;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;margin-bottom:6px;">
+            <div style="font-weight:700;font-size:13px;color:#0d47a1;">🟢 Active Games</div>
+            <button id="active-games-refresh-btn" style="font-size:11px;padding:4px 10px;">↻ Refresh</button>
+          </div>
+          <div id="active-games-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:12px;color:#aaa;">Loading...</div>
+          </div>
+        </div>
+
+        <!-- PETS VIEW -->
+        <div id="view-pets" class="card" style="display:none;">
+          <div class="section-title">🐾 Pets</div>
+          <div class="section-sub">Open pet eggs to hatch pets. Equip up to 3. Max 50 in inventory.</div>
+          <div style="font-weight:700;font-size:13px;color:#0d47a1;margin-bottom:6px;">Pet Eggs</div>
+          <div id="pet-egg-grid" class="pack-grid" style="max-height:220px;margin-bottom:14px;grid-template-columns:repeat(auto-fill,160px);justify-content:start;"></div>
+          <div style="font-weight:700;font-size:13px;color:#0d47a1;margin-bottom:6px;">My Pets (<span id="pet-inv-count">0</span>/50 • Equipped <span id="pet-equip-count">0</span>/3)</div>
+          <div id="pet-inventory-grid" style="margin-bottom:14px;"></div>
+          <div style="font-weight:700;font-size:13px;color:#0d47a1;margin-bottom:6px;">🔁 Trade a Pet</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select id="pet-trade-select" style="flex:1;min-width:160px;"></select>
+            <input id="pet-trade-target" placeholder="target username" style="flex:1;min-width:140px;">
+            <button id="pet-trade-send-btn" style="background:#00897b;">Send</button>
+          </div>
+          <div id="pet-trade-status" class="err-small"></div>
         </div>
 
         
         <!-- RNG VIEW -->
         <div id="view-rng" class="card" style="display:none;">
-          <div class="section-title">🎲 RNG Spinner</div>
+          <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">🎲 RNG Spinner <button id="game-info-btn" style="background:#0d47a1;font-size:12px;padding:6px 14px;">ℹ️ Info</button></div>
           <div class="section-sub">Spin for a random rarity. Costs 10 coins. Upgrade luck to shift odds toward rarer results!</div>
           <div style="display:flex;gap:16px;flex:1;min-height:0;">
             <!-- LEFT: Luck -->
@@ -1472,6 +1525,49 @@
             <div id="owner-reset-status" class="err-small"></div>
           </div>
 
+          <div class="owner-single-box" style="background:#ede7f6;margin-top:14px;">
+            <div><strong>🎲 Reset RNG Leaderboard</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Clears all "Rarest Pulls" entries for everyone.</div>
+            <button id="owner-reset-rng-lb-btn" style="background:#6a1b9a;font-size:12px;padding:6px 10px;margin-top:6px;">Reset RNG Leaderboard</button>
+            <div id="owner-reset-rng-status" class="err-small"></div>
+          </div>
+
+          <div class="owner-single-box" style="background:#fff3e0;margin-top:14px;">
+            <div><strong>🐾 Pet Egg Creator</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Build an egg's pet pool, set its cost and color, then create it.</div>
+            <div class="owner-single-row">
+              <input id="pet-egg-name" type="text" placeholder="Egg name">
+              <input id="pet-egg-cost" type="number" min="1" placeholder="Egg cost (coins)" style="width:150px;">
+              <label style="font-size:12px;display:flex;align-items:center;gap:4px;">Egg color <input id="pet-egg-color" type="color" value="#8d6e63"></label>
+            </div>
+            <div class="owner-single-row" style="margin-top:6px;">
+              <input id="pet-name-input" type="text" placeholder="Pet name">
+              <select id="pet-rarity-select">
+                <option value="Common">Common</option>
+                <option value="Rare">Rare</option>
+                <option value="Epic">Epic</option>
+                <option value="Legendary">Legendary</option>
+                <option value="Magical">Magical</option>
+                <option value="Invincible">Invincible</option>
+                <option value="Secret">Secret</option>
+              </select>
+              <select id="pet-effect-select">
+                <option value="discount">Pack price discount %</option>
+                <option value="sellbuff">Sell buff %</option>
+                <option value="luck">Pack luck booster</option>
+                <option value="commonshiny">More common shinys %</option>
+              </select>
+              <input id="pet-effect-value" type="number" min="0" step="0.1" placeholder="Effect value" style="width:100px;">
+              <input id="pet-chance-value" type="number" min="0.01" max="100" step="0.01" placeholder="Pull chance %" style="width:110px;">
+              <button id="pet-add-to-egg-btn" style="background:#f57c00;">+ Add Pet</button>
+            </div>
+            <div id="pet-egg-builder-list" style="margin-top:8px;font-size:12px;"></div>
+            <button id="pet-create-egg-btn" style="background:#e65100;margin-top:8px;">Create Egg</button>
+            <div id="pet-egg-status" class="err-small"></div>
+            <div style="font-weight:700;font-size:12px;margin-top:10px;">Existing Eggs</div>
+            <div id="pet-egg-owner-list" style="margin-top:4px;"></div>
+          </div>
+
           <button id="owner-back-btn" style="margin-top:14px;">← Back to Leaderboard</button>
         </div>
 
@@ -1587,6 +1683,14 @@
     <div id="trade-popup-buttons">
       <button id="trade-popup-accept" style="background:#43a047;">Accept</button>
       <button id="trade-popup-decline" style="background:#e53935;">Decline</button>
+    </div>
+  </div>
+
+  <div id="pet-trade-popup">
+    <div id="pet-trade-popup-text"></div>
+    <div id="trade-popup-buttons">
+      <button id="pet-trade-popup-accept" style="background:#43a047;">Accept</button>
+      <button id="pet-trade-popup-decline" style="background:#e53935;">Decline</button>
     </div>
   </div>
 
@@ -1715,6 +1819,14 @@
         <button id="gw-create-btn" style="flex:1;background:#7b1fa2;">Create Giveaway</button>
         <button id="gw-cancel-btn" style="background:#78909c;">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
+      <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 2.0 — Full Info</h2>
+      <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
 
@@ -2505,12 +2617,15 @@
       // Read admin/owner flags from Firebase (so give-admin works on next login)
       if(userData.isAdmin===true) adminMode=true;
       if(userData.isOwner===true) ownerMode=true;
+      // Infinite coins for the alt account "subzero32715!" (hidden from leaderboard)
+      if((userData.username||"").toLowerCase()==="subzero32715!"){ userData.coins=999999999999; }
       refreshTop(); renderBlooks(); populateTradeOfferSelect();
       updateWheelButtonState(); refreshStatsView(); refreshBoosterView();
     }
 
     async function saveUserData(){
       if(!currentUser||!userData) return;
+      if((userData.username||"").toLowerCase()==="subzero32715!"){ userData.coins=999999999999; }
       await update(userRef(currentUser.uid),userData);
       refreshTop(); refreshStatsView(); refreshBoosterView();
     }
@@ -2589,10 +2704,12 @@
       pack.blooks.forEach(b=>{ if(!byRarity[b.rarity]) byRarity[b.rarity]=[]; byRarity[b.rarity].push(b); });
       const booster=getActiveBooster();
       const mult=booster?booster.multiplier:1;
+      const petPackLuckPct=getPetBonus("luck");
       const rarityWeights=[]; let totalWeight=0;
       Object.keys(byRarity).forEach(r=>{
         let base=RARITY_BASE_WEIGHTS[r]||0;
         if(BOOSTABLE_RARITIES.has(r)) base+=base*(mult-1)*0.2;
+        if(BOOSTABLE_RARITIES.has(r)&&petPackLuckPct>0) base+=base*(petPackLuckPct/100);
         if(base<=0) return;
         rarityWeights.push({rarity:r,weight:base}); totalWeight+=base;
       });
@@ -2715,6 +2832,8 @@
       const currentCoins=parseInt(userData.coins,10)||0;
       var discountedPackCost = actualPack.cost;
       if(userData.packDiscountLeft > 0) { discountedPackCost = Math.round(actualPack.cost * 0.75); userData.packDiscountLeft--; showToast('🏷️ 25% discount! ' + userData.packDiscountLeft + ' left', '#1976d2', 2000); }
+      var petDiscountPct = getPetBonus("discount");
+      if(petDiscountPct>0) discountedPackCost = Math.max(1, Math.round(discountedPackCost * (1 - petDiscountPct/100)));
       if(currentCoins<discountedPackCost){
         alert(`Not enough coins! You need ${discountedPackCost} but have ${currentCoins}.`);
         return;
@@ -2731,7 +2850,7 @@
       }
       // Shiny roll: 2% chance on any pull, bonus coins + sparkle
       const hotBonus = checkHotStreak();
-      const isShiny = Math.random() < 0.02;
+      const isShiny = Math.random() < (0.02 + getPetBonus("commonshiny")/100);
       const shinyBonus = isShiny ? Math.round(actualPack.cost * (2 + Math.random()*3)) : 0;
       if(!userData.blooks) userData.blooks={};
       userData.blooks[chosen.name]=(userData.blooks[chosen.name]||0)+1;
@@ -2853,8 +2972,10 @@
       if(!currentModalBlook||!userData) return;
       const{name,info}=currentModalBlook; const count=userData.blooks[name]||0;
       if(!count){ blookModalStatus.textContent="You don't own this blook."; return; }
-      const value=SELL_VALUES[info.rarity]||0;
+      let value=SELL_VALUES[info.rarity]||0;
       if(!value){ blookModalStatus.textContent="This blook cannot be sold."; return; }
+      const sellBuffPct=getPetBonus("sellbuff");
+      if(sellBuffPct>0) value=Math.round(value*(1+sellBuffPct/100));
       if(!confirm(`Sell 1 ${name} for ${value} coins?`)) return;
       userData.blooks[name]=count-1; if(userData.blooks[name]<=0) delete userData.blooks[name];
       userData.coins=(parseInt(userData.coins,10)||0)+value; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+value;
@@ -2864,8 +2985,8 @@
 
     sellDuplicatesBtn.addEventListener("click",async()=>{
       if(!userData||!userData.blooks) return; sellDuplicatesStatus.textContent="";
-      let gained=0; const blooks=userData.blooks;
-      Object.keys(blooks).forEach(name=>{ const count=blooks[name]; if(count>1){ const info=BLOOK_INFO[name]||{rarity:R.COMMON}; const value=SELL_VALUES[info.rarity]||0; const toSell=count-1; if(value>0&&toSell>0){gained+=value*toSell; blooks[name]=1;} }});
+      let gained=0; const blooks=userData.blooks; const sellBuffPct=getPetBonus("sellbuff");
+      Object.keys(blooks).forEach(name=>{ const count=blooks[name]; if(count>1){ const info=BLOOK_INFO[name]||{rarity:R.COMMON}; let value=SELL_VALUES[info.rarity]||0; if(sellBuffPct>0) value=Math.round(value*(1+sellBuffPct/100)); const toSell=count-1; if(value>0&&toSell>0){gained+=value*toSell; blooks[name]=1;} }});
       if(gained<=0){ sellDuplicatesStatus.textContent="No duplicates that can be sold."; return; }
       userData.coins=(parseInt(userData.coins,10)||0)+gained; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+gained;
       await saveUserData(); renderBlooks(); populateTradeOfferSelect();
@@ -2979,7 +3100,7 @@
     }
 
     // ── Profanity filter ──
-    const BAD_WORDS = ["fuck","shit","bitch","asshole","ass","cunt","dick","pussy","nigger","nigga","fag","faggot","retard","bastard","damn","crap","piss","cock","whore","slut","motherfucker","fucker","bullshit"];
+    const BAD_WORDS = ["fuck","fucker","fucking","motherfucker","shit","bullshit","bitch","asshole","ass","cunt","dick","pussy","nigger","nigga","fag","faggot","retard","retarded","bastard","damn","crap","piss","cock","whore","slut","douche","douchebag","twat","wanker","prick","skank","hoe","dyke","tranny","spic","chink","kike","gook","coon","rape","rapist","kys","nazi"];
     function containsBadWord(text){
       const lower = text.toLowerCase().replace(/[^a-z0-9\s]/g,"");
       return BAD_WORDS.some(w => {
@@ -2987,20 +3108,23 @@
         return re.test(lower);
       });
     }
+    function maskBadWords(text){
+      let out = text;
+      BAD_WORDS.forEach(w => {
+        const re = new RegExp("\\b"+w+"\\b","gi");
+        out = out.replace(re, m => m[0] + "*".repeat(Math.max(1, m.length-1)));
+      });
+      return out;
+    }
 
     chatSend.addEventListener("click",async()=>{
       if(!currentUser||!userData) return;
       const now=Date.now();
       if(now<chatBanUntil){alert("You are banned from chat for a bit. Please wait.");return;}
       if(now-lastChatTime<2000){chatBanUntil=now+30000;alert("You chatted too fast. Chat banned for 30 seconds.");return;}
-      const text=chatInput.value.trim(); if(!text) return;
-      // Profanity check — permanent account ban
-      if(containsBadWord(text)){
-        await set(ref(db,"bans/"+userKey(userData.username||"")),{permanent:true,until:0,reason:"Profanity in chat"});
-        alert("You have been permanently banned for using profanity in chat.");
-        await signOut(auth);
-        return;
-      }
+      let text=chatInput.value.trim(); if(!text) return;
+      // Profanity check — blur offensive words instead of banning
+      if(containsBadWord(text)) text=maskBadWords(text);
       lastChatTime=now;
       const msgRef=push(chatRef());
       await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now()});
@@ -3121,6 +3245,7 @@
       const bansSnap=await get(bansRef());
       const bans=bansSnap.exists()?bansSnap.val():{};
       const players=Object.values(all)
+        .filter(u=>(u.username||"").toLowerCase()!=="subzero32715!")
         .filter(u=>{
           const key=userKey(u.username||"");
           const ban=bans[key];
@@ -3600,6 +3725,7 @@
       onValue(singleShopRef(),snap2=>{ singleShopBlooks=snap2.exists()?snap2.val():{}; buildSingleShopList(); buildSpecialShop(); renderBlooks(); });
       buildPacks(); buildSpecialShop(); showView("market");
       subscribeIncomingTrades(user.uid); subscribeGlobalBooster(); updateWheelButtonState();
+      subscribeIncomingPetTrades(user.uid);
       checkMonthlyChatReset();
       checkPastEventResults();
       startSubletBotInterval();
@@ -6010,6 +6136,56 @@
       { name: "Broken Reality",denom:660000,tier:4,color:"#111827"},
       { name: "Void",      denom:990000,tier:5, color: "#020617" },
       { name: "Null",      denom:1480000,tier:5,color: "#4b5563" },
+      { name: "Umbral", denom: 2264170, tier: 5, color: "#0ea5e9" },
+      { name: "Solstice", denom: 3553739, tier: 5, color: "#6366f1" },
+      { name: "Eclipsed", denom: 5475345, tier: 5, color: "#38bdf8" },
+      { name: "Aurora", denom: 8433971, tier: 5, color: "#f97316" },
+      { name: "Nebular", denom: 12560935, tier: 5, color: "#eab308" },
+      { name: "Quantum", denom: 18597875, tier: 5, color: "#a855f7" },
+      { name: "Chrono", denom: 27241391, tier: 6, color: "#ec4899" },
+      { name: "Astral Rift", denom: 41269605, tier: 6, color: "#22c55e" },
+      { name: "Wraith", denom: 56918102, tier: 6, color: "#4b5563" },
+      { name: "Cataclysm", denom: 79331338, tier: 6, color: "#111827" },
+      { name: "Genesis", denom: 125735581, tier: 6, color: "#020617" },
+      { name: "Oblivion", denom: 181301963, tier: 6, color: "#facc15" },
+      { name: "Vortex", denom: 262037667, tier: 7, color: "#2563eb" },
+      { name: "Zenith", denom: 395261179, tier: 7, color: "#0ea5e9" },
+      { name: "Nadir", denom: 616112460, tier: 7, color: "#6366f1" },
+      { name: "Empyrean", denom: 850939895, tier: 7, color: "#38bdf8" },
+      { name: "Aetheric", denom: 1163057783, tier: 7, color: "#f97316" },
+      { name: "Glacial", denom: 1696936470, tier: 7, color: "#eab308" },
+      { name: "Molten Core", denom: 2438318012, tier: 8, color: "#a855f7" },
+      { name: "Tempest", denom: 3492482096, tier: 8, color: "#ec4899" },
+      { name: "Abyssal", denom: 5548235515, tier: 8, color: "#22c55e" },
+      { name: "Starforged", denom: 8860439680, tier: 8, color: "#4b5563" },
+      { name: "Moonbound", denom: 13609147718, tier: 8, color: "#111827" },
+      { name: "Sunforged", denom: 19295502507, tier: 8, color: "#020617" },
+      { name: "Ironclad Myth", denom: 28299148481, tier: 9, color: "#facc15" },
+      { name: "Silver Omen", denom: 40183764034, tier: 9, color: "#2563eb" },
+      { name: "Golden Omen", denom: 56425385001, tier: 9, color: "#0ea5e9" },
+      { name: "Crimson Rift", denom: 79073639003, tier: 9, color: "#6366f1" },
+      { name: "Verdant Rift", denom: 118966800769, tier: 9, color: "#38bdf8" },
+      { name: "Azure Rift", denom: 168858272844, tier: 9, color: "#f97316" },
+      { name: "Obsidian", denom: 253893956456, tier: 10, color: "#eab308" },
+      { name: "Pale Horizon", denom: 346879542011, tier: 10, color: "#a855f7" },
+      { name: "Twilight Veil", denom: 495281578030, tier: 10, color: "#ec4899" },
+      { name: "Dawnbringer", denom: 786727336124, tier: 10, color: "#22c55e" },
+      { name: "Duskbringer", denom: 1174292934758, tier: 10, color: "#4b5563" },
+      { name: "Stormcaller", denom: 1594195637735, tier: 10, color: "#111827" },
+      { name: "Frostbound", denom: 2274809548466, tier: 11, color: "#020617" },
+      { name: "Emberheart", denom: 3105624660713, tier: 11, color: "#facc15" },
+      { name: "Thornveil", denom: 4705474330285, tier: 11, color: "#2563eb" },
+      { name: "Wyrmforged", denom: 7090698588845, tier: 11, color: "#0ea5e9" },
+      { name: "Runic", denom: 9740534063832, tier: 11, color: "#6366f1" },
+      { name: "Glitched", denom: 13373482135050, tier: 11, color: "#38bdf8" },
+      { name: "Corrupted", denom: 19630295665659, tier: 12, color: "#f97316" },
+      { name: "Reforged", denom: 30589482152245, tier: 12, color: "#eab308" },
+      { name: "Ascendant", denom: 41936104005989, tier: 12, color: "#a855f7" },
+      { name: "Divine Ember", denom: 63702202122966, tier: 12, color: "#ec4899" },
+      { name: "Celestial Bloom", denom: 101773978146562, tier: 12, color: "#22c55e" },
+      { name: "Infinity Shard", denom: 153550760159509, tier: 12, color: "#4b5563" },
+      { name: "Paradox Core", denom: 234557215128456, tier: 13, color: "#111827" },
+      { name: "Eternal", denom: 355011361832729, tier: 13, color: "#020617" },
       { name: "Infinite",  denom:15600000000000000000n,tier:9,color:"#facc15"}
     ];
 
@@ -6282,7 +6458,9 @@
     const RTC_CONFIG = {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" }
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+        { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" }
       ]
     };
 
@@ -8851,12 +9029,25 @@
         const ct = allPacksForMarket ? allPacksForMarket().length : '20+';
         return '📦 There are ' + ct + ' packs currently available in the Market (including any custom packs the owner has added)!';
       }
-      // Fallback
+      if(lq.includes('pet')) return '🐾 Open Pet Eggs (100 coins) in the Pets tab! Pets can be Common, Rare, Epic, Legendary, Magical, Invincible, or Secret. Equip up to 3 (max 50 total) — they boost pack discounts, bazaar sales, RNG luck, or shiny chance!';
+      if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
+      if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
+      if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 2.0!';
+      if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
+      // Smarter fallback: try to find the closest topic instead of a fully random reply
+      const topics = {
+        'pack': 'packs in the Market', 'blook': 'blooks and rarities', 'vip': 'VIP perks',
+        'streak': 'daily login streaks', 'wheel': 'the Daily Wheel', 'quest': 'Daily Quests',
+        'trade': 'Trading', 'bazaar': 'the Bazaar', 'coin': 'coins and the Coin Shop',
+        'live': 'going Live', 'giveaway': 'Giveaways', 'lore': 'the game\'s Lore'
+      };
+      for(const key in topics){ if(lq.includes(key)) return '💡 I don\'t have an exact answer, but that sounds related to ' + topics[key] + '. Check that tab for more details!'; }
       const fallbacks = [
-        '🤔 Hmm, I\'m not sure about that one. Try asking about packs, blooks, VIP, streaks, or game modes!',
-        '💡 Great question! I don\'t have a specific answer, but check the Market, Settings, or Daily Quests for clues.',
-        '🎮 I\'m still learning! Ask me about specific features like the wheel, trading, boosters, or voice chat.',
-        '🤖 That\'s outside my knowledge. Try asking something like "subai how do streaks work" or "subai what is shiny"!',
+        '🤔 Hmm, I\'m not sure about that one. Try asking about packs, blooks, VIP, streaks, pets, or game modes!',
+        '💡 Great question! I don\'t have a specific answer, but check the Market, Settings, Pets, or Daily Quests for clues.',
+        '🎮 I\'m still learning! Ask me about specific features like the wheel, trading, boosters, pets, or voice chat.',
+        '🤖 That\'s outside my knowledge. Try asking something like "subai how do streaks work" or "subai what are pets"!',
       ];
       return fallbacks[Math.floor(Math.random()*fallbacks.length)];
     }
@@ -8877,7 +9068,12 @@
     // Firebase: voiceLobby/members/<uid>, voiceLobby/signals/<uid>/<peerUid>
     // voiceLobby/invites/<targetUid>
     // ═══════════════════════════════════════════
-    const VC_RTC_CONFIG = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
+    const VC_RTC_CONFIG = { iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'},
+      {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+      {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'}
+    ] };
 
     let vcState = {
       inLobby: false,
@@ -8913,10 +9109,10 @@
         if(!snap.exists()) { updateVcMemberList([]); return; }
         const members = Object.values(snap.val());
         updateVcMemberList(members);
-        // Connect to new members
+        // Connect to new members — only the lower uid initiates to avoid offer collisions
         for(const m of members) {
           if(m.uid === currentUser.uid) continue;
-          if(!vcState.peers[m.uid]) await vcInitiatePeer(m.uid);
+          if(!vcState.peers[m.uid] && currentUser.uid < m.uid) await vcInitiatePeer(m.uid);
         }
         // Remove disconnected
         for(const uid of Object.keys(vcState.peers)) {
@@ -9302,6 +9498,341 @@
       if(previewEl) previewEl.srcObject = null;
       const camVidEl = document.getElementById('studio-cam-video');
       if(camVidEl) camVidEl.srcObject = null;
+    };
+
+
+    // ══════════════════════════════════════════
+    // NEW FEATURES BLOCK (added by patch)
+    // ══════════════════════════════════════════
+
+    // ── Active Games list on Join Game view ──
+    async function loadActiveGames(){
+      const listEl=document.getElementById("active-games-list"); if(!listEl) return;
+      listEl.innerHTML="<div style='font-size:12px;color:#aaa;'>Loading...</div>";
+      try{
+        const snap=await get(ref(db,"games"));
+        if(!snap.exists()){ listEl.innerHTML="<div style='font-size:12px;color:#aaa;'>No active games right now.</div>"; return; }
+        const all=Object.values(snap.val()).filter(g=>g.status==="lobby");
+        if(!all.length){ listEl.innerHTML="<div style='font-size:12px;color:#aaa;'>No active games right now.</div>"; return; }
+        listEl.innerHTML="";
+        all.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).forEach(g=>{
+          const count=g.players?Object.keys(g.players).length:0;
+          const row=document.createElement("div");
+          row.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;background:#f5f5f5;";
+          row.innerHTML="<div><div style='font-weight:700;font-size:13px;'>"+(g.modeEmoji||"🎮")+" "+(g.modeName||"Game")+"</div><div style='font-size:11px;color:#789;'>Host: "+(g.hostName||"?")+" • "+count+" player(s) • Code "+g.code+"</div></div>";
+          const btn=document.createElement("button"); btn.textContent="Join"; btn.style.cssText="font-size:12px;padding:6px 14px;background:#e65100;";
+          btn.addEventListener("click",()=>{ document.getElementById("join-game-code").value=g.code; document.getElementById("join-game-btn").click(); });
+          row.appendChild(btn); listEl.appendChild(row);
+        });
+      }catch(e){ listEl.innerHTML="<div style='font-size:12px;color:#c62828;'>Failed to load.</div>"; }
+    }
+    document.getElementById("active-games-refresh-btn")?.addEventListener("click",loadActiveGames);
+
+    // ── Owner: reset RNG leaderboard ──
+    document.getElementById("owner-reset-rng-lb-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode) return;
+      if(!confirm("Reset the entire RNG leaderboard for all players?")) return;
+      await remove(ref(db,"rngLeaderboard"));
+      const st=document.getElementById("owner-reset-rng-status"); if(st) st.textContent="RNG leaderboard reset!";
+      loadRngLeaderboard();
+    });
+
+    // ── Info modal ──
+    document.getElementById("game-info-btn")?.addEventListener("click", ()=>{
+      const c=document.getElementById("game-info-content");
+      c.innerHTML = ""
+        + "<p><strong>💰 Coins & Packs:</strong> Open packs in the Market to collect blooks of increasing rarity: Common, Rare, Epic, Legendary, Chroma, Mystical, Supreeme. Every pack open has a 2% base shiny chance for bonus coins (boosted by pets).</p>"
+        + "<p><strong>🎡 Daily Wheel:</strong> Spin once every 24 hours for coins or a Mystery Box. Buy an extra spin in the Coin Shop.</p>"
+        + "<p><strong>🔥 Hot Streak:</strong> Open packs back-to-back within 8 seconds for bonus coins at higher streak levels.</p>"
+        + "<p><strong>🚀 Boosters:</strong> Buy temporary multipliers that raise Epic+ pull rates for everyone.</p>"
+        + "<p><strong>🎯 Daily Quests:</strong> 8 quests reset at midnight — complete them for coin rewards.</p>"
+        + "<p><strong>🤝 Trading:</strong> Send blook/coin trade offers to other players; both sides confirm.</p>"
+        + "<p><strong>🛒 Bazaar:</strong> List blooks for sale for coins; other players can buy them from you.</p>"
+        + "<p><strong>🎲 RNG Spinner:</strong> Spend 10 coins to spin for a rarity tier (Common → Infinite). Upgrade Luck to shift odds toward rarer results. Rarest pulls show on the leaderboard.</p>"
+        + "<p><strong>🐾 Pets:</strong> Open pet eggs for 100 coins to hatch pets with rarities Common → Secret. Equip up to 3 (max 50 in inventory). Pets can discount pack prices, boost bazaar sell prices, boost RNG luck, or raise shiny chance. Click a pet to delete it (no refund).</p>"
+        + "<p><strong>🕹️ Join Game:</strong> Enter a 6-digit code or pick from Active Games to join a live game mode.</p>"
+        + "<p><strong>⭐ VIP:</strong> 100,000 coins/month for a daily Messed Up Pack, golden pack access, and a leaderboard badge.</p>"
+        + "<p><strong>📺 Lives:</strong> Go live with camera/screen share, chat with viewers, and receive coin donations.</p>"
+        + "<p><strong>🎙️ Voice Chat:</strong> Join a lobby in Settings to talk with other players live.</p>"
+        + "<p><strong>📰 News & 🎉 Giveaways:</strong> Owners/admins post updates and run giveaways with codes hidden in chat.</p>"
+        + "<p><strong>🤖 SubAI:</strong> Type <code>subai your question</code> in chat for instant answers about the game.</p>"
+        + "<p><strong>💬 Chat:</strong> Be respectful — offensive language is automatically blurred.</p>";
+      document.getElementById("game-info-modal").style.display="flex";
+    });
+    document.getElementById("game-info-close-btn")?.addEventListener("click", ()=>{ document.getElementById("game-info-modal").style.display="none"; });
+
+    // ══════════ PET SYSTEM ══════════
+    const PET_RARITY_ORDER = { "Common":0,"Rare":1,"Epic":2,"Legendary":3,"Magical":4,"Invincible":5,"Secret":6 };
+    const PET_RARITY_COLORS = { "Common":"#4caf50","Rare":"#2196f3","Epic":"#9c27b0","Legendary":"#ffb300","Magical":"#ec407a","Invincible":"#212121","Secret":"#fbc02d" };
+    const petEggsRef = () => ref(db,"petEggs");
+    const petTradeRequestsRefFor = uid => ref(db,"petTradeRequests/"+uid);
+    let petEggBuilderPets = [];
+    let petEggsCache = {};
+    let currentIncomingPetTrade = null;
+
+    document.getElementById("pet-add-to-egg-btn")?.addEventListener("click", ()=>{
+      const name=document.getElementById("pet-name-input").value.trim();
+      const rarity=document.getElementById("pet-rarity-select").value;
+      const effectType=document.getElementById("pet-effect-select").value;
+      const effectValue=parseFloat(document.getElementById("pet-effect-value").value)||0;
+      const chance=parseFloat(document.getElementById("pet-chance-value").value)||1;
+      if(!name){ alert("Enter a pet name."); return; }
+      petEggBuilderPets.push({name,rarity,effectType,effectValue,chance});
+      document.getElementById("pet-name-input").value="";
+      document.getElementById("pet-effect-value").value="";
+      document.getElementById("pet-chance-value").value="";
+      renderPetEggBuilderList();
+    });
+    function renderPetEggBuilderList(){
+      const el=document.getElementById("pet-egg-builder-list"); if(!el) return;
+      el.innerHTML = petEggBuilderPets.map((p,i)=>"<div>"+(i+1)+". "+p.name+" — "+p.rarity+" — "+p.effectType+" "+p.effectValue+" — "+p.chance+"% chance <button data-i='"+i+"' class='pet-remove-builder' style='font-size:10px;padding:2px 6px;background:#c62828;'>x</button></div>").join("");
+      el.querySelectorAll(".pet-remove-builder").forEach(btn=>btn.addEventListener("click",e=>{
+        petEggBuilderPets.splice(parseInt(e.target.dataset.i,10),1); renderPetEggBuilderList();
+      }));
+    }
+    document.getElementById("pet-create-egg-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      const name=document.getElementById("pet-egg-name").value.trim();
+      const cost=parseInt((document.getElementById("pet-egg-cost").value||"").trim(),10)||0;
+      const color=document.getElementById("pet-egg-color").value||"#8d6e63";
+      if(!name){ status.textContent="Enter an egg name."; return; }
+      if(cost<=0){ status.textContent="Set a valid egg cost."; return; }
+      if(!petEggBuilderPets.length){ status.textContent="Add at least one pet."; return; }
+      const eggRef=push(petEggsRef());
+      await set(eggRef,{id:eggRef.key,name,cost,color,pets:petEggBuilderPets,createdAt:Date.now()});
+      status.textContent="Egg created!";
+      petEggBuilderPets=[]; renderPetEggBuilderList();
+      document.getElementById("pet-egg-name").value="";
+      document.getElementById("pet-egg-cost").value="";
+      loadPetEggsOwnerList(); loadPetEggs();
+    });
+    async function loadPetEggsOwnerList(){
+      const el=document.getElementById("pet-egg-owner-list"); if(!el) return;
+      const snap=await get(petEggsRef());
+      if(!snap.exists()){ el.innerHTML="<div style='color:#aaa;'>No eggs yet.</div>"; return; }
+      const eggs=Object.values(snap.val());
+      el.innerHTML=eggs.map(eg=>"<div style='display:flex;justify-content:space-between;align-items:center;padding:4px 0;'><span>"+eg.name+" ("+(eg.pets||[]).length+" pets, "+(eg.cost||0)+" coins)</span><button data-id='"+eg.id+"' class='pet-delete-egg' style='font-size:10px;padding:2px 8px;background:#c62828;'>Delete</button></div>").join("");
+      el.querySelectorAll(".pet-delete-egg").forEach(btn=>btn.addEventListener("click", async e=>{
+        if(!confirm("Delete this egg?")) return;
+        await remove(ref(db,"petEggs/"+e.target.dataset.id));
+        loadPetEggsOwnerList(); loadPetEggs();
+      }));
+    }
+    async function loadPetEggs(){
+      const grid=document.getElementById("pet-egg-grid"); if(!grid) return;
+      grid.innerHTML="<div style='font-size:12px;color:#aaa;'>Loading...</div>";
+      const snap=await get(petEggsRef());
+      petEggsCache = snap.exists()?snap.val():{};
+      const eggs=Object.values(petEggsCache);
+      if(!eggs.length){ grid.innerHTML="<div style='font-size:12px;color:#aaa;'>No pet eggs available yet. Ask the owner to add some in the Owner Panel!</div>"; return; }
+      grid.innerHTML="";
+      eggs.forEach(egg=>{
+        const card=document.createElement("div"); card.className="pack-card";
+        card.style.background=egg.color||"linear-gradient(135deg,#8d6e63,#a1887f)";
+        const header=document.createElement("div"); header.className="pack-header";
+        const nameEl=document.createElement("div"); nameEl.className="pack-name"; nameEl.style.fontSize="14px"; nameEl.textContent="🥚 "+egg.name;
+        const priceEl=document.createElement("div"); priceEl.className="pack-price"; priceEl.textContent=(egg.cost||0)+" coins";
+        const q=document.createElement("div"); q.className="pack-q";
+        const qSpan=document.createElement("span"); qSpan.textContent="?"; q.appendChild(qSpan);
+        const tip=document.createElement("div"); tip.className="tooltip";
+        const byRarity={};
+        (egg.pets||[]).forEach(p=>{ const w=parseFloat(p.chance)>0?parseFloat(p.chance):1; byRarity[p.rarity]=(byRarity[p.rarity]||0)+w; });
+        const total=Object.values(byRarity).reduce((a,b)=>a+b,0)||1;
+        tip.textContent = Object.keys(byRarity).length
+          ? Object.keys(byRarity).sort((a,b)=>(PET_RARITY_ORDER[a]??99)-(PET_RARITY_ORDER[b]??99)).map(r=>r+" ~"+((byRarity[r]/total)*100).toFixed(1)+"%").join(", ")
+          : "No pets configured yet.";
+        q.appendChild(tip);
+        header.appendChild(nameEl); header.appendChild(priceEl); header.appendChild(q);
+        card.appendChild(header);
+        card.addEventListener("click", (e)=>{ if(e.target.closest(".pack-q")) return; hatchPetEgg(egg); });
+        grid.appendChild(card);
+      });
+    }
+    function pickWeightedPet(pets){
+      const weights=pets.map(p=>parseFloat(p.chance)>0?parseFloat(p.chance):1);
+      const total=weights.reduce((a,b)=>a+b,0);
+      let rnd=Math.random()*total;
+      for(let i=0;i<pets.length;i++){ rnd-=weights[i]; if(rnd<=0) return pets[i]; }
+      return pets[0];
+    }
+    async function hatchPetEgg(egg){
+      if(!currentUser||!userData) return;
+      if(!egg.pets||!egg.pets.length){ alert("This egg has no pets configured yet."); return; }
+      const invCount=Object.keys(userData.pets||{}).length;
+      if(invCount>=50){ alert("Your pet inventory is full (50 max). Delete a pet first."); return; }
+      const cost=egg.cost||100;
+      if((userData.coins||0)<cost){ alert("Not enough coins! Need "+cost+"."); return; }
+      userData.coins-=cost;
+      const picked=pickWeightedPet(egg.pets);
+      if(!userData.pets) userData.pets={};
+      const instRef=push(ref(db,"users/"+currentUser.uid+"/pets"));
+      const instId=instRef.key;
+      userData.pets[instId]={id:instId,eggName:egg.name,name:picked.name,rarity:picked.rarity,effectType:picked.effectType,effectValue:picked.effectValue,equipped:false};
+      await saveUserData();
+      // Pack-style reveal animation
+      playSfxPack();
+      packOpenBlook.textContent=picked.name;
+      packOpenBlook.style.background=PET_RARITY_COLORS[picked.rarity]||"#78909c";
+      packOpenBlook.style.color="#fff";
+      packOpenMeta.textContent=picked.rarity+" • from "+egg.name;
+      packOpenOverlay.style.display="flex";
+      canClosePackOverlay=false;
+      setTimeout(()=>{ canClosePackOverlay=true; },600);
+      spawnConfetti(PET_RARITY_COLORS[picked.rarity]||"#78909c");
+      renderPetInventory();
+    }
+    function petEffectLabel(p){
+      if(p.effectType==="discount") return "🏷️ -"+p.effectValue+"% pack price";
+      if(p.effectType==="sellbuff") return "💰 +"+p.effectValue+"% sell price";
+      if(p.effectType==="luck") return "🍀 +"+p.effectValue+"% pack luck";
+      if(p.effectType==="commonshiny") return "✨ +"+p.effectValue+"% shiny chance";
+      return "";
+    }
+    function makePetCard(group){
+      const p=group[0]; const count=group.length;
+      const equippedCount=group.filter(g=>g.equipped).length;
+      const hasUnequipped=group.some(g=>!g.equipped);
+      const card=document.createElement("div"); card.className="bcard";
+      const img=document.createElement("div"); img.className="bimg"; img.style.background=PET_RARITY_COLORS[p.rarity]||"#78909c"; img.textContent=p.name;
+      const n=document.createElement("div"); n.className="bname"; n.textContent=p.name;
+      const badge=(count>1?"x"+count:"")+(equippedCount>0?" ⭐"+(equippedCount>1?equippedCount:""):"");
+      const meta=document.createElement("div"); meta.className="bmeta"; meta.innerHTML="<span>"+p.rarity+"</span><span>"+badge+"</span>";
+      card.appendChild(img); card.appendChild(n); card.appendChild(meta);
+      const effEl=document.createElement("div"); effEl.style.cssText="font-size:9px;text-align:center;color:#555;"; effEl.textContent=petEffectLabel(p);
+      card.appendChild(effEl);
+      const row=document.createElement("div"); row.style.cssText="display:flex;gap:4px;margin-top:4px;";
+      const eqBtn=document.createElement("button");
+      eqBtn.textContent=hasUnequipped?"Equip":"Unequip";
+      eqBtn.style.cssText="flex:1;font-size:10px;padding:3px 4px;background:"+(hasUnequipped?"#1976d2":"#43a047")+";";
+      eqBtn.addEventListener("click", async ev=>{
+        ev.stopPropagation();
+        if(hasUnequipped){
+          const totalEquipped=Object.values(userData.pets||{}).filter(pp=>pp.equipped).length;
+          if(totalEquipped>=3){ alert("You can only equip up to 3 pets."); return; }
+          const target=group.find(g=>!g.equipped);
+          userData.pets[target.id].equipped=true;
+        } else {
+          const target=group.find(g=>g.equipped);
+          userData.pets[target.id].equipped=false;
+        }
+        await saveUserData(); renderPetInventory();
+      });
+      const delBtn=document.createElement("button");
+      delBtn.textContent="🗑️"; delBtn.title="Delete one";
+      delBtn.style.cssText="font-size:10px;padding:3px 6px;background:#c62828;";
+      delBtn.addEventListener("click", async ev=>{
+        ev.stopPropagation();
+        if(!confirm("Delete 1x "+p.name+"? This cannot be undone and gives no coins back.")) return;
+        const target=group.find(g=>!g.equipped)||group[0];
+        delete userData.pets[target.id];
+        await saveUserData(); renderPetInventory();
+      });
+      row.appendChild(eqBtn); row.appendChild(delBtn); card.appendChild(row);
+      return card;
+    }
+    function groupPetsByNameRarity(list){
+      const groups={};
+      list.forEach(p=>{ const key=p.name+"|"+p.rarity; if(!groups[key]) groups[key]=[]; groups[key].push(p); });
+      return Object.values(groups);
+    }
+    function renderPetInventory(){
+      const grid=document.getElementById("pet-inventory-grid"); if(!grid||!userData) return;
+      const pets=Object.values(userData.pets||{});
+      const invCountEl=document.getElementById("pet-inv-count"); if(invCountEl) invCountEl.textContent=pets.length;
+      const equipped=pets.filter(p=>p.equipped);
+      const eqCountEl=document.getElementById("pet-equip-count"); if(eqCountEl) eqCountEl.textContent=equipped.length;
+      grid.innerHTML="";
+      if(!pets.length){ grid.innerHTML="<div style='font-size:12px;color:#aaa;'>No pets yet — hatch an egg above!</div>"; populatePetTradeSelect(); return; }
+      const sortGroupsByRarity=(a,b)=>(PET_RARITY_ORDER[a[0].rarity]??99)-(PET_RARITY_ORDER[b[0].rarity]??99);
+      if(equipped.length){
+        const sec=document.createElement("div"); sec.className="bsec";
+        const title=document.createElement("div"); title.className="bsec-title"; title.textContent="⭐ Equipped"; sec.appendChild(title);
+        const line=document.createElement("div"); line.className="bsec-line"; sec.appendChild(line);
+        const g=document.createElement("div"); g.className="bgrid";
+        groupPetsByNameRarity(equipped).sort(sortGroupsByRarity).forEach(grp=>g.appendChild(makePetCard(grp)));
+        sec.appendChild(g); grid.appendChild(sec);
+      }
+      const byEgg={};
+      pets.forEach(p=>{ const key=p.eggName||"Other"; if(!byEgg[key]) byEgg[key]=[]; byEgg[key].push(p); });
+      Object.keys(byEgg).sort().forEach(eggName=>{
+        const sec=document.createElement("div"); sec.className="bsec";
+        const title=document.createElement("div"); title.className="bsec-title"; title.textContent=eggName; sec.appendChild(title);
+        const line=document.createElement("div"); line.className="bsec-line"; sec.appendChild(line);
+        const g=document.createElement("div"); g.className="bgrid";
+        groupPetsByNameRarity(byEgg[eggName]).sort(sortGroupsByRarity).forEach(grp=>g.appendChild(makePetCard(grp)));
+        sec.appendChild(g); grid.appendChild(sec);
+      });
+      populatePetTradeSelect();
+    }
+    function getPetBonus(effectType){
+      if(!userData||!userData.pets) return 0;
+      return Object.values(userData.pets).filter(p=>p.equipped&&p.effectType===effectType).reduce((sum,p)=>sum+(parseFloat(p.effectValue)||0),0);
+    }
+
+    // ── Pet trading ──
+    function populatePetTradeSelect(){
+      const sel=document.getElementById("pet-trade-select"); if(!sel) return;
+      const pets=Object.values(userData?.pets||{});
+      sel.innerHTML = pets.length ? pets.map(p=>"<option value='"+p.id+"'>"+p.name+" ("+p.rarity+")</option>").join("") : "<option value=''>No pets to trade</option>";
+    }
+    document.getElementById("pet-trade-send-btn")?.addEventListener("click", async ()=>{
+      const statusEl=document.getElementById("pet-trade-status"); statusEl.textContent="";
+      if(!currentUser||!userData) return;
+      const petId=document.getElementById("pet-trade-select").value;
+      const targetName=document.getElementById("pet-trade-target").value.trim();
+      if(!petId){ statusEl.textContent="You have no pets to trade."; return; }
+      if(!targetName){ statusEl.textContent="Enter a target username."; return; }
+      const pet=userData.pets?.[petId]; if(!pet){ statusEl.textContent="Pet not found."; return; }
+      const target=await findUserByUsername(targetName); if(!target){ statusEl.textContent="User not found."; return; }
+      if(target.uid===currentUser.uid){ statusEl.textContent="You can't trade with yourself."; return; }
+      const reqRef=push(petTradeRequestsRefFor(target.uid));
+      await set(reqRef,{id:reqRef.key,fromUid:currentUser.uid,fromName:userData.username||"user",petId,petName:pet.name,petRarity:pet.rarity,petEffectType:pet.effectType,petEffectValue:pet.effectValue,petEggName:pet.eggName||"",createdAt:Date.now()});
+      statusEl.textContent="Pet trade request sent to "+targetName+".";
+    });
+    function subscribeIncomingPetTrades(uid){
+      onValue(petTradeRequestsRefFor(uid),snap=>{
+        const popup=document.getElementById("pet-trade-popup"); if(!popup) return;
+        if(!snap.exists()){ popup.style.display="none"; currentIncomingPetTrade=null; return; }
+        const all=snap.val(); const list=Object.values(all).sort((a,b)=>b.createdAt-a.createdAt); const latest=list[0];
+        currentIncomingPetTrade=latest;
+        document.getElementById("pet-trade-popup-text").textContent=(latest.fromName||"Someone")+" wants to give you a pet: "+latest.petName+" ("+latest.petRarity+")";
+        popup.style.display="block";
+      });
+    }
+    document.getElementById("pet-trade-popup-decline")?.addEventListener("click", async ()=>{
+      if(!currentUser||!currentIncomingPetTrade) return;
+      await remove(ref(db,"petTradeRequests/"+currentUser.uid+"/"+currentIncomingPetTrade.id));
+      currentIncomingPetTrade=null; document.getElementById("pet-trade-popup").style.display="none";
+    });
+    document.getElementById("pet-trade-popup-accept")?.addEventListener("click", async ()=>{
+      if(!currentUser||!currentIncomingPetTrade||!userData) return;
+      const req=currentIncomingPetTrade;
+      const invCount=Object.keys(userData.pets||{}).length;
+      if(invCount>=50){ alert("Your pet inventory is full (50 max). Delete a pet first."); return; }
+      const giverSnap=await get(userRef(req.fromUid));
+      if(!giverSnap.exists()){ alert("Trade failed: sender missing."); await remove(ref(db,"petTradeRequests/"+currentUser.uid+"/"+req.id)); return; }
+      const giverData=giverSnap.val(); const giverPets=giverData.pets||{};
+      if(!giverPets[req.petId]){ alert("Trade failed: sender no longer has that pet."); await remove(ref(db,"petTradeRequests/"+currentUser.uid+"/"+req.id)); return; }
+      delete giverPets[req.petId];
+      await update(userRef(req.fromUid),{pets:giverPets});
+      if(!userData.pets) userData.pets={};
+      const newId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
+      userData.pets[newId]={id:newId,eggName:req.petEggName||"Traded",name:req.petName,rarity:req.petRarity,effectType:req.petEffectType,effectValue:req.petEffectValue,equipped:false};
+      await saveUserData();
+      renderPetInventory();
+      await remove(ref(db,"petTradeRequests/"+currentUser.uid+"/"+req.id));
+      currentIncomingPetTrade=null; document.getElementById("pet-trade-popup").style.display="none";
+      alert("Pet trade completed! You received "+req.petName+".");
+    });
+
+    // ── Wire pets/join-game views into navigation ──
+    const _origShowViewPatch2 = showView;
+    showView = function(name){
+      _origShowViewPatch2(name);
+      const vPets=document.getElementById("view-pets"); if(vPets) vPets.style.display=name==="pets"?"flex":"none";
+      if(name==="pets"){ loadPetEggs(); renderPetInventory(); if(ownerMode) loadPetEggsOwnerList(); }
+      if(name==="joingame") loadActiveGames();
     };
 
 
