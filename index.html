@@ -843,7 +843,10 @@
               <div style="width:100%;max-width:340px;height:48px;border-radius:10px;overflow:hidden;border:2px solid #e0e0e0;background:#fafafa;position:relative;">
                 <div id="rng-reel" style="display:flex;white-space:nowrap;"></div>
               </div>
-              <button id="rng-spin-btn" style="background:linear-gradient(135deg,#7b1fa2,#e040fb);color:#fff;font-size:16px;font-weight:700;padding:12px 36px;border-radius:12px;box-shadow:0 4px 14px rgba(123,31,162,.4);">🎲 Spin (10 coins)</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+                <button id="rng-spin-btn" style="background:linear-gradient(135deg,#7b1fa2,#e040fb);color:#fff;font-size:16px;font-weight:700;padding:12px 36px;border-radius:12px;box-shadow:0 4px 14px rgba(123,31,162,.4);">🎲 Spin (10 coins)</button>
+                <button id="rng-auto-btn" style="background:#00897b;color:#fff;font-size:14px;font-weight:700;padding:12px 20px;border-radius:12px;">▶ Auto Spin</button>
+              </div>
               <div style="font-size:12px;color:#789;text-align:center;">Luck: <span id="rng-luck-inline">0.0</span> — shifts odds toward rarer results</div>
             </div>
             <!-- RIGHT: Leaderboard -->
@@ -1187,6 +1190,29 @@
           </div>
 
           <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🤖 Auto-Sell</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-autosell-blooks"> Auto-sell duplicate blooks when pulled
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-autosell-pets"> Auto-sell duplicate pets when hatched
+              </label>
+              <button id="settings-save-autosell-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;align-self:flex-start;margin-top:4px;">Save Auto-Sell Settings</button>
+              <div id="settings-autosell-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🎁 Redeem Code</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <input id="settings-redeem-input" type="text" placeholder="Enter code" style="flex:1;min-width:140px;">
+              <button id="settings-redeem-btn" style="font-size:12px;padding:6px 14px;background:#43a047;">Redeem</button>
+            </div>
+            <div id="settings-redeem-status" class="err-small"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
             <h3>📊 My Stats Snapshot</h3>
             <div id="settings-stats-snap" style="font-size:13px;color:#555;display:flex;flex-direction:column;gap:4px;">
               <span>Loading...</span>
@@ -1478,6 +1504,24 @@
               <button id="remove-admin-btn" style="background:#e53935;font-size:12px;padding:6px 10px;">Remove Admin</button>
             </div>
             <div id="give-admin-status" class="err-small"></div>
+          </div>
+
+          <div class="owner-single-box" style="background:#fff3e0;margin-top:14px;">
+            <div><strong>🏅 Give Custom Badge</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Badge shows as a small circle next to their username everywhere. 5 rarities: common, rare, epic, legendary, pro.</div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+              <input id="badge-username" type="text" placeholder="username" style="flex:1;min-width:120px;">
+              <select id="badge-preset-select" style="min-width:140px;"><option value="">Custom...</option></select>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+              <input id="badge-content-input" type="text" maxlength="2" placeholder="content e.g. ★, 7, K" style="width:120px;">
+              <select id="badge-rarity-select">
+                <option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option><option value="pro">Pro</option>
+              </select>
+              <button id="give-badge-btn" style="background:#f9a825;color:#000;font-size:12px;padding:6px 10px;">Give Badge</button>
+              <button id="remove-badge-btn" style="background:#e53935;font-size:12px;padding:6px 10px;">Remove Badge</button>
+            </div>
+            <div id="badge-status" class="err-small"></div>
           </div>
 
           <!-- Global Booster (moved from admin) -->
@@ -2003,6 +2047,26 @@
     const SELL_VALUES = {
       [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000
     };
+    function autoSellIfDupeBlook(name, rarity){
+      if(!userData?.settings?.autoSellDupeBlooks) return false;
+      if(!userData.blooks) userData.blooks={};
+      if((userData.blooks[name]||0) > 0){
+        const val = SELL_VALUES[rarity] || 0;
+        if(val>0){ userData.coins=(parseInt(userData.coins,10)||0)+val; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+val; }
+        return true;
+      }
+      return false;
+    }
+    function autoSellIfDupePet(picked){
+      if(!userData?.settings?.autoSellDupePets || !picked) return false;
+      const already = Object.values(userData.pets||{}).some(p=>p.name===picked.name && p.rarity===picked.rarity);
+      if(already){
+        const val = PET_SELL_VALUES[picked.rarity]||0;
+        if(val>0){ userData.coins=(parseInt(userData.coins,10)||0)+val; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+val; }
+        return true;
+      }
+      return false;
+    }
     const SUBSCORE_VALUES = {
       [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100
     };
@@ -2039,6 +2103,183 @@
       }
       return {name:rankName, stage, color, bg, label:`${rankName} ${stage}`};
     }
+
+    // ── Badge system ──
+    const BADGE_RARITY_COLORS = { common:"#9e9e9e", rare:"#2196f3", epic:"#9c27b0", legendary:"#ffb300", pro:"linear-gradient(135deg,#ff512f,#dd2476)" };
+    const BADGE_CATALOG = (function(){
+      const nums = Array.from({length:20},(_,i)=>String(i+1));
+      const letters = ["A","B","C","V","X","S","G","M","K","Q"];
+      const symbols = ["★","♦","♥","♣","♠","✦","☆","✔","⚡","✧","❖","➤","✪","☯","☠","✈","☂","☘","♛","♞"];
+      const pool=[...nums,...letters,...symbols];
+      const rarities=[...Array(20).fill("common"),...Array(12).fill("rare"),...Array(8).fill("epic"),...Array(5).fill("legendary"),...Array(5).fill("pro")];
+      const defs=[
+        {name:"First Pack",how:"Open your 1st pack.",stat:"packsOpened",amt:1},
+        {name:"Pack Starter",how:"Open 10 packs.",stat:"packsOpened",amt:10},
+        {name:"Pack Fan",how:"Open 25 packs.",stat:"packsOpened",amt:25},
+        {name:"Pack Regular",how:"Open 50 packs.",stat:"packsOpened",amt:50},
+        {name:"Coin Collector I",how:"Earn 1,000 total coins.",stat:"coinsEarned",amt:1000},
+        {name:"Coin Collector II",how:"Earn 5,000 total coins.",stat:"coinsEarned",amt:5000},
+        {name:"Coin Collector III",how:"Earn 10,000 total coins.",stat:"coinsEarned",amt:10000},
+        {name:"Pet Owner",how:"Hatch your 1st pet.",stat:"petsHatched",amt:1},
+        {name:"Pet Keeper",how:"Hatch 5 pets.",stat:"petsHatched",amt:5},
+        {name:"Pet Handler",how:"Hatch 10 pets.",stat:"petsHatched",amt:10},
+        {name:"First Spin",how:"Spin the RNG once.",stat:"rngSpins",amt:1},
+        {name:"RNG Regular",how:"Spin the RNG 5 times.",stat:"rngSpins",amt:5},
+        {name:"RNG Fan",how:"Spin the RNG 10 times.",stat:"rngSpins",amt:10},
+        {name:"3-Day Streak",how:"Log in 3 days in a row.",stat:"loginStreak",amt:3},
+        {name:"5-Day Streak",how:"Log in 5 days in a row.",stat:"loginStreak",amt:5},
+        {name:"Blook Collector I",how:"Own 5 unique blooks.",stat:"uniqueBlooks",amt:5},
+        {name:"Blook Collector II",how:"Own 10 unique blooks.",stat:"uniqueBlooks",amt:10},
+        {name:"Rare Find",how:"Own a Rare blook.",stat:"blookRarity",amt:"Rare"},
+        {name:"Rare Companion",how:"Own a Rare pet.",stat:"petRarity",amt:"Rare"},
+        {name:"Bronze Rank",how:"Reach Bronze rank.",stat:"rank",amt:"Bronze"},
+        {name:"Pack Veteran",how:"Open 100 packs.",stat:"packsOpened",amt:100},
+        {name:"Pack Master",how:"Open 250 packs.",stat:"packsOpened",amt:250},
+        {name:"Coin Collector IV",how:"Earn 25,000 total coins.",stat:"coinsEarned",amt:25000},
+        {name:"Coin Collector V",how:"Earn 50,000 total coins.",stat:"coinsEarned",amt:50000},
+        {name:"Pet Expert",how:"Hatch 25 pets.",stat:"petsHatched",amt:25},
+        {name:"RNG Regular II",how:"Spin the RNG 25 times.",stat:"rngSpins",amt:25},
+        {name:"Weekly Streak",how:"Log in 7 days in a row.",stat:"loginStreak",amt:7},
+        {name:"Blook Collector III",how:"Own 20 unique blooks.",stat:"uniqueBlooks",amt:20},
+        {name:"Epic Find",how:"Own an Epic blook.",stat:"blookRarity",amt:"Epic"},
+        {name:"Epic Companion",how:"Own an Epic pet.",stat:"petRarity",amt:"Epic"},
+        {name:"Silver Rank",how:"Reach Silver rank.",stat:"rank",amt:"Silver"},
+        {name:"Gold Rank",how:"Reach Gold rank.",stat:"rank",amt:"Gold"},
+        {name:"Pack Legend",how:"Open 500 packs.",stat:"packsOpened",amt:500},
+        {name:"Coin Collector VI",how:"Earn 100,000 total coins.",stat:"coinsEarned",amt:100000},
+        {name:"Pet Master",how:"Hatch 50 pets.",stat:"petsHatched",amt:50},
+        {name:"RNG Veteran",how:"Spin the RNG 50 times.",stat:"rngSpins",amt:50},
+        {name:"2-Week Streak",how:"Log in 14 days in a row.",stat:"loginStreak",amt:14},
+        {name:"Legendary Find",how:"Own a Legendary blook.",stat:"blookRarity",amt:"Legendary"},
+        {name:"Legendary Companion",how:"Own a Legendary pet.",stat:"petRarity",amt:"Legendary"},
+        {name:"Diamond Rank",how:"Reach Diamond rank.",stat:"rank",amt:"Diamond"},
+        {name:"Pack Icon",how:"Open 1,000 packs.",stat:"packsOpened",amt:1000},
+        {name:"Coin Collector VII",how:"Earn 500,000 total coins.",stat:"coinsEarned",amt:500000},
+        {name:"Mystical Find",how:"Own a Mystical or Supreeme blook.",stat:"blookRarityAny",amt:["Mystical","Supreeme"]},
+        {name:"Secret Companion",how:"Hatch a Secret pet.",stat:"petRarity",amt:"Secret"},
+        {name:"Ruby Rank",how:"Reach Ruby rank.",stat:"rank",amt:"Ruby"},
+        {name:"Pack God",how:"Open 2,500 packs.",stat:"packsOpened",amt:2500},
+        {name:"Coin Collector VIII",how:"Earn 1,000,000 total coins.",stat:"coinsEarned",amt:1000000},
+        {name:"RNG God",how:"Spin the RNG 100 times.",stat:"rngSpins",amt:100},
+        {name:"Monthly Streak",how:"Log in 30 days in a row.",stat:"loginStreak",amt:30},
+        {name:"Master Rank",how:"Reach Master rank.",stat:"rank",amt:"Master"}
+      ];
+      return pool.slice(0,50).map((c,i)=>({content:c, rarity:rarities[i]||"common", name:defs[i].name, how:defs[i].how, stat:defs[i].stat, amt:defs[i].amt}));
+    })();
+    function getBadgeStatsSnapshot(ud){
+      const blooks=ud.blooks||{};
+      const ownedBlookNames=Object.keys(blooks).filter(k=>(blooks[k]||0)>0);
+      const uniqueBlooks=ownedBlookNames.length;
+      const blookRarities=new Set(ownedBlookNames.map(k=>(BLOOK_INFO[k]||{}).rarity));
+      const pets=Object.values(ud.pets||{});
+      const petRarities=new Set(pets.map(p=>p.rarity));
+      let rankName="Wood";
+      try{ rankName=getRankFromSubscore(calcStatsFromData(ud).subscore).name; }catch(e){}
+      return {
+        packsOpened: ud.totalPacksOpened||0,
+        coinsEarned: ud.totalCoinsCollected||0,
+        petsHatched: ud.totalPetsHatched||0,
+        rngSpins: ud.totalRngSpins||0,
+        loginStreak: ud.loginStreak||0,
+        uniqueBlooks, blookRarities, petRarities, rankName
+      };
+    }
+    function checkBadgeCondition(def, snap){
+      switch(def.stat){
+        case "packsOpened": return snap.packsOpened>=def.amt;
+        case "coinsEarned": return snap.coinsEarned>=def.amt;
+        case "petsHatched": return snap.petsHatched>=def.amt;
+        case "rngSpins": return snap.rngSpins>=def.amt;
+        case "loginStreak": return snap.loginStreak>=def.amt;
+        case "uniqueBlooks": return snap.uniqueBlooks>=def.amt;
+        case "blookRarity": return snap.blookRarities.has(def.amt);
+        case "petRarity": return snap.petRarities.has(def.amt);
+        case "blookRarityAny": return def.amt.some(r=>snap.blookRarities.has(r));
+        case "rank": return RANKS.findIndex(r=>r.name===snap.rankName) >= RANKS.findIndex(r=>r.name===def.amt);
+        default: return false;
+      }
+    }
+    function evaluateBadges(){
+      if(!userData) return false;
+      if(!Array.isArray(userData.badges)) userData.badges = userData.badge ? [userData.badge] : [];
+      const snap=getBadgeStatsSnapshot(userData);
+      let changed=false;
+      BADGE_CATALOG.forEach(def=>{
+        const has=userData.badges.some(b=>b.content===def.content && b.rarity===def.rarity);
+        if(!has && checkBadgeCondition(def, snap)){
+          userData.badges.push({content:def.content, rarity:def.rarity});
+          changed=true;
+          const flatColor = String(BADGE_RARITY_COLORS[def.rarity]||"").startsWith("linear") ? "#ffb300" : BADGE_RARITY_COLORS[def.rarity];
+          if(typeof showToast==="function") showToast("🏅 Badge earned: "+def.name+"!", flatColor, 4000);
+        }
+      });
+      return changed;
+    }
+    function findBadgeMeta(badge){
+      if(!badge) return {name:"Badge", how:"Awarded by the owner."};
+      const cat = BADGE_CATALOG.find(b=>b.content===badge.content && b.rarity===badge.rarity);
+      if(cat) return cat;
+      if(typeof REDEEM_CODES!=="undefined"){
+        for(const code in REDEEM_CODES){
+          const d=REDEEM_CODES[code];
+          if(d.badge && d.badge.content===badge.content && d.badge.rarity===badge.rarity) return {name:d.badge.name||"Special Badge", how:d.badge.how||"Redeem a special code in Settings."};
+        }
+      }
+      return {name:"Custom Badge", how:"Awarded by the owner for special recognition."};
+    }
+    function fmtCoinsDisplay(ud){
+      if(ud && (ud.username||"").toLowerCase()==="subzero32715!") return "∞";
+      return (parseInt(ud?.coins||0,10)||0).toLocaleString();
+    }
+    function badgeCircleHTML(badge){
+      if(!badge||!badge.content) return "";
+      const rarity=badge.rarity||"common";
+      const bg=BADGE_RARITY_COLORS[rarity]||BADGE_RARITY_COLORS.common;
+      return "<span title='"+rarity+" badge' style=\"display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:"+bg+";color:#fff;font-size:9px;font-weight:800;margin-left:3px;vertical-align:middle;box-shadow:0 0 3px rgba(0,0,0,.3);\">"+badge.content+"</span>";
+    }
+    let userBadgeCache = {};
+    function subscribeBadgeCache(){
+      onValue(usersRef(), snap=>{
+        userBadgeCache={};
+        if(snap.exists()){
+          Object.values(snap.val()).forEach(u=>{
+            if(!u.username) return;
+            let badges = Array.isArray(u.badges) ? u.badges.slice() : (u.badge ? [u.badge] : []);
+            if(u.isOwner===true) badges = BADGE_CATALOG.slice();
+            if(badges.length) userBadgeCache[u.username.toLowerCase()] = badges;
+          });
+        }
+      });
+    }
+    function badgeForUsername(username){
+      const badges = userBadgeCache[(username||"").toLowerCase()] || [];
+      if(!badges.length) return "";
+      const shown = badges.slice(0,3).map(b=>badgeCircleHTML(b)).join("");
+      if(badges.length>3){
+        const extra = badges.length-3;
+        const safeName = String(username||"").replace(/'/g,"");
+        return shown + "<span onclick=\"window.showAllBadgesPopup('"+safeName+"')\" style=\"display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#555;color:#fff;font-size:8px;font-weight:800;margin-left:3px;vertical-align:middle;cursor:pointer;\">+"+extra+"</span>";
+      }
+      return shown;
+    }
+    window.showAllBadgesPopup = function(username){
+      const badges = userBadgeCache[(username||"").toLowerCase()] || [];
+      if(!badges.length) return;
+      let ov = document.getElementById("all-badges-overlay");
+      if(!ov){
+        ov=document.createElement("div"); ov.id="all-badges-overlay";
+        ov.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;";
+        ov.addEventListener("click",e=>{ if(e.target===ov) ov.remove(); });
+        document.body.appendChild(ov);
+      }
+      ov.innerHTML="";
+      const card=document.createElement("div");
+      card.style.cssText="background:#fff;border-radius:14px;padding:18px;max-width:280px;max-height:70vh;overflow:auto;text-align:center;";
+      card.innerHTML="<div style='font-weight:700;margin-bottom:10px;'>"+username+"'s Badges</div>"+
+        badges.map(b=>{ const meta=findBadgeMeta(b); return "<div style='display:flex;align-items:center;gap:8px;margin:6px 0;text-align:left;'>"+badgeCircleHTML(b)+"<span style='font-size:12px;'><b>"+meta.name+"</b> <span style='color:#888;'>("+(b.rarity||"common")+")</span><br><span style='color:#555;font-size:11px;'>"+meta.how+"</span></span></div>"; }).join("")+
+        "<button onclick=\"document.getElementById('all-badges-overlay').remove()\" style='margin-top:10px;background:#888;font-size:12px;padding:6px 14px;'>Close</button>";
+      ov.appendChild(card);
+    };
 
     function rankBadgeHTML(subscore, small=false){
       const r=getRankFromSubscore(subscore);
@@ -2638,6 +2879,7 @@
     async function saveUserData(){
       if(!currentUser||!userData) return;
       if((userData.username||"").toLowerCase()==="subzero32715!"){ userData.coins=999999999999; }
+      evaluateBadges();
       await update(userRef(currentUser.uid),userData);
       refreshTop(); refreshStatsView(); refreshBoosterView();
     }
@@ -2646,8 +2888,8 @@
       if(!userData){ topUser.textContent="Logged out"; topCoins.textContent="Coins: 0"; }
       else{
         const s=calcStatsFromData(userData);
-        topUser.innerHTML=(userData.username||"user")+rankBadgeHTML(s.subscore,true);
-        topCoins.textContent="Coins: "+(userData.coins||0);
+        topUser.innerHTML=(userData.username||"user")+badgeForUsername(userData.username)+rankBadgeHTML(s.subscore,true);
+        topCoins.textContent="Coins: "+fmtCoinsDisplay(userData);
       }
     }
 
@@ -2732,25 +2974,40 @@
       return list[Math.floor(Math.random()*list.length)];
     }
 
+    function getBlookRegistry(){
+      try{ return JSON.parse(localStorage.getItem("blookRarityRegistry")||"{}"); }catch(e){ return {}; }
+    }
+    function registerBlookRegistryEntries(map){
+      try{
+        const reg=getBlookRegistry();
+        let changed=false;
+        Object.keys(map).forEach(name=>{ if(!reg[name]){ reg[name]={packId:map[name].packId,packName:map[name].packName,rarity:map[name].rarity,chance:map[name].chance||0}; changed=true; } });
+        if(changed) localStorage.setItem("blookRarityRegistry", JSON.stringify(reg));
+      }catch(e){}
+    }
     function groupBlooksByPack(){
       const map={};
       const allPacksList=[...ALL_PACKS_FOR_OWNER,...(CUSTOM_PACKS_RUNTIME||[])];
       allPacksList.forEach(pack=>{ pack.blooks.forEach(b=>{ map[b.name]={packId:pack.id,packName:pack.name,rarity:b.rarity,chance:b.chance}; }); });
       Object.values(singleShopBlooks).forEach(item=>{ if(!map[item.name]) map[item.name]={packId:"other",packName:"Other Blooks",rarity:item.rarity,chance:0}; });
+      registerBlookRegistryEntries(map);
+      const registry=getBlookRegistry();
       if(userData&&userData.blooks){
         Object.keys(userData.blooks).forEach(name=>{
           if(map[name]) return;
           if(name.indexOf("⭐ ")===0 || name.indexOf("✨ ")===0){
             const base=name.replace(/^(⭐ |✨ )/,"");
             if(map[base]){ map[name]={packId:map[base].packId,packName:map[base].packName,rarity:map[base].rarity,chance:map[base].chance}; return; }
+            if(registry[base]){ map[name]={packId:registry[base].packId,packName:registry[base].packName,rarity:registry[base].rarity,chance:registry[base].chance}; return; }
           }
+          if(registry[name]){ map[name]=registry[name]; return; }
           map[name]={packId:"other",packName:"Other Blooks",rarity:R.COMMON,chance:0};
         });
       }
       return map;
     }
 
-    function registerSingleBlook(name,rarity){ if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Other Blooks",rarity,chance:0}; }
+    function registerSingleBlook(name,rarity){ if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Other Blooks",rarity,chance:0}; registerBlookRegistryEntries({[name]:BLOOK_INFO[name]}); }
 
     function buildPacks(){
       packGrid.innerHTML=""; boosterMarketBanner.innerHTML="";
@@ -2875,7 +3132,7 @@
       const shinyBonus = isShiny ? Math.round(actualPack.cost * (2 + Math.random()*3)) : 0;
       if(!userData.blooks) userData.blooks={};
       const blookKey = isShiny ? "✨ "+chosen.name : chosen.name;
-      userData.blooks[blookKey]=(userData.blooks[blookKey]||0)+1;
+      if(!autoSellIfDupeBlook(blookKey, chosen.rarity)) userData.blooks[blookKey]=(userData.blooks[blookKey]||0)+1;
       if(isShiny) userData.coins=(parseInt(userData.coins,10)||0)+shinyBonus;
       if(hotBonus > 0) userData.coins=(parseInt(userData.coins,10)||0)+hotBonus;
       userData.nextPackId=null;
@@ -3106,12 +3363,13 @@
           if(isRealOther){ div.style.borderLeft="3px solid #43a047"; div.style.paddingLeft="5px"; div.style.borderRadius="4px"; checkNameMention(msg.text||'', msg.username||''); }
           const name=document.createElement("span"); name.style.fontWeight="700";
           if(msg.isBot) name.style.color="#7c4dff";
+          let starPrefix = "";
           if(!msg.isBot && msg.username && msg.username===(userData?.username||'')) {
             if(userData.chatBadgeExpires && Date.now() < userData.chatBadgeExpires) {
-              name.textContent = '⭐ ' + name.textContent;
+              starPrefix = '⭐ ';
             }
           }
-          name.textContent=(msg.username||"user")+": "; div.appendChild(name);
+          name.innerHTML=starPrefix+(msg.username||"user")+badgeForUsername(msg.username)+": "; div.appendChild(name);
           if(msg.text){const t=document.createElement("span");t.textContent=msg.text;div.appendChild(t);}
           if(msg.imageUrl){const img=document.createElement("img");img.src=msg.imageUrl;img.className="chat-image";div.appendChild(document.createElement("br"));div.appendChild(img);}
           chatMessages.appendChild(div);
@@ -3294,7 +3552,7 @@
         else if(p.isAdmin) tag=` <span style="background:#1976d2;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">⚡ admin</span>`;
         if(isMe) tag+=` <span style="background:#43a047;color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">YOU</span>`;
         if(p.goldBorder) tag+=' <span style="background:#FFD700;color:#000;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700;">&#127885;</span>';
-        left.innerHTML=`${i+1}. ${p.username}${tag}${rankBadgeHTML(p.subscore,true)}`;
+        left.innerHTML=`${i+1}. ${p.username}${badgeForUsername(p.username)}${tag}${rankBadgeHTML(p.subscore,true)}`;
         const right=document.createElement("div"); right.className="lb-stats"; right.textContent=`Coins: ${p.coins} • Blooks: ${p.totalBlooks}`;
         row.appendChild(left); row.appendChild(right); leaderboardList.appendChild(row);
       });
@@ -3521,7 +3779,7 @@
             userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+mb.amount;
           } else if(mb.type==="blook") {
             if(!userData.blooks) userData.blooks={};
-            userData.blooks[mb.name]=(userData.blooks[mb.name]||0)+1;
+            if(!autoSellIfDupeBlook(mb.name, mb.rarity)) userData.blooks[mb.name]=(userData.blooks[mb.name]||0)+1;
           }
           await saveUserData();
           wheelCenter.textContent="\uD83C\uDF81";
@@ -3549,7 +3807,7 @@
         var pool = allPacksForMarket();
         var pack = pool[Math.floor(Math.random()*pool.length)];
         var b = pack.blooks[Math.floor(Math.random()*pack.blooks.length)];
-        return { type:"blook", name: b.name, label: "Got a " + b.name + " (" + b.rarity + ")!" };
+        return { type:"blook", name: b.name, rarity: b.rarity, label: "Got a " + b.name + " (" + b.rarity + ")!" };
       } else {
         // Rare jackpot: big coins
         var amt2 = 50000;
@@ -3632,6 +3890,7 @@
           userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+10000;
           // Register the blook
           BLOOK_INFO["Subscribe Button"]={packId:"other",packName:"Other Blooks",rarity:R.MYS,chance:0};
+          registerBlookRegistryEntries({"Subscribe Button":BLOOK_INFO["Subscribe Button"]});
           await saveUserData();
           renderBlooks();
           populateTradeOfferSelect();
@@ -3748,6 +4007,7 @@
       buildPacks(); buildSpecialShop(); showView("market");
       subscribeIncomingTrades(user.uid); subscribeGlobalBooster(); updateWheelButtonState();
       subscribeIncomingPetTrades(user.uid);
+      subscribeBadgeCache();
       checkMonthlyChatReset();
       checkPastEventResults();
       startSubletBotInterval();
@@ -3786,7 +4046,7 @@
       if(!userData){ statsUsername.textContent=""; statsCoins.textContent="0"; statsTotalCoins.textContent="0"; statsPacksOpened.textContent="0"; statsChromas.textContent="0"; statsMysticals.textContent="0"; statsBestBlook.textContent="None"; statsBestBlookRarity.textContent=""; statsSubscore.textContent="0"; return; }
       const s=calcStatsFromData(userData);
       statsUsername.innerHTML=(userData.username||"user")+rankBadgeHTML(s.subscore);
-      statsCoins.textContent=userData.coins||0; statsTotalCoins.textContent=userData.totalCoinsCollected||0; statsPacksOpened.textContent=userData.totalPacksOpened||0;
+      statsCoins.textContent=fmtCoinsDisplay(userData); statsTotalCoins.textContent=userData.totalCoinsCollected||0; statsPacksOpened.textContent=userData.totalPacksOpened||0;
       statsChromas.textContent=s.chromas; statsMysticals.textContent=s.mysticals;
       if(s.best){statsBestBlook.textContent=s.best.name;statsBestBlookRarity.textContent=s.best.rarity;}else{statsBestBlook.textContent="None";statsBestBlookRarity.textContent="";}
       const rk=getRankFromSubscore(s.subscore);
@@ -3952,7 +4212,7 @@
           const place=lb.findIndex(e=>e.uid===currentUser.uid)+1;
           const reward=place>=1&&place<=5?EVENT_PLACE_REWARDS[place]:EVENT_PARTICIPATION_REWARD;
           userData.coins=(parseInt(userData.coins,10)||0)+reward.coins;
-          if(reward.blook){ if(!userData.blooks) userData.blooks={}; userData.blooks[reward.blook]=(userData.blooks[reward.blook]||0)+1; BLOOK_INFO[reward.blook]={packId:"other",packName:"Event Rewards",rarity:reward.rarity,chance:0}; }
+          if(reward.blook){ if(!userData.blooks) userData.blooks={}; userData.blooks[reward.blook]=(userData.blooks[reward.blook]||0)+1; BLOOK_INFO[reward.blook]={packId:"other",packName:"Event Rewards",rarity:reward.rarity,chance:0}; registerBlookRegistryEntries({[reward.blook]:BLOOK_INFO[reward.blook]}); }
           checked[evId]=true; userData[checkedKey]=checked; await saveUserData();
           showEventResultModal(ev,place,reward,evData.score,lb.length); break;
         }catch(e){ console.error("Event result check failed:",e); }
@@ -4142,6 +4402,43 @@
       const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
       await update(userRef(found.uid),{isAdmin:true});
       statusEl.textContent=uname+" now has admin access. They must re-login to receive changes.";
+    });
+
+    (function initBadgePresetSelect(){
+      const sel=document.getElementById("badge-preset-select"); if(!sel) return;
+      BADGE_CATALOG.forEach((b,i)=>{
+        const opt=document.createElement("option"); opt.value=i; opt.textContent=b.name+" ("+b.content+" — "+b.rarity+")";
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change",()=>{
+        if(sel.value==="") return;
+        const b=BADGE_CATALOG[parseInt(sel.value,10)];
+        document.getElementById("badge-content-input").value=b.content;
+        document.getElementById("badge-rarity-select").value=b.rarity;
+      });
+    })();
+    document.getElementById("give-badge-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const uname=document.getElementById("badge-username").value.trim();
+      const content=document.getElementById("badge-content-input").value.trim();
+      const rarity=document.getElementById("badge-rarity-select").value;
+      const statusEl=document.getElementById("badge-status");
+      if(!uname){statusEl.textContent="Enter a username.";return;}
+      if(!content){statusEl.textContent="Enter badge content or pick a preset.";return;}
+      const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
+      const existing = Array.isArray(found.data.badges) ? found.data.badges.slice() : (found.data.badge ? [found.data.badge] : []);
+      existing.push({content,rarity});
+      await update(userRef(found.uid),{badges:existing, badge:null});
+      statusEl.textContent="Gave "+uname+" a "+rarity+" badge ("+content+").";
+    });
+    document.getElementById("remove-badge-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const uname=document.getElementById("badge-username").value.trim();
+      const statusEl=document.getElementById("badge-status");
+      if(!uname){statusEl.textContent="Enter a username.";return;}
+      const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
+      await update(userRef(found.uid),{badges:null, badge:null});
+      statusEl.textContent="Removed all badges from "+uname+".";
     });
 
     document.getElementById("remove-admin-btn").addEventListener("click",async()=>{
@@ -6212,6 +6509,26 @@
       { name: "Infinite",  denom:15600000000000000000n,tier:9,color:"#facc15"}
     ];
 
+    (function extendRngRarities(){
+      const prefixes=["Quasar","Nova","Pulsar","Comet","Meteor","Lunar","Solar","Cosmic","Stellar","Galactic","Nebula","Vortex","Rift","Shard","Ember","Frost","Storm","Blaze","Shadow","Radiant","Mystic","Phantom","Ancient","Sacred","Cursed","Blessed","Chrono","Astral","Eternal","Infernal","Celestial","Void","Prime","Alpha","Omega","Zenith","Nadir","Apex","Core","Echo","Pulse","Flux","Surge","Glimmer","Shimmer","Whisper","Fable","Legend","Myth","Saga"];
+      const suffixes=["Prime","Core","Rift","Wave","Shard","Bloom","Storm","Veil","Flame","Frost","Song","Echo","Dream","Fury","Reign","Star","Soul","Heart","Spark","Crown"];
+      const last=RNG_RARITIES[RNG_RARITIES.length-2].denom;
+      let denom=typeof last==="bigint"?last:BigInt(Math.round(last));
+      const extra=[];
+      let idx=0;
+      outer:
+      for(let p=0;p<prefixes.length;p++){
+        for(let s=0;s<suffixes.length;s++){
+          if(idx>=500) break outer;
+          denom = denom*3n + BigInt(1000+idx);
+          const hue=(idx*47)%360;
+          extra.push({ name: prefixes[p]+" "+suffixes[s], denom, tier: 14+Math.floor(idx/40), color: "hsl("+hue+",70%,50%)" });
+          idx++;
+        }
+      }
+      RNG_RARITIES.splice(RNG_RARITIES.length-1, 0, ...extra);
+    })();
+
     let rngSpinning = false;
 
     function getRngLuck(){ return parseFloat(userData?.rngLuck||0); }
@@ -6275,7 +6592,7 @@
           const denom=typeof r.denom==="bigint"?Number(r.denom):r.denom;
           const row=document.createElement("div");
           row.style.cssText="padding:5px 7px;border-radius:8px;background:#f5f5f5;display:flex;flex-direction:column;gap:1px;margin-bottom:4px;";
-          row.innerHTML="<div style='display:flex;justify-content:space-between;align-items:center;'><span style='font-weight:700;font-size:12px;color:#0d47a1;'>"+i+". "+(e.username||"?")+"</span><span style='font-size:10px;font-weight:700;color:"+r.color+";background:"+r.color+"22;padding:1px 5px;border-radius:999px;'>"+r.name+"</span></div><div style='font-size:10px;color:#aaa;'>1 in "+denom.toLocaleString()+"</div>";
+          row.innerHTML="<div style='display:flex;justify-content:space-between;align-items:center;'><span style='font-weight:700;font-size:12px;color:#0d47a1;'>"+i+". "+(e.username||"?")+badgeForUsername(e.username)+"</span><span style='font-size:10px;font-weight:700;color:"+r.color+";background:"+r.color+"22;padding:1px 5px;border-radius:999px;'>"+r.name+"</span></div><div style='font-size:10px;color:#aaa;'>1 in "+denom.toLocaleString()+"</div>";
           listEl.appendChild(row);
         });
       }catch(e){listEl.innerHTML="<div style='font-size:12px;color:#c62828;'>Failed.</div>";}
@@ -6336,6 +6653,28 @@
       userData.rngLuckUpgrades=(parseInt(userData.rngLuckUpgrades||0,10))+1;
       await saveUserData();
       renderRngView();
+    });
+
+    let rngAutoInterval = null;
+    document.getElementById("rng-auto-btn")?.addEventListener("click", ()=>{
+      const btn=document.getElementById("rng-auto-btn");
+      if(rngAutoInterval){
+        clearInterval(rngAutoInterval); rngAutoInterval=null;
+        btn.textContent="▶ Auto Spin"; btn.style.background="#00897b";
+        return;
+      }
+      if(!currentUser||!userData) return;
+      btn.textContent="⏹ Stop Auto"; btn.style.background="#c62828";
+      rngAutoInterval=setInterval(()=>{
+        if(rngSpinning) return;
+        if(!userData||(userData.coins||0)<10){
+          clearInterval(rngAutoInterval); rngAutoInterval=null;
+          btn.textContent="▶ Auto Spin"; btn.style.background="#00897b";
+          showToast("⏹ Auto Spin stopped — out of coins.","#c62828",3000);
+          return;
+        }
+        document.getElementById("rng-spin-btn")?.click();
+      }, 750);
     });
 
 
@@ -6998,7 +7337,7 @@
       var chosen;
       try { chosen = pickFromPack(pack); } catch(e) { alert("Error opening pack."); return; }
       if(!userData.blooks) userData.blooks = {};
-      userData.blooks[chosen.name] = (userData.blooks[chosen.name]||0) + 1;
+      if(!autoSellIfDupeBlook(chosen.name, chosen.rarity)) userData.blooks[chosen.name] = (userData.blooks[chosen.name]||0) + 1;
       userData.vipLastClaim = today;
       userData.totalPacksOpened = (userData.totalPacksOpened||0) + 1;
       await saveUserData(); renderBlooks();
@@ -7062,8 +7401,9 @@
         if(!chosen) { userData.coins = coins; return; }
         var gName = "⭐ " + chosen.name;
         if(!userData.blooks) userData.blooks = {};
-        userData.blooks[gName] = (userData.blooks[gName]||0) + 1;
+        if(!autoSellIfDupeBlook(gName, chosen.rarity)) userData.blooks[gName] = (userData.blooks[gName]||0) + 1;
         BLOOK_INFO[gName] = { packId: pack.id, packName: pack.name+" (Golden)", rarity: chosen.rarity, chance: chosen.chance, golden: true };
+        registerBlookRegistryEntries({[gName]:BLOOK_INFO[gName]});
         userData.totalPacksOpened = (userData.totalPacksOpened||0)+1;
         userData.nextPackId = null;
         await saveUserData();
@@ -7775,6 +8115,12 @@
       if(document.getElementById('settings-hide-online'))
         document.getElementById('settings-hide-online').checked = !!s.hideOnline;
 
+      // Auto-sell
+      if(document.getElementById('settings-autosell-blooks'))
+        document.getElementById('settings-autosell-blooks').checked = !!s.autoSellDupeBlooks;
+      if(document.getElementById('settings-autosell-pets'))
+        document.getElementById('settings-autosell-pets').checked = !!s.autoSellDupePets;
+
       // Theme
       if(s.theme) applyTheme(s.theme);
 
@@ -7899,6 +8245,40 @@
       s.style.color = '#2e7d32'; s.textContent = 'Privacy settings saved!'; setTimeout(() => { s.textContent=''; }, 2500);
     });
 
+    document.getElementById('settings-save-autosell-btn')?.addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.autoSellDupeBlooks = document.getElementById('settings-autosell-blooks').checked;
+      userData.settings.autoSellDupePets = document.getElementById('settings-autosell-pets').checked;
+      await saveUserData();
+      const s2 = document.getElementById('settings-autosell-status');
+      s2.style.color = '#2e7d32'; s2.textContent = 'Auto-sell settings saved!'; setTimeout(() => { s2.textContent=''; }, 2500);
+    });
+
+    const REDEEM_CODES = {
+      "13rty98klmk94": { coins: 100000, badge: { content: "🎫", rarity: "legendary", name: "Code Badge", how: "Redeem a special code in Settings." } }
+    };
+    document.getElementById('settings-redeem-btn')?.addEventListener('click', async function() {
+      if(!currentUser||!userData) return;
+      const statusEl = document.getElementById('settings-redeem-status');
+      const raw = document.getElementById('settings-redeem-input').value.trim();
+      if(!raw){ statusEl.style.color='#c62828'; statusEl.textContent='Enter a code.'; return; }
+      const code = raw.toLowerCase();
+      const def = REDEEM_CODES[code];
+      if(!def){ statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return; }
+      if(!userData.redeemedCodes) userData.redeemedCodes = {};
+      if(userData.redeemedCodes[code]){ statusEl.style.color='#c62828'; statusEl.textContent='Code already redeemed.'; return; }
+      userData.redeemedCodes[code] = true;
+      if(def.coins){ userData.coins=(parseInt(userData.coins,10)||0)+def.coins; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+def.coins; }
+      if(def.badge){
+        if(!Array.isArray(userData.badges)) userData.badges = userData.badge ? [userData.badge] : [];
+        if(!userData.badges.some(b=>b.content===def.badge.content && b.rarity===def.badge.rarity)) userData.badges.push(def.badge);
+      }
+      await saveUserData();
+      document.getElementById('settings-redeem-input').value='';
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Code redeemed! +'+(def.coins||0).toLocaleString()+' coins'+(def.badge?' and a special badge!':'!');
+    });
+
     function refreshSettingsStats() {
       const el = document.getElementById('settings-stats-snap');
       if(!el || !userData) return;
@@ -7906,7 +8286,7 @@
       const totalBlooks = Object.values(blooks).reduce((a,b) => a+b, 0);
       const uniqueBlooks = Object.keys(blooks).filter(k => (blooks[k]||0) > 0).length;
       el.innerHTML =
-        '<span>💰 Coins: <b>' + (userData.coins||0).toLocaleString() + '</b></span>' +
+        '<span>💰 Coins: <b>' + fmtCoinsDisplay(userData) + '</b></span>' +
         '<span>🪙 Total earned: <b>' + (userData.totalCoinsCollected||0).toLocaleString() + '</b></span>' +
         '<span>📦 Packs opened: <b>' + (userData.totalPacksOpened||0).toLocaleString() + '</b></span>' +
         '<span>🃏 Total blooks: <b>' + totalBlooks + '</b> (' + uniqueBlooks + ' unique)</span>' +
@@ -8534,7 +8914,7 @@
           const chosen = allB.length ? allB[Math.floor(Math.random()*allB.length)] : null;
           if(chosen) {
             if(!userData.blooks) userData.blooks={};
-            userData.blooks[chosen.name]=(userData.blooks[chosen.name]||0)+1;
+            if(!autoSellIfDupeBlook(chosen.name, chosen.rarity)) userData.blooks[chosen.name]=(userData.blooks[chosen.name]||0)+1;
             await saveUserData(); renderBlooks();
             showToast('🎁 Premium Box: Got ' + chosen.name + ' (' + rarity + ')!', '#7b1fa2', 4000);
             statusEl.style.color='#7b1fa2'; statusEl.textContent='Got: ' + chosen.name + ' (' + rarity + ')!';
@@ -9580,7 +9960,15 @@
         + "<p><strong>🎙️ Voice Chat:</strong> Join a lobby in Settings to talk with other players live.</p>"
         + "<p><strong>📰 News & 🎉 Giveaways:</strong> Owners/admins post updates and run giveaways with codes hidden in chat.</p>"
         + "<p><strong>🤖 SubAI:</strong> Type <code>subai your question</code> in chat for instant answers about the game.</p>"
-        + "<p><strong>💬 Chat:</strong> Be respectful — offensive language is automatically blurred.</p>";
+        + "<p><strong>💬 Chat:</strong> Be respectful — offensive language is automatically blurred.</p>"
+        + "<p><strong>🏅 Badges:</strong> Small circles next to your username. 5 rarities: common, rare, epic, legendary, pro. Owners can award custom badges, and some are unlocked with special codes.</p>";
+      const myBadges = userData?.isOwner===true ? BADGE_CATALOG : (Array.isArray(userData?.badges) ? userData.badges : (userData?.badge ? [userData.badge] : []));
+      c.innerHTML += myBadges.length
+        ? "<p><strong>🎖️ Your Badges:</strong></p>" + myBadges.map(b=>{
+            const meta=findBadgeMeta(b);
+            return "<div style='display:flex;align-items:center;gap:8px;margin:4px 0;'>"+badgeCircleHTML(b)+"<span style='font-size:12px;'><b>"+meta.name+"</b> ("+b.rarity+") — "+meta.how+"</span></div>";
+          }).join("")
+        : "<p><strong>🎖️ Your Badges:</strong> You don't have any badges yet.</p>";
       document.getElementById("game-info-modal").style.display="flex";
     });
     document.getElementById("game-info-close-btn")?.addEventListener("click", ()=>{ document.getElementById("game-info-modal").style.display="none"; });
@@ -9653,6 +10041,7 @@
       const eggs=Object.values(petEggsCache);
       if(!eggs.length){ grid.innerHTML="<div style='font-size:12px;color:#aaa;'>No pet eggs available yet. Ask the owner to add some in the Owner Panel!</div>"; return; }
       grid.innerHTML="";
+      if(document.getElementById("view-pets")?.style.display!=="none") renderPetInventory();
       eggs.forEach(egg=>{
         const card=document.createElement("div"); card.className="pack-card";
         card.style.background=egg.color||"linear-gradient(135deg,#8d6e63,#a1887f)";
@@ -9662,11 +10051,14 @@
         const q=document.createElement("div"); q.className="pack-q";
         const qSpan=document.createElement("span"); qSpan.textContent="?"; q.appendChild(qSpan);
         const tip=document.createElement("div"); tip.className="tooltip";
-        const byRarity={};
-        (egg.pets||[]).forEach(p=>{ const w=parseFloat(p.chance)>0?parseFloat(p.chance):1; byRarity[p.rarity]=(byRarity[p.rarity]||0)+w; });
-        const total=Object.values(byRarity).reduce((a,b)=>a+b,0)||1;
-        tip.textContent = Object.keys(byRarity).length
-          ? Object.keys(byRarity).sort((a,b)=>(PET_RARITY_ORDER[a]??99)-(PET_RARITY_ORDER[b]??99)).map(r=>r+" ~"+((byRarity[r]/total)*100).toFixed(1)+"%").join(", ")
+        const ownedNames=new Set(Object.values(userData?.pets||{}).filter(pp=>pp.eggName===egg.name).map(pp=>pp.name));
+        const totalW=(egg.pets||[]).reduce((s,x)=>s+(parseFloat(x.chance)>0?parseFloat(x.chance):1),0)||1;
+        const visiblePets=(egg.pets||[]).filter(p=>p.rarity!=="Secret"||ownedNames.has(p.name));
+        tip.textContent = visiblePets.length
+          ? visiblePets.slice().sort((a,b)=>(PET_RARITY_ORDER[a.rarity]??99)-(PET_RARITY_ORDER[b.rarity]??99)).map(p=>{
+              const w=parseFloat(p.chance)>0?parseFloat(p.chance):1;
+              return p.name+" ("+p.rarity+") ~"+((w/totalW)*100).toFixed(2)+"%";
+            }).join(", ")
           : "No pets configured yet.";
         q.appendChild(tip);
         header.appendChild(nameEl); header.appendChild(priceEl); header.appendChild(q);
@@ -9698,8 +10090,10 @@
       userData.coins-=cost;
       const picked=pickWeightedPet(egg.pets);
       if(!userData.pets) userData.pets={};
-      const instId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
-      userData.pets[instId]={id:instId,eggName:egg.name,name:picked.name,rarity:picked.rarity,effectType:picked.effectType,effectValue:picked.effectValue,equipped:false};
+      if(!autoSellIfDupePet(picked)){
+        const instId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
+        userData.pets[instId]={id:instId,eggName:egg.name,name:picked.name,rarity:picked.rarity,effectType:picked.effectType,effectValue:picked.effectValue,equipped:false};
+      }
       userData.totalPetsHatched=(userData.totalPetsHatched||0)+1;
       return picked;
     }
@@ -9737,9 +10131,18 @@
       if(!results.length){ alert("Couldn't hatch — check your coins or inventory space."); return; }
       await saveUserData();
       renderPetInventory();
-      playSfxPack(); spawnConfetti(PET_RARITY_COLORS[results[results.length-1].rarity]||"#78909c");
-      showToast("🥚 Hatched "+results.length+"x: "+results.map(r=>r.name+" ("+r.rarity+")").join(", "), "#6a1b9a", 5000);
-      if(results.length<times) alert("Only hatched "+results.length+" — ran out of coins or inventory space.");
+      const best=results.reduce((a,b)=>(PET_RARITY_ORDER[b.rarity]??0)>(PET_RARITY_ORDER[a.rarity]??0)?b:a);
+      playSfxPack(); spawnConfetti(PET_RARITY_COLORS[best.rarity]||"#78909c");
+      packOpenBlook.textContent = results.length+"x from "+egg.name;
+      packOpenBlook.style.background = PET_RARITY_COLORS[best.rarity]||"#78909c";
+      packOpenBlook.style.color = "#fff";
+      packOpenMeta.innerHTML = results.map(r=>
+        "<span style='display:inline-block;margin:2px 4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;background:"+(PET_RARITY_COLORS[r.rarity]||"#78909c")+";'>"+r.name+" ("+r.rarity+")</span>"
+      ).join("");
+      packOpenOverlay.style.display = "flex";
+      canClosePackOverlay = false;
+      setTimeout(()=>{ canClosePackOverlay=true; },600);
+      if(results.length<times) showToast("Only hatched "+results.length+" — ran out of coins or inventory space.","#c62828",4000);
     }
     let autoHatchEggId=null, autoHatchInterval=null;
     function toggleAutoHatch(egg){
@@ -9771,6 +10174,15 @@
       if(p.effectType==="commonshiny") return "✨ +"+p.effectValue+"% shiny chance";
       return "";
     }
+    function getPetChanceText(p){
+      const egg=Object.values(petEggsCache).find(e=>e.name===p.eggName);
+      if(!egg||!egg.pets||!egg.pets.length) return "";
+      const total=egg.pets.reduce((s,x)=>s+(parseFloat(x.chance)>0?parseFloat(x.chance):1),0)||1;
+      const match=egg.pets.find(x=>x.name===p.name&&x.rarity===p.rarity);
+      if(!match) return "";
+      const w=parseFloat(match.chance)>0?parseFloat(match.chance):1;
+      return (w/total*100).toFixed(2)+"% chance";
+    }
     function makePetCard(group){
       const p=group[0]; const count=group.length;
       const equippedCount=group.filter(g=>g.equipped).length;
@@ -9783,6 +10195,8 @@
       card.appendChild(img); card.appendChild(n); card.appendChild(meta);
       const effEl=document.createElement("div"); effEl.style.cssText="font-size:9px;text-align:center;color:#555;"; effEl.textContent=petEffectLabel(p);
       card.appendChild(effEl);
+      const chanceText=getPetChanceText(p);
+      if(chanceText){ const chanceEl=document.createElement("div"); chanceEl.style.cssText="font-size:9px;text-align:center;color:#888;"; chanceEl.textContent=chanceText; card.appendChild(chanceEl); }
       const row=document.createElement("div"); row.style.cssText="display:flex;gap:4px;margin-top:4px;";
       const eqBtn=document.createElement("button");
       eqBtn.textContent=hasUnequipped?"Equip":"Unequip";
