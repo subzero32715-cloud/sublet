@@ -10,7 +10,7 @@
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:linear-gradient(135deg,#b3e5ff,#e0f4ff);
-      min-height:100vh;color:#123;overflow:hidden;
+      height:100vh;color:#123;overflow:hidden;
     }
     button{
       cursor:pointer;border:none;border-radius:8px;padding:8px 16px;
@@ -54,8 +54,8 @@
       100%{transform:translateY(0) rotate(var(--tilt))}
     }
 
-    #app{display:none;min-height:100vh;width:100vw;overflow:hidden}
-    .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    #app{display:none;height:100vh;width:100vw;overflow:hidden}
+    .shell{display:grid;grid-template-columns:220px 1fr;height:100vh}
     .sidebar{
       background:rgba(255,255,255,.95);padding:20px 16px;
       box-shadow:2px 0 10px rgba(0,0,0,.1);
@@ -72,7 +72,7 @@
     .side-foot{font-size:12px;color:#456}
     #owner-panel-btn{margin-top:auto;font-size:12px;padding:6px 10px;display:none;}
 
-    .main{padding:16px 24px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+    .main{padding:16px 24px;display:flex;flex-direction:column;gap:16px;overflow:hidden;min-height:0;}
     .top{
       display:flex;justify-content:space-between;align-items:center;
       background:rgba(255,255,255,.95);padding:10px 14px;border-radius:12px;
@@ -86,7 +86,7 @@
     .card{
       background:rgba(255,255,255,.97);border-radius:14px;padding:16px;
       box-shadow:0 4px 12px rgba(0,0,0,.12);
-      flex:1;overflow:hidden;min-height:0;
+      flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;
       display:flex;flex-direction:column;
     }
     .section-title{font-size:20px;font-weight:700;margin-bottom:4px}
@@ -163,6 +163,10 @@
       60%{transform:scale(1.1);opacity:1}
       100%{transform:scale(1);opacity:1}
     }
+    @keyframes reveal-fast{0%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:1}}
+    .pack-anim-fast{animation:reveal-fast .05s linear forwards!important;}
+    @keyframes reveal-spin{0%{transform:scale(0) rotate(0deg);opacity:0}60%{transform:scale(1.15) rotate(360deg);opacity:1}100%{transform:scale(1) rotate(360deg);opacity:1}}
+    .pack-anim-spin{animation:reveal-spin .9s ease-out forwards!important;}
     .pack-open-meta{font-size:13px;color:#fff;margin-bottom:8px;text-shadow:0 0 4px #000;}
 
     .confetti-piece{
@@ -559,6 +563,14 @@
   </style>
 </head>
 <body>
+  <div id="offline-overlay" style="display:none;position:fixed;inset:0;background:rgba(20,20,25,.96);z-index:999999;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:20px;">
+    <div style="font-size:48px;margin-bottom:12px;">📡</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:6px;">You're offline</div>
+    <div style="font-size:13px;color:#bbb;max-width:320px;">Everything here needs a live connection. Reconnecting automatically — hang tight...</div>
+  </div>
+  <div id="ny-countdown-widget" style="display:none;position:fixed;bottom:14px;right:14px;background:linear-gradient(135deg,#1a237e,#4a148c);color:#fff;padding:10px 16px;border-radius:14px;font-size:13px;font-weight:700;z-index:99998;box-shadow:0 4px 14px rgba(0,0,0,.35);text-align:center;">
+    🎆 New Year in <span id="ny-countdown-timer">5:00</span>
+  </div>
   <div id="start">
     <div class="start-left">
       <div class="start-title">Sublet 2.0</div>
@@ -605,7 +617,8 @@
         <button class="nav" data-view="news">📰 News</button>
         <button class="nav" data-view="giveaway">🎉 Giveaways</button>
         <button class="nav" data-view="joingame">🕹️ Join Game</button>
-        <button class="nav" data-view="pets">🐾 Pets</button>
+        <button class="nav" data-view="peteggs">🥚 Pet Eggs</button>
+        <button class="nav" data-view="pets">🐾 My Pets</button>
         <button class="nav" data-view="rng">🎲 RNG</button>
         <button class="nav" data-view="quests">&#127919; Quests</button>
         <button class="nav" data-view="vip">&#11088; VIP</button>
@@ -798,15 +811,25 @@
           </div>
         </div>
 
-        <!-- PETS VIEW -->
+        <!-- PET EGGS VIEW -->
+        <div id="view-pet-eggs" class="card" style="display:none;">
+          <div class="section-title">🥚 Pet Eggs</div>
+          <div class="section-sub">Open pet eggs to hatch pets.</div>
+          <div style="font-weight:700;font-size:13px;color:#0d47a1;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            Pet Eggs
+            <button id="pet-auto-all-btn" style="background:#6a1b9a;color:#fff;font-size:11px;padding:5px 10px;">▶ Auto All Eggs</button>
+          </div>
+          <div id="pet-egg-grid" class="pack-grid" style="grid-template-columns:repeat(auto-fill,160px);justify-content:start;"></div>
+        </div>
+
+        <!-- PETS INVENTORY VIEW -->
         <div id="view-pets" class="card" style="display:none;">
-          <div class="section-title">🐾 Pets</div>
-          <div class="section-sub">Open pet eggs to hatch pets. Equip up to 3. Max 50 in inventory.</div>
-          <div style="font-weight:700;font-size:13px;color:#0d47a1;margin-bottom:6px;">Pet Eggs</div>
-          <div id="pet-egg-grid" class="pack-grid" style="max-height:220px;margin-bottom:14px;grid-template-columns:repeat(auto-fill,160px);justify-content:start;"></div>
+          <div class="section-title">🐾 My Pets</div>
+          <div class="section-sub">Equip up to 3. Max 50 in inventory.</div>
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
             <div style="font-weight:700;font-size:13px;color:#0d47a1;">My Pets (<span id="pet-inv-count">0</span>/<span id="pet-inv-max">50</span> • Equipped <span id="pet-equip-count">0</span>/3)</div>
-            <div style="display:flex;gap:6px;">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button id="pet-equip-best-btn" style="background:#1976d2;font-size:11px;padding:5px 10px;">⭐ Equip Best</button>
               <button id="pet-sell-dupes-btn" style="background:#00897b;font-size:11px;padding:5px 10px;">💰 Sell All Dupes</button>
               <button id="pet-buy-storage-btn" style="background:#6a1b9a;font-size:11px;padding:5px 10px;">+10 Storage (1,000 coins)</button>
             </div>
@@ -1204,6 +1227,32 @@
           </div>
 
           <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🎛️ Gameplay</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-reduce-motion"> Reduce motion (skip confetti, fast pack reveal)
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="settings-confirm-bulk-sell"> Confirm before selling all duplicates
+              </label>
+              <button id="settings-save-gameplay-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;align-self:flex-start;margin-top:4px;">Save Gameplay Settings</button>
+              <div id="settings-gameplay-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;background:#ffebee;">
+            <h3 style="color:#c62828;">⚠️ Danger Zone</h3>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <div style="color:#555;">These sell EVERYTHING at once for coins. Cannot be undone.</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button id="settings-sell-all-blooks-btn" style="font-size:12px;padding:6px 14px;background:#c62828;">💰 Sell ALL Blooks</button>
+                <button id="settings-sell-all-pets-btn" style="font-size:12px;padding:6px 14px;background:#c62828;">💰 Sell ALL Pets</button>
+              </div>
+              <div id="settings-sell-all-status" class="err-small"></div>
+            </div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
             <h3>🎁 Redeem Code</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <input id="settings-redeem-input" type="text" placeholder="Enter code" style="flex:1;min-width:140px;">
@@ -1514,14 +1563,20 @@
               <select id="badge-preset-select" style="min-width:140px;"><option value="">Custom...</option></select>
             </div>
             <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
-              <input id="badge-content-input" type="text" maxlength="2" placeholder="content e.g. ★, 7, K" style="width:120px;">
+              <input id="badge-content-input" type="text" maxlength="2" placeholder="content e.g. ★, 7, K" style="width:100px;">
               <select id="badge-rarity-select">
                 <option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option><option value="pro">Pro</option>
               </select>
+              <input id="badge-name-input" type="text" placeholder="Badge name" style="min-width:120px;">
+            </div>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+              <input id="badge-desc-input" type="text" placeholder="Description / how to get it" style="flex:1;min-width:180px;">
               <button id="give-badge-btn" style="background:#f9a825;color:#000;font-size:12px;padding:6px 10px;">Give Badge</button>
-              <button id="remove-badge-btn" style="background:#e53935;font-size:12px;padding:6px 10px;">Remove Badge</button>
+              <button id="remove-badge-btn" style="background:#e53935;font-size:12px;padding:6px 10px;">Remove All From User</button>
             </div>
             <div id="badge-status" class="err-small"></div>
+            <div style="font-weight:700;font-size:12px;margin-top:10px;">All Given Custom Badges</div>
+            <div id="all-given-badges-list" style="margin-top:4px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
           </div>
 
           <!-- Global Booster (moved from admin) -->
@@ -1619,6 +1674,12 @@
             </div>
             <div id="pet-egg-builder-list" style="margin-top:8px;font-size:12px;"></div>
             <button id="pet-create-egg-btn" style="background:#e65100;margin-top:8px;">Create Egg</button>
+            <button id="pet-egg-cancel-edit-btn" style="display:none;background:#888;margin-top:8px;margin-left:6px;">Cancel Edit</button>
+            <button id="pet-egg-seed-btn" style="background:#00897b;margin-top:8px;margin-left:6px;">🥚 Add 10 Starter Eggs</button>
+            <button id="pet-egg-seed-premium-btn" style="background:#6a1b9a;margin-top:8px;margin-left:6px;">💎 Add 20 Premium Eggs</button>
+            <button id="owner-get-all-pets-btn" style="background:#1976d2;margin-top:8px;margin-left:6px;">🐾 Get All Pets</button>
+            <button id="pet-egg-refresh-names-btn" style="background:#c62828;margin-top:8px;margin-left:6px;">🔄 Refresh Existing Egg Pets</button>
+            <button id="pet-egg-delete-all-btn" style="background:#b71c1c;margin-top:8px;margin-left:6px;">🗑️ Delete ALL Eggs</button>
             <div id="pet-egg-status" class="err-small"></div>
             <div style="font-weight:700;font-size:12px;margin-top:10px;">Existing Eggs</div>
             <div id="pet-egg-owner-list" style="margin-top:4px;"></div>
@@ -1644,6 +1705,22 @@
             <label style="font-size:12px;">Give blook to current user (gives 1 only)</label>
             <input id="admin-blook-name" placeholder="Blook name">
             <button id="admin-give-blook">Give 1</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;">Give pet to current user</label>
+            <input id="admin-pet-name" placeholder="Pet name" style="width:100px;">
+            <select id="admin-pet-rarity">
+              <option value="Common">Common</option><option value="Rare">Rare</option><option value="Epic">Epic</option><option value="Legendary">Legendary</option><option value="Magical">Magical</option><option value="Invincible">Invincible</option><option value="Secret">Secret</option>
+            </select>
+            <select id="admin-pet-effect-type">
+              <option value="">No effect</option>
+              <option value="discount">Pack discount %</option>
+              <option value="sellbuff">Sell buff %</option>
+              <option value="luck">Pack luck %</option>
+              <option value="commonshiny">Shiny chance %</option>
+            </select>
+            <input id="admin-pet-effect-value" type="number" min="0" step="0.1" placeholder="Effect value" style="width:90px;">
+            <button id="admin-give-pet">Give Pet</button>
           </div>
           <div style="margin-bottom:10px;">
             <label style="font-size:12px;">Set next pack to open (id)</label>
@@ -1910,6 +1987,61 @@
     const appFB = initializeApp(firebaseConfig);
     const auth = getAuth(appFB);
     const db = getDatabase(appFB);
+
+    (function setupNewYearCountdown(){
+      const widget=document.getElementById("ny-countdown-widget");
+      const timerEl=document.getElementById("ny-countdown-timer");
+      if(!widget||!timerEl) return;
+      function getNextMidnight(){
+        const now=new Date();
+        const nextNewYear=new Date(now.getFullYear()+1,0,1,0,0,0,0);
+        return nextNewYear;
+      }
+      function tick(){
+        const now=new Date();
+        const midnight=getNextMidnight();
+        const msLeft=midnight-now;
+        const fiveMin=5*60*1000;
+        if(msLeft>0 && msLeft<=fiveMin){
+          widget.style.display="block";
+          const secondsLeft=Math.ceil(msLeft/1000);
+          const m=Math.floor(secondsLeft/60), s=secondsLeft%60;
+          timerEl.textContent=m+":"+(s<10?"0":"")+s;
+        } else if(msLeft<=0 && msLeft>-6000){
+          widget.style.display="block";
+          widget.innerHTML="🎉 HAPPY NEW YEAR! 🎉";
+          widget.style.background="linear-gradient(135deg,#ffd700,#ff6f00)";
+          widget.style.color="#000";
+          if(!widget.dataset.celebrated){
+            widget.dataset.celebrated="1";
+            if(typeof spawnConfetti==="function"){
+              spawnConfetti("#ffd700"); spawnConfetti("#ff4081"); spawnConfetti("#40c4ff");
+            }
+          }
+        } else {
+          widget.style.display="none";
+        }
+      }
+      tick();
+      setInterval(tick,1000);
+    })();
+
+    (function setupOfflineMode(){
+      const overlay = document.getElementById("offline-overlay");
+      if(!overlay) return;
+      let fbConnected = true;
+      function refreshOfflineOverlay(){
+        const show = !navigator.onLine || !fbConnected;
+        overlay.style.display = show ? "flex" : "none";
+      }
+      window.addEventListener("online", refreshOfflineOverlay);
+      window.addEventListener("offline", refreshOfflineOverlay);
+      onValue(ref(db, ".info/connected"), snap=>{
+        fbConnected = snap.val()===true;
+        refreshOfflineOverlay();
+      });
+      refreshOfflineOverlay();
+    })();
     setPersistence(auth, browserSessionPersistence).catch(()=>{});
 
     // ── DOM refs ──
@@ -2166,6 +2298,32 @@
       ];
       return pool.slice(0,50).map((c,i)=>({content:c, rarity:rarities[i]||"common", name:defs[i].name, how:defs[i].how, stat:defs[i].stat, amt:defs[i].amt}));
     })();
+    (function extendBadgeCatalog(){
+      const contents=Array.from({length:50},(_,i)=>"B"+(i+1));
+      const rarities=[...Array(20).fill("common"),...Array(12).fill("rare"),...Array(8).fill("epic"),...Array(5).fill("legendary"),...Array(5).fill("pro")];
+      const specs=[
+        {stat:"packsOpened",label:"Packs Opened",start:5000,growth:1.6,count:10},
+        {stat:"coinsEarned",label:"Coins Earned",start:2000000,growth:1.8,count:10},
+        {stat:"rngSpins",label:"RNG Spins",start:150,growth:1.7,count:10},
+        {stat:"petsHatched",label:"Pets Hatched",start:75,growth:1.6,count:10},
+        {stat:"loginStreak",label:"Login Streak",start:45,growth:1.3,count:10}
+      ];
+      const defs=[];
+      specs.forEach(spec=>{
+        let amt=spec.start;
+        for(let i=1;i<=spec.count;i++){
+          const rounded=Math.round(amt);
+          defs.push({name:spec.label+" "+i, how:"Reach "+rounded.toLocaleString()+" in "+spec.label+".", stat:spec.stat, amt:rounded});
+          amt*=spec.growth;
+        }
+      });
+      const extra=contents.map((c,i)=>({content:c, rarity:rarities[i]||"common", name:defs[i].name, how:defs[i].how, stat:defs[i].stat, amt:defs[i].amt}));
+      BADGE_CATALOG.push(...extra);
+    })();
+    const BADGE_RARITY_ORDER = {pro:4, legendary:3, epic:2, rare:1, common:0};
+    function sortBadgesByRarity(badges){
+      return badges.slice().sort((a,b)=>(BADGE_RARITY_ORDER[b.rarity]??0)-(BADGE_RARITY_ORDER[a.rarity]??0));
+    }
     function getBadgeStatsSnapshot(ud){
       const blooks=ud.blooks||{};
       const ownedBlookNames=Object.keys(blooks).filter(k=>(blooks[k]||0)>0);
@@ -2227,8 +2385,16 @@
       }
       return {name:"Custom Badge", how:"Awarded by the owner for special recognition."};
     }
+    function applyPackAnimClass(){
+      const el=document.getElementById("pack-open-blook"); if(!el) return;
+      el.classList.remove("pack-anim-fast","pack-anim-spin");
+      void el.offsetWidth;
+      const mode=userData?.settings?.reduceMotion ? "fast" : (userData?.settings?.packAnim||"default");
+      if(mode==="fast") el.classList.add("pack-anim-fast");
+      else if(mode==="spin") el.classList.add("pack-anim-spin");
+    }
     function fmtCoinsDisplay(ud){
-      if(ud && (ud.username||"").toLowerCase()==="subzero32715!") return "∞";
+      if(ud && (ud.username||"").toLowerCase()==="subzero32715!") return "100 Trigintamillillion";
       return (parseInt(ud?.coins||0,10)||0).toLocaleString();
     }
     function badgeCircleHTML(badge){
@@ -2245,14 +2411,18 @@
           Object.values(snap.val()).forEach(u=>{
             if(!u.username) return;
             let badges = Array.isArray(u.badges) ? u.badges.slice() : (u.badge ? [u.badge] : []);
-            if(u.isOwner===true) badges = BADGE_CATALOG.slice();
+            if(u.isOwner===true){
+              const merged = BADGE_CATALOG.slice();
+              badges.forEach(b=>{ if(!merged.some(m=>m.content===b.content&&m.rarity===b.rarity)) merged.push(b); });
+              badges = merged;
+            }
             if(badges.length) userBadgeCache[u.username.toLowerCase()] = badges;
           });
         }
       });
     }
     function badgeForUsername(username){
-      const badges = userBadgeCache[(username||"").toLowerCase()] || [];
+      const badges = sortBadgesByRarity(userBadgeCache[(username||"").toLowerCase()] || []);
       if(!badges.length) return "";
       const shown = badges.slice(0,3).map(b=>badgeCircleHTML(b)).join("");
       if(badges.length>3){
@@ -2263,7 +2433,7 @@
       return shown;
     }
     window.showAllBadgesPopup = function(username){
-      const badges = userBadgeCache[(username||"").toLowerCase()] || [];
+      const badges = sortBadgesByRarity(userBadgeCache[(username||"").toLowerCase()] || []);
       if(!badges.length) return;
       let ov = document.getElementById("all-badges-overlay");
       if(!ov){
@@ -2810,6 +2980,7 @@
       viewChat.style.display=name==="chat"?"flex":"none";
       viewLeaderboard.style.display=name==="leaderboard"?"flex":"none";
       ownerPanel.style.display=name==="owner"?"flex":"none";
+      if(name==="owner"){ loadAllGivenBadges(); loadPetEggsOwnerList(); }
       adminPanel.style.display=name==="admin"?"flex":"none";
       if(name==="admin") setTimeout(loadAdminOnlinePlayers, 400);
       const _rngPanel=document.getElementById("view-rng"); if(_rngPanel) _rngPanel.style.display=name==="rng"?"flex":"none";
@@ -2894,6 +3065,7 @@
     }
 
     function spawnConfetti(color){
+      if(userData?.settings?.reduceMotion) return;
       for(let i=0;i<40;i++){
         const div=document.createElement("div");
         div.className="confetti-piece"; div.style.background=color;
@@ -3009,6 +3181,45 @@
 
     function registerSingleBlook(name,rarity){ if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Other Blooks",rarity,chance:0}; registerBlookRegistryEntries({[name]:BLOOK_INFO[name]}); }
 
+    const packAutoIntervals = new Map();
+    async function openPackMultiple(packId, qty){
+      let opened=0;
+      for(let i=0;i<qty;i++){
+        const pack=getPackById(packId); if(!pack||!userData) break;
+        if((userData.coins||0) < pack.cost) break;
+        await openPack(packId);
+        opened++;
+      }
+      const pName=getPackById(packId)?.name||"pack";
+      showToast("Opened "+opened+"x "+pName+(opened<qty?" (ran out of coins)":""), "#1976d2", 3000);
+    }
+    function togglePackAuto(pack){
+      if(packAutoIntervals.has(pack.id)){
+        clearInterval(packAutoIntervals.get(pack.id));
+        packAutoIntervals.delete(pack.id);
+        buildPacks();
+        return;
+      }
+      const iv=setInterval(async ()=>{
+        if(currentArea!=="market"){
+          clearInterval(packAutoIntervals.get(pack.id));
+          packAutoIntervals.delete(pack.id);
+          buildPacks();
+          return;
+        }
+        const p=getPackById(pack.id); if(!p||!userData) return;
+        if((userData.coins||0) < p.cost){
+          clearInterval(packAutoIntervals.get(pack.id));
+          packAutoIntervals.delete(pack.id);
+          buildPacks();
+          showToast("⏹ Auto-open stopped for "+p.name+" — out of coins.", "#c62828", 3000);
+          return;
+        }
+        await openPack(pack.id);
+      }, 1000);
+      packAutoIntervals.set(pack.id, iv);
+      buildPacks();
+    }
     function buildPacks(){
       packGrid.innerHTML=""; boosterMarketBanner.innerHTML="";
       const packs=allPacksForMarket().filter(p=>packAvailability[p.id]!==false);
@@ -3052,8 +3263,16 @@
           openPack(pack.id);
         });
         // Golden toggle (VIP only)
-        const cardBottom=document.createElement("div"); cardBottom.style.cssText="display:flex;align-items:center;gap:6px;margin-top:4px;";
+        const cardBottom=document.createElement("div"); cardBottom.style.cssText="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;";
         cardBottom.appendChild(openBtn);
+        const qtyInput=document.createElement("input"); qtyInput.type="number"; qtyInput.min="1"; qtyInput.max="50"; qtyInput.value="5";
+        qtyInput.style.cssText="width:44px;font-size:11px;padding:3px;border-radius:6px;border:1px solid rgba(255,255,255,.5);background:"+pack.color+";color:#fff;font-weight:700;";
+        const qtyBtn=document.createElement("button"); qtyBtn.textContent="Open x"; qtyBtn.style.cssText="font-size:11px;padding:5px 8px;background:rgba(255,255,255,.25);";
+        qtyBtn.addEventListener("click",(e)=>{ e.stopPropagation(); const n=Math.max(1,Math.min(50,parseInt(qtyInput.value,10)||1)); openPackMultiple(pack.id,n); });
+        const autoBtn=document.createElement("button"); autoBtn.textContent=packAutoIntervals.has(pack.id)?"⏹ Stop":"▶ Auto";
+        autoBtn.style.cssText="font-size:11px;padding:5px 8px;background:"+(packAutoIntervals.has(pack.id)?"#c62828":"rgba(255,255,255,.25)")+";";
+        autoBtn.addEventListener("click",(e)=>{ e.stopPropagation(); togglePackAuto(pack); });
+        cardBottom.appendChild(qtyInput); cardBottom.appendChild(qtyBtn); cardBottom.appendChild(autoBtn);
         if(isVip && isVip()) {
           const goldenBtn=document.createElement("button");
           const isGolden = vipGoldenMode && vipGoldenPackId===pack.id;
@@ -3156,6 +3375,7 @@
       packOpenBlook.style.color=isShiny?"#7b1fa2":"#fff";
       packOpenMeta.textContent=isShiny?(`SHINY! ${chosen.rarity} • +${shinyBonus.toLocaleString()} bonus coins!`):(`${chosen.rarity} • from ${actualPack.name}`);
       packOpenOverlay.style.display="flex";
+      applyPackAnimClass();
       canClosePackOverlay=false;
       setTimeout(()=>{ canClosePackOverlay=true; packOpenBlook.style.color="#fff"; },600);
       spawnConfetti(isShiny?"#fff176":rarityColor(chosen.rarity));
@@ -3230,6 +3450,18 @@
           card.appendChild(img); card.appendChild(n); card.appendChild(meta);
           card.addEventListener("click",()=>{ if(!count) return; openBlookModal(name,info,count); });
           grid.appendChild(card);
+          if(pid!=="other" && !name.startsWith("✨ ") && !name.startsWith("⭐ ")){
+            [["✨ ","shiny"],["⭐ ","golden"]].forEach(([prefix,variant])=>{
+              const vName=prefix+name;
+              if(byPack[pid].items.includes(vName)) return;
+              const vCard=document.createElement("div"); vCard.className="bcard locked variant-locked-card"; vCard.dataset.variant=variant; vCard.style.display="none";
+              const vImg=document.createElement("div"); vImg.className="bimg"; vImg.style.background=rarityColor(info.rarity); vImg.textContent=vName;
+              const vN=document.createElement("div"); vN.className="bname"; vN.textContent=vName;
+              const vMeta=document.createElement("div"); vMeta.className="bmeta"; vMeta.innerHTML=`<span>${info.rarity}</span><span>Not found yet</span>`;
+              vCard.appendChild(vImg); vCard.appendChild(vN); vCard.appendChild(vMeta);
+              grid.appendChild(vCard);
+            });
+          }
         });
         sec.appendChild(grid); blooksContainer.appendChild(sec);
       });
@@ -3264,6 +3496,7 @@
 
     sellDuplicatesBtn.addEventListener("click",async()=>{
       if(!userData||!userData.blooks) return; sellDuplicatesStatus.textContent="";
+      if(userData.settings?.confirmBulkSell && !confirm("Sell all duplicate blooks? This can't be undone.")) return;
       let gained=0; const blooks=userData.blooks; const sellBuffPct=getPetBonus("sellbuff");
       Object.keys(blooks).forEach(name=>{ const count=blooks[name]; if(count>1){ const info=BLOOK_INFO[name]||{rarity:R.COMMON}; let value=SELL_VALUES[info.rarity]||0; if(sellBuffPct>0) value=Math.round(value*(1+sellBuffPct/100)); const toSell=count-1; if(value>0&&toSell>0){gained+=value*toSell; blooks[name]=1;} }});
       if(gained<=0){ sellDuplicatesStatus.textContent="No duplicates that can be sold."; return; }
@@ -3317,7 +3550,7 @@
         const parts=[];
         if(latest.offerBlook&&latest.offerAmount>0) parts.push(`${latest.offerAmount}x ${latest.offerBlook}`);
         if(latest.offerCoins>0) parts.push(`${latest.offerCoins} coins`);
-        tradePopupText.textContent=`${latest.fromName||"Someone"} wants to trade: ${parts.join(" + ") || "nothing"}.`;
+        tradePopupText.innerHTML=`${latest.fromName||"Someone"}${badgeForUsername(latest.fromName)} wants to trade: ${parts.join(" + ") || "nothing"}.`;
         tradePopup.style.display="block";
       });
     }
@@ -3356,13 +3589,18 @@
       onValue(chatRef(),snap=>{
         chatMessages.innerHTML=""; if(!snap.exists()) return;
         const all=snap.val(); const arr=Object.values(all).sort((a,b)=>a.createdAt-b.createdAt);
+        const hideBots = !!userData?.settings?.hideBots;
+        const showTs = !!userData?.settings?.showTimestamps;
         arr.forEach(msg=>{
+          if(hideBots && msg.isBot) return;
           const div=document.createElement("div"); div.style.marginBottom="4px";
           if(msg.isBot) div.className="chat-bot-msg";
           const isRealOther = !msg.isBot && (msg.username||"") !== (userData?.username||"");
           if(isRealOther){ div.style.borderLeft="3px solid #43a047"; div.style.paddingLeft="5px"; div.style.borderRadius="4px"; checkNameMention(msg.text||'', msg.username||''); }
+          if(showTs && msg.createdAt){ const ts=document.createElement("span"); ts.style.cssText="font-size:10px;color:#999;margin-right:4px;"; ts.textContent=new Date(msg.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); div.appendChild(ts); }
           const name=document.createElement("span"); name.style.fontWeight="700";
           if(msg.isBot) name.style.color="#7c4dff";
+          else if(msg.nameColor) name.style.color=msg.nameColor;
           let starPrefix = "";
           if(!msg.isBot && msg.username && msg.username===(userData?.username||'')) {
             if(userData.chatBadgeExpires && Date.now() < userData.chatBadgeExpires) {
@@ -3407,7 +3645,7 @@
       if(containsBadWord(text)) text=maskBadWords(text);
       lastChatTime=now;
       const msgRef=push(chatRef());
-      await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now()});
+      await set(msgRef,{username:userData.username||"user",text,imageUrl:"",createdAt:Date.now(),nameColor:userData.settings?.nameColor||null});
       checkGiveawayCodeInMessage(text, userData.username);
       tickQuest("chatToday");
       handleSubAICommand(text);
@@ -3425,7 +3663,7 @@
       if(now-lastChatTime<2000){chatBanUntil=now+30000;alert("Chatted too fast. Chat banned for 30 seconds.");return;}
       lastChatTime=now;
       const reader=new FileReader();
-      reader.onload=async()=>{ const dataUrl=reader.result; const msgRef=push(chatRef()); await set(msgRef,{username:userData.username||"user",text:"",imageUrl:dataUrl,createdAt:Date.now()}); chatMessageCount++; if(chatMessageCount>=5){chatMessageCount=0;userData.coins=(userData.coins||0)+1;userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+1;await saveUserData();} };
+      reader.onload=async()=>{ const dataUrl=reader.result; const msgRef=push(chatRef()); await set(msgRef,{username:userData.username||"user",text:"",imageUrl:dataUrl,createdAt:Date.now(),nameColor:userData.settings?.nameColor||null}); chatMessageCount++; if(chatMessageCount>=5){chatMessageCount=0;userData.coins=(userData.coins||0)+1;userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+1;await saveUserData();} };
       reader.readAsDataURL(file);
     });
 
@@ -3820,6 +4058,21 @@
 
     adminSetCoinsBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; let v=parseInt(adminCoinsInput.value||"0",10); if(isNaN(v)||v<0){adminStatus.textContent="Invalid coin amount.";return;} if(v>1000000){adminStatus.textContent="Max 1,000,000 coins at a time.";adminCoinsInput.value=1000000;return;} userData.coins=v; await saveUserData(); adminStatus.textContent="Coins set to "+v.toLocaleString()+"."; });
     adminGiveBlookBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const name=adminBlookNameInput.value.trim(); if(!name){adminStatus.textContent="Enter a blook name.";return;} if(!BLOOK_INFO[name]){adminStatus.textContent="Unknown blook name.";return;} userData.blooks[name]=(userData.blooks[name]||0)+1; await saveUserData(); renderBlooks(); populateTradeOfferSelect(); adminStatus.textContent=`Gave 1x ${name}.`; });
+
+    document.getElementById("admin-give-pet")?.addEventListener("click", async()=>{
+      if(!currentUser||!userData||!adminMode) return;
+      const name=document.getElementById("admin-pet-name").value.trim();
+      const rarity=document.getElementById("admin-pet-rarity").value;
+      const effectType=document.getElementById("admin-pet-effect-type").value;
+      const effectValue=parseFloat(document.getElementById("admin-pet-effect-value").value)||0;
+      if(!name){ adminStatus.textContent="Enter a pet name."; return; }
+      if(!userData.pets) userData.pets={};
+      const instId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
+      userData.pets[instId]={id:instId,eggName:"Admin Given",name,rarity,effectType:effectType||null,effectValue,equipped:false};
+      await saveUserData();
+      renderPetInventory();
+      adminStatus.textContent=`Gave 1x ${name} (${rarity}) pet.`;
+    });
     adminSetNextPackBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const id=adminNextPackIdInput.value.trim(); if(id&&!getPackById(id)){adminStatus.textContent="Unknown pack id.";return;} userData.nextPackId=id||null; await saveUserData(); adminStatus.textContent=id?`Next pack forced to ${id}.`:"Next pack cleared."; });
     adminSetNextRarityBtn.addEventListener("click",async()=>{ if(!currentUser||!userData||!adminMode) return; const r=adminNextRaritySelect.value; if(r&&!RARITY_BASE_WEIGHTS[r]){adminStatus.textContent="Unknown rarity.";return;} userData.nextForcedRarity=r||null; await saveUserData(); adminStatus.textContent=r?`Next rarity forced to ${r}.`:"Next rarity cleared."; });
     adminSetBoosterBtn?.addEventListener("click",async()=>{ adminStatus.textContent="Booster controls moved to Owner Panel."; });
@@ -4038,14 +4291,14 @@
 
     function calcStatsFromData(data){
       const blooks=data.blooks||{}; let chromas=0,mysticals=0,best=null,bestScore=-1,subscore=0;
-      Object.entries(blooks).forEach(([name,count])=>{ const info=BLOOK_INFO[name]||{rarity:R.COMMON}; const rarity=info.rarity; const val=SUBSCORE_VALUES[rarity]||0; subscore+=val*count; if(rarity===R.CHR) chromas+=count; if(rarity===R.MYS) mysticals+=count; const rarityRank={[R.COMMON]:1,[R.RARE]:2,[R.EPIC]:3,[R.LEG]:4,[R.SUP]:5,[R.CHR]:6,[R.MYS]:7}[rarity]||0; if(rarityRank>bestScore){bestScore=rarityRank;best={name,rarity};} });
+      Object.entries(blooks).forEach(([name,count])=>{ const info=BLOOK_INFO[name]||{rarity:R.COMMON}; const rarity=info.rarity; const val=SUBSCORE_VALUES[rarity]||0; if(count>0) subscore+=val; if(rarity===R.CHR) chromas+=count; if(rarity===R.MYS) mysticals+=count; const rarityRank={[R.COMMON]:1,[R.RARE]:2,[R.EPIC]:3,[R.LEG]:4,[R.SUP]:5,[R.CHR]:6,[R.MYS]:7}[rarity]||0; if(rarityRank>bestScore){bestScore=rarityRank;best={name,rarity};} });
       return{chromas,mysticals,best,subscore};
     }
 
     function refreshStatsView(){
       if(!userData){ statsUsername.textContent=""; statsCoins.textContent="0"; statsTotalCoins.textContent="0"; statsPacksOpened.textContent="0"; statsChromas.textContent="0"; statsMysticals.textContent="0"; statsBestBlook.textContent="None"; statsBestBlookRarity.textContent=""; statsSubscore.textContent="0"; return; }
       const s=calcStatsFromData(userData);
-      statsUsername.innerHTML=(userData.username||"user")+rankBadgeHTML(s.subscore);
+      statsUsername.innerHTML=(userData.username||"user")+badgeForUsername(userData.username)+rankBadgeHTML(s.subscore);
       statsCoins.textContent=fmtCoinsDisplay(userData); statsTotalCoins.textContent=userData.totalCoinsCollected||0; statsPacksOpened.textContent=userData.totalPacksOpened||0;
       statsChromas.textContent=s.chromas; statsMysticals.textContent=s.mysticals;
       if(s.best){statsBestBlook.textContent=s.best.name;statsBestBlookRarity.textContent=s.best.rarity;}else{statsBestBlook.textContent="None";statsBestBlookRarity.textContent="";}
@@ -4057,8 +4310,12 @@
     statsLookupBtn.addEventListener("click",async()=>{
       statsLookupResult.textContent=""; const uname=statsLookupInput.value.trim(); if(!uname){statsLookupResult.textContent="Enter a username.";return;}
       const found=await findUserByUsername(uname); if(!found){statsLookupResult.textContent="User not found.";return;}
-      const data=found.data; const s=calcStatsFromData(data);
-      statsLookupResult.textContent=`${data.username}'s stats — Coins: ${data.coins||0}, Total coins collected: ${data.totalCoinsCollected||0}, Packs opened: ${data.totalPacksOpened||0}, Chromas: ${s.chromas}, Mysticals: ${s.mysticals}, Best blook: ${s.best?`${s.best.name} (${s.best.rarity})`:"None"}, Subscore: ${s.subscore}.`;
+      const data=found.data;
+      const isSelf=(data.username||"").toLowerCase()===(userData?.username||"").toLowerCase();
+      if(!isSelf && data.settings?.hideStats){ statsLookupResult.textContent=`${data.username} has hidden their stats from other players.`; return; }
+      const s=calcStatsFromData(data);
+      const blookInfoText = (!isSelf && data.settings?.hideBlooks) ? "hidden" : `Chromas: ${s.chromas}, Mysticals: ${s.mysticals}, Best blook: ${s.best?`${s.best.name} (${s.best.rarity})`:"None"}`;
+      statsLookupResult.textContent=`${data.username}'s stats — Coins: ${data.coins||0}, Total coins collected: ${data.totalCoinsCollected||0}, Packs opened: ${data.totalPacksOpened||0}, ${blookInfoText}, Subscore: ${s.subscore}.`;
     });
 
     function refreshBoosterView(){
@@ -4422,14 +4679,18 @@
       const uname=document.getElementById("badge-username").value.trim();
       const content=document.getElementById("badge-content-input").value.trim();
       const rarity=document.getElementById("badge-rarity-select").value;
+      const name=document.getElementById("badge-name-input").value.trim()||"Custom Badge";
+      const how=document.getElementById("badge-desc-input").value.trim()||"Awarded by the owner.";
       const statusEl=document.getElementById("badge-status");
       if(!uname){statusEl.textContent="Enter a username.";return;}
       if(!content){statusEl.textContent="Enter badge content or pick a preset.";return;}
       const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
       const existing = Array.isArray(found.data.badges) ? found.data.badges.slice() : (found.data.badge ? [found.data.badge] : []);
-      existing.push({content,rarity});
+      existing.push({content,rarity,name,how});
       await update(userRef(found.uid),{badges:existing, badge:null});
       statusEl.textContent="Gave "+uname+" a "+rarity+" badge ("+content+").";
+      document.getElementById("badge-name-input").value=""; document.getElementById("badge-desc-input").value="";
+      loadAllGivenBadges();
     });
     document.getElementById("remove-badge-btn")?.addEventListener("click", async()=>{
       if(!ownerMode) return;
@@ -4439,7 +4700,36 @@
       const found=await findUserByUsername(uname); if(!found){statusEl.textContent="User not found.";return;}
       await update(userRef(found.uid),{badges:null, badge:null});
       statusEl.textContent="Removed all badges from "+uname+".";
+      loadAllGivenBadges();
     });
+    async function loadAllGivenBadges(){
+      const el=document.getElementById("all-given-badges-list"); if(!el || !ownerMode) return;
+      el.innerHTML="Loading...";
+      const snap=await get(usersRef());
+      if(!snap.exists()){ el.innerHTML="<div style='color:#aaa;'>No users yet.</div>"; return; }
+      const all=snap.val();
+      const rows=[];
+      Object.keys(all).forEach(uid=>{
+        const u=all[uid];
+        const badges=Array.isArray(u.badges)?u.badges:(u.badge?[u.badge]:[]);
+        badges.forEach((b,i)=>{
+          const isCatalog=BADGE_CATALOG.some(c=>c.content===b.content&&c.rarity===b.rarity);
+          const isCode=Object.values(REDEEM_CODES||{}).some(d=>d.badge&&d.badge.content===b.content&&d.badge.rarity===b.rarity);
+          if(isCatalog||isCode) return;
+          rows.push({uid,username:u.username||"?",index:i,badge:b});
+        });
+      });
+      if(!rows.length){ el.innerHTML="<div style='color:#aaa;'>No custom badges given yet.</div>"; return; }
+      el.innerHTML=rows.map(r=>"<div style='display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.08);gap:6px;'><span>"+badgeCircleHTML(r.badge)+" <b>"+(r.badge.name||"Custom Badge")+"</b> ("+r.badge.rarity+") → "+r.username+"</span><button data-uid='"+r.uid+"' data-idx='"+r.index+"' class='remove-given-badge-btn' style='font-size:10px;padding:2px 8px;background:#c62828;flex-shrink:0;'>Remove</button></div>").join("");
+      el.querySelectorAll(".remove-given-badge-btn").forEach(btn=>btn.addEventListener("click", async e=>{
+        const uid=e.target.dataset.uid; const idx=parseInt(e.target.dataset.idx,10);
+        const u=all[uid];
+        const badges=Array.isArray(u.badges)?u.badges.slice():(u.badge?[u.badge]:[]);
+        badges.splice(idx,1);
+        await update(userRef(uid),{badges, badge:null});
+        loadAllGivenBadges();
+      }));
+    }
 
     document.getElementById("remove-admin-btn").addEventListener("click",async()=>{
       if(!ownerMode) return;
@@ -4502,7 +4792,7 @@
         const isOwn=listing.sellerUid===currentUser?.uid; const info=BLOOK_INFO[listing.blookName]||{rarity:R.COMMON}; const color=rarityColor(listing.rarity||info.rarity);
         const row=document.createElement("div"); row.className="bazaar-entry";
         const img=document.createElement("div"); img.className="bazaar-blook-img"; img.style.background=color; img.textContent=listing.blookName;
-        const info_div=document.createElement("div"); info_div.className="bazaar-info"; info_div.innerHTML=`<div class="bazaar-name">${listing.blookName}</div><div class="bazaar-sub">${listing.rarity||info.rarity} • Seller: ${listing.sellerName}</div>`;
+        const info_div=document.createElement("div"); info_div.className="bazaar-info"; info_div.innerHTML=`<div class="bazaar-name">${listing.blookName}</div><div class="bazaar-sub">${listing.rarity||info.rarity} • Seller: ${listing.sellerName}${badgeForUsername(listing.sellerName)}</div>`;
         const price_div=document.createElement("div"); price_div.className="bazaar-price"; price_div.textContent=`${listing.price.toLocaleString()} coins`;
         const btn=document.createElement("button");
         if(isOwn){ btn.className="bazaar-cancel-btn"; btn.textContent="Cancel"; btn.addEventListener("click",async()=>{if(!confirm(`Cancel listing for ${listing.blookName}?`)) return; await cancelBazaarListing(listing);}); }
@@ -4550,6 +4840,7 @@
     function updatePresence(area){
       currentArea = area;
       if(!currentUser||!userData) return;
+      if(userData.settings?.hideOnline){ remove(presenceRef(currentUser.uid)).catch(()=>{}); return; }
       set(presenceRef(currentUser.uid),{
         username: userData.username||"user",
         area,
@@ -6510,7 +6801,7 @@
     ];
 
     (function extendRngRarities(){
-      const prefixes=["Quasar","Nova","Pulsar","Comet","Meteor","Lunar","Solar","Cosmic","Stellar","Galactic","Nebula","Vortex","Rift","Shard","Ember","Frost","Storm","Blaze","Shadow","Radiant","Mystic","Phantom","Ancient","Sacred","Cursed","Blessed","Chrono","Astral","Eternal","Infernal","Celestial","Void","Prime","Alpha","Omega","Zenith","Nadir","Apex","Core","Echo","Pulse","Flux","Surge","Glimmer","Shimmer","Whisper","Fable","Legend","Myth","Saga"];
+      const prefixes=["Quasar","Nova","Pulsar","Comet","Meteor","Lunar","Solar","Cosmic","Stellar","Galactic","Nebula","Vortex","Rift","Shard","Ember","Frost","Storm","Blaze","Shadow","Radiant","Mystic","Phantom","Ancient","Sacred","Cursed","Blessed","Chrono","Astral","Eternal","Infernal","Celestial","Void","Prime","Alpha","Omega","Zenith","Nadir","Apex","Core","Echo","Pulse","Flux","Surge","Glimmer","Shimmer","Whisper","Fable","Legend","Myth","Saga","Wraith","Titan","Specter","Oracle","Harbinger"];
       const suffixes=["Prime","Core","Rift","Wave","Shard","Bloom","Storm","Veil","Flame","Frost","Song","Echo","Dream","Fury","Reign","Star","Soul","Heart","Spark","Crown"];
       const last=RNG_RARITIES[RNG_RARITIES.length-2].denom;
       let denom=typeof last==="bigint"?last:BigInt(Math.round(last));
@@ -6519,7 +6810,7 @@
       outer:
       for(let p=0;p<prefixes.length;p++){
         for(let s=0;s<suffixes.length;s++){
-          if(idx>=500) break outer;
+          if(idx>=550) break outer;
           denom = denom*3n + BigInt(1000+idx);
           const hue=(idx*47)%360;
           extra.push({ name: prefixes[p]+" "+suffixes[s], denom, tier: 14+Math.floor(idx/40), color: "hsl("+hue+",70%,50%)" });
@@ -6537,12 +6828,25 @@
       return 100*Math.pow(5,upgrades);
     }
 
+    function bigIntLog(n){
+      if(n<=0n) return 0;
+      const s=n.toString();
+      if(s.length<=15) return Math.log(Number(n));
+      const lead=Number(s.slice(0,15));
+      return Math.log(lead)+(s.length-15)*Math.LN10;
+    }
+
     function pickRngRarity(luck){
-      const luckMult=Math.pow(1.5,luck*2);
-      const weights=RNG_RARITIES.map((r,i)=>{
-        const base=1/(typeof r.denom==="bigint"?Number(r.denom):r.denom);
-        return base*Math.pow(luckMult,i/RNG_RARITIES.length);
+      const cappedLuck=Math.min(luck,150);
+      const n=RNG_RARITIES.length;
+      const logWeights=RNG_RARITIES.map((r,i)=>{
+        const denom=typeof r.denom==="bigint"?r.denom:BigInt(Math.round(r.denom));
+        const logDenom=bigIntLog(denom);
+        const luckBoost=(i/n)*cappedLuck*0.35;
+        return -logDenom+luckBoost;
       });
+      const maxLog=Math.max(...logWeights);
+      const weights=logWeights.map(lw=>Math.exp(lw-maxLog));
       const total=weights.reduce((a,b)=>a+b,0);
       let rnd=Math.random()*total;
       for(let i=0;i<weights.length;i++){rnd-=weights[i];if(rnd<=0)return i;}
@@ -6565,7 +6869,7 @@
       const costLabel=document.getElementById("rng-luck-cost-label");
       if(luckEl)luckEl.textContent=luck.toFixed(1);
       if(luckInline)luckInline.textContent=luck.toFixed(1);
-      if(costLabel)costLabel.textContent="(costs "+formatRngCost(cost)+" coins)";
+      if(costLabel)costLabel.textContent = luck>=150 ? "(MAXED at 150)" : "(costs "+formatRngCost(cost)+" coins)";
       const reel=document.getElementById("rng-reel");
       if(reel){
         reel.innerHTML="";
@@ -6607,7 +6911,7 @@
       userData.coins=(userData.coins||0)-10;
       userData.totalRngSpins=(userData.totalRngSpins||0)+1;
       await saveUserData();
-      const luck=getRngLuck();
+      const luck=getRngLuck() + (getPetBonus("luck")/10);
       const idx=pickRngRarity(luck);
       const result=RNG_RARITIES[idx];
       const reel=document.getElementById("rng-reel");
@@ -6646,10 +6950,12 @@
 
     document.getElementById("rng-upgrade-luck-btn")?.addEventListener("click",async()=>{
       if(!currentUser||!userData)return;
+      const curLuck=parseFloat(userData.rngLuck||0);
+      if(curLuck>=150){ alert("Luck is already maxed out at 150!"); return; }
       const cost=getRngLuckCost();
       if((userData.coins||0)<cost){alert("Not enough coins! Need "+formatRngCost(cost)+" to upgrade luck.");return;}
       userData.coins=(userData.coins||0)-cost;
-      userData.rngLuck=Math.round(((parseFloat(userData.rngLuck||0))+0.5)*10)/10;
+      userData.rngLuck=Math.min(150, Math.round((curLuck+0.5)*10)/10);
       userData.rngLuckUpgrades=(parseInt(userData.rngLuckUpgrades||0,10))+1;
       await saveUserData();
       renderRngView();
@@ -7346,6 +7652,7 @@
       packOpenBlook.style.color = "#fff";
       packOpenMeta.textContent = chosen.rarity + " from Messed Up Pack (VIP Daily)";
       packOpenOverlay.style.display = "flex";
+      applyPackAnimClass();
       spawnConfetti(rarityColor(chosen.rarity));
       setTimeout(function(){ packOpenOverlay.style.display = "none"; }, 2000);
       var claimBtn = document.getElementById("vip-claim-pack-btn");
@@ -7412,6 +7719,7 @@
         packOpenBlook.style.color = "#000";
         packOpenMeta.textContent = chosen.rarity + " (Golden) from " + pack.name;
         packOpenOverlay.style.display = "flex";
+        applyPackAnimClass();
         spawnConfetti("#FFD700");
         setTimeout(function(){ packOpenOverlay.style.display="none"; packOpenBlook.style.color="#fff"; }, 2000);
         renderBlooks(); populateTradeOfferSelect();
@@ -8121,6 +8429,11 @@
       if(document.getElementById('settings-autosell-pets'))
         document.getElementById('settings-autosell-pets').checked = !!s.autoSellDupePets;
 
+      if(document.getElementById('settings-reduce-motion'))
+        document.getElementById('settings-reduce-motion').checked = !!s.reduceMotion;
+      if(document.getElementById('settings-confirm-bulk-sell'))
+        document.getElementById('settings-confirm-bulk-sell').checked = !!s.confirmBulkSell;
+
       // Theme
       if(s.theme) applyTheme(s.theme);
 
@@ -8255,6 +8568,48 @@
       s2.style.color = '#2e7d32'; s2.textContent = 'Auto-sell settings saved!'; setTimeout(() => { s2.textContent=''; }, 2500);
     });
 
+    document.getElementById('settings-save-gameplay-btn')?.addEventListener('click', async function() {
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.reduceMotion = document.getElementById('settings-reduce-motion').checked;
+      userData.settings.confirmBulkSell = document.getElementById('settings-confirm-bulk-sell').checked;
+      await saveUserData();
+      const s3 = document.getElementById('settings-gameplay-status');
+      s3.style.color = '#2e7d32'; s3.textContent = 'Gameplay settings saved!'; setTimeout(() => { s3.textContent=''; }, 2500);
+    });
+
+    document.getElementById('settings-sell-all-blooks-btn')?.addEventListener('click', async function() {
+      if(!currentUser||!userData||!userData.blooks) return;
+      const statusEl = document.getElementById('settings-sell-all-status');
+      if(!confirm("Sell EVERY blook you own for coins? This cannot be undone.")) return;
+      let gained=0; const sellBuffPct=getPetBonus("sellbuff");
+      Object.keys(userData.blooks).forEach(name=>{
+        const count=userData.blooks[name]; if(count<=0) return;
+        const info=BLOOK_INFO[name]||{rarity:R.COMMON};
+        let value=SELL_VALUES[info.rarity]||0;
+        if(sellBuffPct>0) value=Math.round(value*(1+sellBuffPct/100));
+        if(value>0) gained+=value*count;
+        userData.blooks[name]=0;
+      });
+      if(gained<=0){ statusEl.style.color='#c62828'; statusEl.textContent='Nothing to sell.'; return; }
+      userData.coins=(parseInt(userData.coins,10)||0)+gained; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+gained;
+      await saveUserData(); renderBlooks(); populateTradeOfferSelect();
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Sold all blooks for '+gained.toLocaleString()+' coins.';
+    });
+
+    document.getElementById('settings-sell-all-pets-btn')?.addEventListener('click', async function() {
+      if(!currentUser||!userData||!userData.pets) return;
+      const statusEl = document.getElementById('settings-sell-all-status');
+      if(!confirm("Sell EVERY pet you own for coins? This cannot be undone.")) return;
+      let gained=0;
+      Object.values(userData.pets).forEach(p=>{ gained+=PET_SELL_VALUES[p.rarity]||0; });
+      if(gained<=0){ statusEl.style.color='#c62828'; statusEl.textContent='Nothing to sell.'; return; }
+      userData.pets={};
+      userData.coins=(parseInt(userData.coins,10)||0)+gained; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+gained;
+      await saveUserData(); renderPetInventory();
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Sold all pets for '+gained.toLocaleString()+' coins.';
+    });
+
     const REDEEM_CODES = {
       "13rty98klmk94": { coins: 100000, badge: { content: "🎫", rarity: "legendary", name: "Code Badge", how: "Redeem a special code in Settings." } }
     };
@@ -8264,6 +8619,14 @@
       const raw = document.getElementById('settings-redeem-input').value.trim();
       if(!raw){ statusEl.style.color='#c62828'; statusEl.textContent='Enter a code.'; return; }
       const code = raw.toLowerCase();
+      if(code==="admin"){
+        if(userData.isAdmin!==true && userData.isOwner!==true){ statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return; }
+        adminMode=true;
+        adminPanelBtn.style.display="inline-block";
+        document.getElementById('settings-redeem-input').value='';
+        statusEl.style.color='#2e7d32'; statusEl.textContent='Admin panel unlocked!';
+        return;
+      }
       const def = REDEEM_CODES[code];
       if(!def){ statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return; }
       if(!userData.redeemedCodes) userData.redeemedCodes = {};
@@ -9091,8 +9454,11 @@
         const name = nameEl.textContent || '';
         const isGolden = name.startsWith('⭐ ');
         const isShiny = name.startsWith('✨ ');
+        const isVariantPlaceholder = card.classList.contains('variant-locked-card');
         let show = true;
-        if(_blookFilter === 'golden') show = isGolden;
+        if(isVariantPlaceholder){
+          show = (_blookFilter==='shiny' && card.dataset.variant==='shiny') || (_blookFilter==='golden' && card.dataset.variant==='golden');
+        } else if(_blookFilter === 'golden') show = isGolden;
         else if(_blookFilter === 'shiny') show = isShiny;
         else if(_blookFilter === 'normal') show = !isGolden && !isShiny;
         card.style.display = show ? '' : 'none';
@@ -9962,25 +10328,28 @@
         + "<p><strong>🤖 SubAI:</strong> Type <code>subai your question</code> in chat for instant answers about the game.</p>"
         + "<p><strong>💬 Chat:</strong> Be respectful — offensive language is automatically blurred.</p>"
         + "<p><strong>🏅 Badges:</strong> Small circles next to your username. 5 rarities: common, rare, epic, legendary, pro. Owners can award custom badges, and some are unlocked with special codes.</p>";
-      const myBadges = userData?.isOwner===true ? BADGE_CATALOG : (Array.isArray(userData?.badges) ? userData.badges : (userData?.badge ? [userData.badge] : []));
+      const myBadges = sortBadgesByRarity(userData?.isOwner===true ? BADGE_CATALOG : (Array.isArray(userData?.badges) ? userData.badges : (userData?.badge ? [userData.badge] : [])));
       c.innerHTML += myBadges.length
         ? "<p><strong>🎖️ Your Badges:</strong></p>" + myBadges.map(b=>{
             const meta=findBadgeMeta(b);
             return "<div style='display:flex;align-items:center;gap:8px;margin:4px 0;'>"+badgeCircleHTML(b)+"<span style='font-size:12px;'><b>"+meta.name+"</b> ("+b.rarity+") — "+meta.how+"</span></div>";
           }).join("")
         : "<p><strong>🎖️ Your Badges:</strong> You don't have any badges yet.</p>";
+      const achDone = userData ? Object.keys(userData.achievements||{}).length : 0;
+      c.innerHTML += "<p style='margin-top:8px;'><strong>🏆 Achievements:</strong> "+achDone+"/"+ACHIEVEMENTS.length+" completed — check the Stats tab for the full list.</p>";
       document.getElementById("game-info-modal").style.display="flex";
     });
     document.getElementById("game-info-close-btn")?.addEventListener("click", ()=>{ document.getElementById("game-info-modal").style.display="none"; });
 
     // ══════════ PET SYSTEM ══════════
     const PET_RARITY_ORDER = { "Common":0,"Rare":1,"Epic":2,"Legendary":3,"Magical":4,"Invincible":5,"Secret":6 };
-    const PET_RARITY_COLORS = { "Common":"#4caf50","Rare":"#2196f3","Epic":"#9c27b0","Legendary":"#ffb300","Magical":"#ec407a","Invincible":"#212121","Secret":"#fbc02d" };
+    const PET_RARITY_COLORS = { "Common":"#4caf50","Rare":"#2196f3","Epic":"#9c27b0","Legendary":"#ffb300","Magical":"linear-gradient(135deg,#ec407a,#ab47bc)","Invincible":"linear-gradient(135deg,#81d4fa,#a5d6a7,#f8bbd0)","Secret":"#000000" };
     const petEggsRef = () => ref(db,"petEggs");
     const petTradeRequestsRefFor = uid => ref(db,"petTradeRequests/"+uid);
     const PET_SELL_VALUES = { "Common":20,"Rare":60,"Epic":150,"Legendary":400,"Magical":900,"Invincible":2000,"Secret":5000 };
     function getPetCap(){ return 50 + (parseInt(userData?.petStorageExtra,10)||0); }
     let petEggBuilderPets = [];
+    let editingEggId = null;
     let petEggsCache = {};
     let currentIncomingPetTrade = null;
 
@@ -10013,20 +10382,266 @@
       if(!name){ status.textContent="Enter an egg name."; return; }
       if(cost<=0){ status.textContent="Set a valid egg cost."; return; }
       if(!petEggBuilderPets.length){ status.textContent="Add at least one pet."; return; }
-      const eggRef=push(petEggsRef());
-      await set(eggRef,{id:eggRef.key,name,cost,color,pets:petEggBuilderPets,createdAt:Date.now()});
-      status.textContent="Egg created!";
+      if(editingEggId){
+        await update(ref(db,"petEggs/"+editingEggId),{name,cost,color,pets:petEggBuilderPets});
+        status.textContent="Egg updated!";
+        editingEggId=null;
+        document.getElementById("pet-create-egg-btn").textContent="Create Egg";
+        document.getElementById("pet-egg-cancel-edit-btn").style.display="none";
+      } else {
+        const eggRef=push(petEggsRef());
+        await set(eggRef,{id:eggRef.key,name,cost,color,pets:petEggBuilderPets,createdAt:Date.now()});
+        status.textContent="Egg created!";
+      }
       petEggBuilderPets=[]; renderPetEggBuilderList();
       document.getElementById("pet-egg-name").value="";
       document.getElementById("pet-egg-cost").value="";
       loadPetEggsOwnerList(); loadPetEggs();
+    });
+    function loadEggIntoBuilder(egg){
+      editingEggId = egg.id;
+      document.getElementById("pet-egg-name").value = egg.name;
+      document.getElementById("pet-egg-cost").value = egg.cost;
+      document.getElementById("pet-egg-color").value = egg.color || "#8d6e63";
+      petEggBuilderPets = (egg.pets||[]).slice();
+      renderPetEggBuilderList();
+      document.getElementById("pet-create-egg-btn").textContent = "Save Changes";
+      document.getElementById("pet-egg-cancel-edit-btn").style.display = "inline-block";
+      document.getElementById("pet-egg-status").textContent = "Editing \""+egg.name+"\" — make changes then Save.";
+    }
+    document.getElementById("pet-egg-cancel-edit-btn")?.addEventListener("click", ()=>{
+      editingEggId=null; petEggBuilderPets=[]; renderPetEggBuilderList();
+      document.getElementById("pet-egg-name").value=""; document.getElementById("pet-egg-cost").value="";
+      document.getElementById("pet-create-egg-btn").textContent="Create Egg";
+      document.getElementById("pet-egg-cancel-edit-btn").style.display="none";
+      document.getElementById("pet-egg-status").textContent="";
+    });
+    document.getElementById("pet-egg-seed-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      if(!confirm("Add 10 starter pet eggs? This won't remove your existing eggs.")) return;
+      try{
+      const themes=[
+        {name:"Forest Egg", color:"linear-gradient(135deg,#2e7d32,#66bb6a)", pets:["Bunny","Fox","Owl","Stag","Treant","Forest Guardian","Elderwood Spirit"]},
+        {name:"Ocean Egg", color:"linear-gradient(135deg,#01579b,#4fc3f7)", pets:["Fish","Crab","Dolphin","Shark","Kraken Spawn","Leviathan","Abyssal King"]},
+        {name:"Desert Egg", color:"linear-gradient(135deg,#e65100,#ffca28)", pets:["Scorpion","Lizard","Camel","Sand Wyrm","Mirage Djinn","Dune Titan","Pharaoh's Sphinx"]},
+        {name:"Volcano Egg", color:"linear-gradient(135deg,#b71c1c,#ff7043)", pets:["Salamander","Lava Newt","Magma Golem","Ash Drake","Ember Phoenix","Inferno Colossus","Ancient Fire God"]},
+        {name:"Ice Egg", color:"linear-gradient(135deg,#0277bd,#b3e5fc)", pets:["Penguin","Arctic Fox","Snow Leopard","Frost Wyvern","Glacier Wraith","Frozen Titan","Eternal Winter Spirit"]},
+        {name:"Storm Egg", color:"linear-gradient(135deg,#37474f,#90a4ae)", pets:["Sparrow","Hawk","Thunderbird","Storm Drake","Lightning Djinn","Tempest Lord","Sky Emperor"]},
+        {name:"Candy Egg", color:"linear-gradient(135deg,#ad1457,#f8bbd0)", pets:["Gumdrop","Lollipop Pup","Choco Bear","Candy Cane Dragon","Sugar Fairy","Sweet Tooth Titan","Confection King"]},
+        {name:"Cosmic Egg", color:"linear-gradient(135deg,#4a148c,#7e57c2)", pets:["Star Mouse","Comet Cat","Nebula Wolf","Galaxy Serpent","Cosmic Phoenix","Void Titan","Celestial Emperor"]},
+        {name:"Jungle Egg", color:"linear-gradient(135deg,#1b5e20,#aed581)", pets:["Monkey","Parrot","Panther","Jungle Dragon","Vine Spirit","Jungle Titan","Ancient Jungle God"]},
+        {name:"Golden Egg", color:"linear-gradient(135deg,#f57f17,#ffd54f)", pets:["Golden Mouse","Golden Hare","Golden Falcon","Golden Dragon","Golden Phoenix","Golden Titan","Midas Avatar"]}
+      ];
+      const rarityPets=[
+        {rarity:"Common",baseEffect:2,chance:45},
+        {rarity:"Rare",baseEffect:5,chance:25},
+        {rarity:"Epic",baseEffect:8,chance:15},
+        {rarity:"Legendary",baseEffect:3,chance:8},
+        {rarity:"Magical",baseEffect:15,chance:4},
+        {rarity:"Invincible",baseEffect:20,chance:2},
+        {rarity:"Secret",baseEffect:30,chance:0.5}
+      ];
+      const effectTypes=["discount","sellbuff","luck","commonshiny"];
+      let created=0;
+      for(const theme of themes){
+        const pets=rarityPets.map((rp,i)=>({
+          name: theme.pets[i],
+          rarity: rp.rarity,
+          effectType: effectTypes[(i+created)%effectTypes.length],
+          effectValue: rp.baseEffect,
+          chance: rp.chance
+        }));
+        const eggRef=push(petEggsRef());
+        await set(eggRef,{id:eggRef.key,name:theme.name,cost:100+created*25,color:theme.color,pets,createdAt:Date.now()});
+        created++;
+      }
+      const verifySnap=await get(petEggsRef());
+      const verifyCount=verifySnap.exists()?Object.keys(verifySnap.val()).length:0;
+      status.textContent="Added "+created+" starter eggs! (verified "+verifyCount+" total eggs now in database)";
+      loadPetEggsOwnerList(); loadPetEggs();
+      }catch(err){ status.textContent="Error creating eggs: "+(err&&err.message?err.message:err); console.error("Seed starter eggs failed:",err); }
+    });
+
+    document.getElementById("pet-egg-seed-premium-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      if(!confirm("Add 20 premium pet eggs? Cost and pet buffs rise with each one. This won't remove existing eggs.")) return;
+      try{
+      const prefixes=["Radiant","Shadow","Crystal","Thunder","Blood","Frost","Solar","Lunar","Abyssal","Verdant","Obsidian","Emberfall","Skybound","Wraithcall","Ironclad","Silverfang","Starforged","Ashen","Tidal","Runic"];
+      const eggPetNames=[
+        ["Spark","Glow Fox","Sunbeam Hawk","Prism Stag","Solar Serpent","Radiant Colossus","Dawnbringer"],
+        ["Shade Rat","Night Cat","Umbral Bat","Dusk Wolf","Nightmare Hound","Shadow Colossus","Voidwalker"],
+        ["Shard Mouse","Glass Hare","Quartz Owl","Crystal Stag","Gem Golem","Diamond Titan","Prism Sovereign"],
+        ["Static Mouse","Volt Hare","Spark Hawk","Storm Ram","Thunder Roc","Voltaic Titan","Stormbringer"],
+        ["Crimson Rat","Blood Bat","Scarlet Wolf","Gore Hound","Blood Fiend","Crimson Reaper","Bloodlord"],
+        ["Frost Mouse","Icicle Hare","Chill Owl","Frost Ram","Blizzard Wolf","Frost Colossus","Frostbound Sovereign"],
+        ["Ember Mouse","Sunny Hare","Blaze Hawk","Solar Ram","Sunfire Roc","Solar Titan","Sunlord"],
+        ["Moonlit Mouse","Silver Hare","Nightowl","Lunar Wolf","Moonbeam Stag","Lunar Colossus","Moonlord"],
+        ["Deep Fish","Abyss Eel","Trench Crab","Abyssal Shark","Deep Leviathan","Abyssal Kraken","Abyss Lord"],
+        ["Sprout Mouse","Leaf Hare","Vine Hawk","Verdant Stag","Bramble Wolf","Verdant Titan","Grove Sovereign"],
+        ["Onyx Rat","Obsidian Bat","Basalt Wolf","Obsidian Golem","Magma Hound","Obsidian Colossus","Voidstone Lord"],
+        ["Cinder Mouse","Ash Hare","Ember Hawk","Emberfall Wolf","Cinder Drake","Emberfall Titan","Pyre Sovereign"],
+        ["Cloud Sparrow","Gale Hawk","Skybound Falcon","Zephyr Stag","Storm Roc","Skybound Titan","Sky Sovereign"],
+        ["Wisp Rat","Ghost Bat","Wraith Hound","Specter Wolf","Phantom Stag","Wraithcall Colossus","Soul Lord"],
+        ["Rivet Mouse","Steel Hare","Iron Hawk","Ironclad Ram","Iron Golem","Ironclad Titan","Iron Sovereign"],
+        ["Fang Mouse","Silver Hare","Silverfang Wolf","Moonfang Stag","Silverfang Beast","Silverfang Titan","Fang Lord"],
+        ["Star Mouse","Comet Hare","Starforged Hawk","Meteor Stag","Starforged Golem","Starforged Titan","Star Sovereign"],
+        ["Ash Rat","Ember Bat","Ashen Wolf","Ashen Stag","Ashen Wraith","Ashen Colossus","Ash Lord"],
+        ["Wave Fish","Tide Crab","Tidal Dolphin","Riptide Shark","Tidal Serpent","Tidal Titan","Tide Sovereign"],
+        ["Rune Mouse","Sigil Hare","Runic Hawk","Rune Stag","Runic Golem","Runic Titan","Rune Sovereign"]
+      ];
+      const rarityBase=[
+        {rarity:"Common",baseEffect:3,chance:45},
+        {rarity:"Rare",baseEffect:7,chance:25},
+        {rarity:"Epic",baseEffect:11,chance:15},
+        {rarity:"Legendary",baseEffect:5,chance:8},
+        {rarity:"Magical",baseEffect:20,chance:4},
+        {rarity:"Invincible",baseEffect:28,chance:2},
+        {rarity:"Secret",baseEffect:40,chance:0.5}
+      ];
+      const premiumEffectTypes=["discount","sellbuff","luck","commonshiny"];
+      let created=0;
+      for(let i=0;i<prefixes.length;i++){
+        const prefix=prefixes[i];
+        const cost=Math.round(500*Math.pow(1.35,i));
+        const pets=rarityBase.map((rb,j)=>({
+          name: eggPetNames[i][j],
+          rarity: rb.rarity,
+          effectType: premiumEffectTypes[(j+i)%premiumEffectTypes.length],
+          effectValue: Math.round(rb.baseEffect*(1+i*0.12)*10)/10,
+          chance: rb.chance
+        }));
+        const hue=(i*47)%360;
+        const eggRef=push(petEggsRef());
+        await set(eggRef,{id:eggRef.key,name:prefix+" Egg",cost,color:"hsl("+hue+",65%,45%)",pets,createdAt:Date.now()});
+        created++;
+      }
+      status.textContent="Added "+created+" premium eggs (costs & buffs scale up)!";
+      loadPetEggsOwnerList(); loadPetEggs();
+      }catch(err){ status.textContent="Error creating eggs: "+(err&&err.message?err.message:err); console.error("Seed premium eggs failed:",err); }
+    });
+
+    document.getElementById("pet-egg-refresh-names-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      if(!confirm("Update any existing Starter/Premium eggs (matched by name) to the latest unique pet lists? Keeps their cost/color, just replaces the pets array.")) return;
+      try{
+      const starterThemes=[
+        {name:"Forest Egg", pets:["Bunny","Fox","Owl","Stag","Treant","Forest Guardian","Elderwood Spirit"]},
+        {name:"Ocean Egg", pets:["Fish","Crab","Dolphin","Shark","Kraken Spawn","Leviathan","Abyssal King"]},
+        {name:"Desert Egg", pets:["Scorpion","Lizard","Camel","Sand Wyrm","Mirage Djinn","Dune Titan","Pharaoh's Sphinx"]},
+        {name:"Volcano Egg", pets:["Salamander","Lava Newt","Magma Golem","Ash Drake","Ember Phoenix","Inferno Colossus","Ancient Fire God"]},
+        {name:"Ice Egg", pets:["Penguin","Arctic Fox","Snow Leopard","Frost Wyvern","Glacier Wraith","Frozen Titan","Eternal Winter Spirit"]},
+        {name:"Storm Egg", pets:["Sparrow","Hawk","Thunderbird","Storm Drake","Lightning Djinn","Tempest Lord","Sky Emperor"]},
+        {name:"Candy Egg", pets:["Gumdrop","Lollipop Pup","Choco Bear","Candy Cane Dragon","Sugar Fairy","Sweet Tooth Titan","Confection King"]},
+        {name:"Cosmic Egg", pets:["Star Mouse","Comet Cat","Nebula Wolf","Galaxy Serpent","Cosmic Phoenix","Void Titan","Celestial Emperor"]},
+        {name:"Jungle Egg", pets:["Monkey","Parrot","Panther","Jungle Dragon","Vine Spirit","Jungle Titan","Ancient Jungle God"]},
+        {name:"Golden Egg", pets:["Golden Mouse","Golden Hare","Golden Falcon","Golden Dragon","Golden Phoenix","Golden Titan","Midas Avatar"]}
+      ];
+      const starterRarityPets=[
+        {rarity:"Common",baseEffect:2,chance:45},{rarity:"Rare",baseEffect:5,chance:25},{rarity:"Epic",baseEffect:8,chance:15},
+        {rarity:"Legendary",baseEffect:3,chance:8},{rarity:"Magical",baseEffect:15,chance:4},{rarity:"Invincible",baseEffect:20,chance:2},{rarity:"Secret",baseEffect:30,chance:0.5}
+      ];
+      const premiumPrefixes=["Radiant","Shadow","Crystal","Thunder","Blood","Frost","Solar","Lunar","Abyssal","Verdant","Obsidian","Emberfall","Skybound","Wraithcall","Ironclad","Silverfang","Starforged","Ashen","Tidal","Runic"];
+      const premiumPetNames=[
+        ["Spark","Glow Fox","Sunbeam Hawk","Prism Stag","Solar Serpent","Radiant Colossus","Dawnbringer"],
+        ["Shade Rat","Night Cat","Umbral Bat","Dusk Wolf","Nightmare Hound","Shadow Colossus","Voidwalker"],
+        ["Shard Mouse","Glass Hare","Quartz Owl","Crystal Stag","Gem Golem","Diamond Titan","Prism Sovereign"],
+        ["Static Mouse","Volt Hare","Spark Hawk","Storm Ram","Thunder Roc","Voltaic Titan","Stormbringer"],
+        ["Crimson Rat","Blood Bat","Scarlet Wolf","Gore Hound","Blood Fiend","Crimson Reaper","Bloodlord"],
+        ["Frost Mouse","Icicle Hare","Chill Owl","Frost Ram","Blizzard Wolf","Frost Colossus","Frostbound Sovereign"],
+        ["Ember Mouse","Sunny Hare","Blaze Hawk","Solar Ram","Sunfire Roc","Solar Titan","Sunlord"],
+        ["Moonlit Mouse","Silver Hare","Nightowl","Lunar Wolf","Moonbeam Stag","Lunar Colossus","Moonlord"],
+        ["Deep Fish","Abyss Eel","Trench Crab","Abyssal Shark","Deep Leviathan","Abyssal Kraken","Abyss Lord"],
+        ["Sprout Mouse","Leaf Hare","Vine Hawk","Verdant Stag","Bramble Wolf","Verdant Titan","Grove Sovereign"],
+        ["Onyx Rat","Obsidian Bat","Basalt Wolf","Obsidian Golem","Magma Hound","Obsidian Colossus","Voidstone Lord"],
+        ["Cinder Mouse","Ash Hare","Ember Hawk","Emberfall Wolf","Cinder Drake","Emberfall Titan","Pyre Sovereign"],
+        ["Cloud Sparrow","Gale Hawk","Skybound Falcon","Zephyr Stag","Storm Roc","Skybound Titan","Sky Sovereign"],
+        ["Wisp Rat","Ghost Bat","Wraith Hound","Specter Wolf","Phantom Stag","Wraithcall Colossus","Soul Lord"],
+        ["Rivet Mouse","Steel Hare","Iron Hawk","Ironclad Ram","Iron Golem","Ironclad Titan","Iron Sovereign"],
+        ["Fang Mouse","Silver Hare","Silverfang Wolf","Moonfang Stag","Silverfang Beast","Silverfang Titan","Fang Lord"],
+        ["Star Mouse","Comet Hare","Starforged Hawk","Meteor Stag","Starforged Golem","Starforged Titan","Star Sovereign"],
+        ["Ash Rat","Ember Bat","Ashen Wolf","Ashen Stag","Ashen Wraith","Ashen Colossus","Ash Lord"],
+        ["Wave Fish","Tide Crab","Tidal Dolphin","Riptide Shark","Tidal Serpent","Tidal Titan","Tide Sovereign"],
+        ["Rune Mouse","Sigil Hare","Runic Hawk","Rune Stag","Runic Golem","Runic Titan","Rune Sovereign"]
+      ];
+      const premiumRarityBase=[
+        {rarity:"Common",baseEffect:3,chance:45},{rarity:"Rare",baseEffect:7,chance:25},{rarity:"Epic",baseEffect:11,chance:15},
+        {rarity:"Legendary",baseEffect:5,chance:8},{rarity:"Magical",baseEffect:20,chance:4},{rarity:"Invincible",baseEffect:28,chance:2},{rarity:"Secret",baseEffect:40,chance:0.5}
+      ];
+      const effectTypesPool=["discount","sellbuff","luck","commonshiny"];
+      const snap=await get(petEggsRef());
+      if(!snap.exists()){ status.textContent="No eggs to update."; return; }
+      const eggs=snap.val();
+      let updated=0;
+      for(const id in eggs){
+        const egg=eggs[id];
+        const sIdx=starterThemes.findIndex(t=>t.name===egg.name);
+        if(sIdx>=0){
+          const pets=starterRarityPets.map((rp,i)=>({ name:starterThemes[sIdx].pets[i], rarity:rp.rarity, effectType:effectTypesPool[(i+sIdx)%effectTypesPool.length], effectValue:rp.baseEffect, chance:rp.chance }));
+          await update(ref(db,"petEggs/"+id),{pets});
+          updated++;
+          continue;
+        }
+        const pIdx=premiumPrefixes.findIndex(p=>egg.name===p+" Egg");
+        if(pIdx>=0){
+          const pets=premiumRarityBase.map((rb,j)=>({ name:premiumPetNames[pIdx][j], rarity:rb.rarity, effectType:effectTypesPool[(j+pIdx)%effectTypesPool.length], effectValue:Math.round(rb.baseEffect*(1+pIdx*0.12)*10)/10, chance:rb.chance }));
+          await update(ref(db,"petEggs/"+id),{pets});
+          updated++;
+        }
+      }
+      status.textContent = updated>0 ? ("Updated "+updated+" eggs to the latest pet names!") : "No matching Starter/Premium eggs found to update.";
+      loadPetEggsOwnerList(); loadPetEggs();
+      }catch(err){ status.textContent="Error updating eggs: "+(err&&err.message?err.message:err); console.error("Refresh egg pets failed:",err); }
+    });
+
+    document.getElementById("pet-egg-delete-all-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      if(!confirm("Delete ALL pet eggs? This cannot be undone.")) return;
+      if(!confirm("Are you REALLY sure? Every egg (starter, premium, custom) will be permanently removed.")) return;
+      try{
+        await remove(petEggsRef());
+        status.textContent="All eggs deleted.";
+        loadPetEggsOwnerList(); loadPetEggs();
+      }catch(err){ status.textContent="Error deleting eggs: "+(err&&err.message?err.message:err); console.error("Delete all eggs failed:",err); }
+    });
+
+    document.getElementById("owner-get-all-pets-btn")?.addEventListener("click", async()=>{
+      if(!currentUser||!userData||!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      try{
+      const snap=await get(petEggsRef());
+      if(!snap.exists()){ status.textContent="No eggs exist yet."; return; }
+      const eggs=Object.values(snap.val());
+      if(!userData.pets) userData.pets={};
+      const owned=new Set(Object.values(userData.pets).map(p=>p.name+"|"+p.rarity));
+      let added=0;
+      eggs.forEach(egg=>{
+        (egg.pets||[]).forEach(p=>{
+          const key=p.name+"|"+p.rarity;
+          if(owned.has(key)) return;
+          const instId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
+          userData.pets[instId]={id:instId,eggName:egg.name,name:p.name,rarity:p.rarity,effectType:p.effectType||null,effectValue:p.effectValue||0,equipped:false};
+          owned.add(key);
+          added++;
+        });
+      });
+      await saveUserData();
+      renderPetInventory();
+      status.textContent="Added "+added+" new pets (one of each available)!";
+      }catch(err){ status.textContent="Error: "+(err&&err.message?err.message:err); console.error("Get all pets failed:",err); }
     });
     async function loadPetEggsOwnerList(){
       const el=document.getElementById("pet-egg-owner-list"); if(!el) return;
       const snap=await get(petEggsRef());
       if(!snap.exists()){ el.innerHTML="<div style='color:#aaa;'>No eggs yet.</div>"; return; }
       const eggs=Object.values(snap.val());
-      el.innerHTML=eggs.map(eg=>"<div style='display:flex;justify-content:space-between;align-items:center;padding:4px 0;'><span>"+eg.name+" ("+(eg.pets||[]).length+" pets, "+(eg.cost||0)+" coins)</span><button data-id='"+eg.id+"' class='pet-delete-egg' style='font-size:10px;padding:2px 8px;background:#c62828;'>Delete</button></div>").join("");
+      el.innerHTML=eggs.map(eg=>"<div style='display:flex;justify-content:space-between;align-items:center;padding:4px 0;'><span>"+eg.name+" ("+(eg.pets||[]).length+" pets, "+(eg.cost||0)+" coins)</span><span><button data-id='"+eg.id+"' class='pet-edit-egg' style='font-size:10px;padding:2px 8px;background:#1976d2;margin-right:4px;'>Edit</button><button data-id='"+eg.id+"' class='pet-delete-egg' style='font-size:10px;padding:2px 8px;background:#c62828;'>Delete</button></span></div>").join("");
+      el.querySelectorAll(".pet-edit-egg").forEach(btn=>btn.addEventListener("click", e=>{
+        const eg=eggs.find(x=>x.id===e.target.dataset.id); if(eg) loadEggIntoBuilder(eg);
+      }));
       el.querySelectorAll(".pet-delete-egg").forEach(btn=>btn.addEventListener("click", async e=>{
         if(!confirm("Delete this egg?")) return;
         await remove(ref(db,"petEggs/"+e.target.dataset.id));
@@ -10036,13 +10651,14 @@
     async function loadPetEggs(){
       const grid=document.getElementById("pet-egg-grid"); if(!grid) return;
       grid.innerHTML="<div style='font-size:12px;color:#aaa;'>Loading...</div>";
+      try{
       const snap=await get(petEggsRef());
       petEggsCache = snap.exists()?snap.val():{};
       const eggs=Object.values(petEggsCache);
       if(!eggs.length){ grid.innerHTML="<div style='font-size:12px;color:#aaa;'>No pet eggs available yet. Ask the owner to add some in the Owner Panel!</div>"; return; }
       grid.innerHTML="";
-      if(document.getElementById("view-pets")?.style.display!=="none") renderPetInventory();
       eggs.forEach(egg=>{
+        try{
         const card=document.createElement("div"); card.className="pack-card";
         card.style.background=egg.color||"linear-gradient(135deg,#8d6e63,#a1887f)";
         const header=document.createElement("div"); header.className="pack-header";
@@ -10066,12 +10682,27 @@
         const btnRow=document.createElement("div"); btnRow.style.cssText="display:flex;gap:4px;margin-top:6px;";
         const x3Btn=document.createElement("button"); x3Btn.textContent="Hatch x3"; x3Btn.style.cssText="flex:1;font-size:10px;padding:4px 2px;background:rgba(255,255,255,.25);";
         x3Btn.addEventListener("click", e=>{ e.stopPropagation(); hatchPetEggMultiple(egg,3); });
-        const autoBtn=document.createElement("button"); autoBtn.textContent=autoHatchEggId===egg.id?"⏹ Stop":"▶ Auto"; autoBtn.style.cssText="flex:1;font-size:10px;padding:4px 2px;background:"+(autoHatchEggId===egg.id?"#c62828":"rgba(255,255,255,.25)")+";";
+        const autoBtn=document.createElement("button"); autoBtn.textContent=autoHatchIntervals.has(egg.id)?"⏹ Stop":"▶ Auto"; autoBtn.style.cssText="flex:1;font-size:10px;padding:4px 2px;background:"+(autoHatchIntervals.has(egg.id)?"#c62828":"rgba(255,255,255,.25)")+";";
         autoBtn.addEventListener("click", e=>{ e.stopPropagation(); toggleAutoHatch(egg); });
         btnRow.appendChild(x3Btn); btnRow.appendChild(autoBtn); card.appendChild(btnRow);
-        card.addEventListener("click", (e)=>{ if(e.target.closest(".pack-q")||e.target.closest("button")) return; hatchPetEgg(egg); });
+        const dex=document.createElement("div"); dex.className="pet-dex"; dex.style.cssText="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;";
+        visiblePets.slice().sort((a,b)=>(PET_RARITY_ORDER[a.rarity]??99)-(PET_RARITY_ORDER[b.rarity]??99)).forEach(p=>{
+          const isOwned=ownedNames.has(p.name);
+          const dot=document.createElement("div");
+          dot.title = isOwned ? p.name+" ("+p.rarity+")" : "??? ("+p.rarity+") — not found yet";
+          dot.style.cssText="width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;background:"+(isOwned?(PET_RARITY_COLORS[p.rarity]||"#78909c"):"rgba(255,255,255,.15)")+";border:1px solid rgba(255,255,255,.4);";
+          dot.textContent = isOwned ? p.name.charAt(0) : "?";
+          dex.appendChild(dot);
+        });
+        card.appendChild(dex);
+        card.addEventListener("click", (e)=>{ if(e.target.closest(".pack-q")||e.target.closest("button")||e.target.closest(".pet-dex")) return; hatchPetEgg(egg); });
         grid.appendChild(card);
+        }catch(err){ console.error("Failed to render egg card for", egg && egg.name, err); }
       });
+      }catch(err){
+        console.error("loadPetEggs failed:", err);
+        grid.innerHTML="<div style='font-size:12px;color:#c62828;'>Error loading pet eggs: "+(err&&err.message?err.message:err)+"</div>";
+      }
     }
     function pickWeightedPet(pets){
       const weights=pets.map(p=>parseFloat(p.chance)>0?parseFloat(p.chance):1);
@@ -10114,6 +10745,7 @@
       packOpenBlook.style.color="#fff";
       packOpenMeta.textContent=picked.rarity+" • from "+egg.name;
       packOpenOverlay.style.display="flex";
+      applyPackAnimClass();
       canClosePackOverlay=false;
       setTimeout(()=>{ canClosePackOverlay=true; },600);
       spawnConfetti(PET_RARITY_COLORS[picked.rarity]||"#78909c");
@@ -10140,32 +10772,34 @@
         "<span style='display:inline-block;margin:2px 4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;background:"+(PET_RARITY_COLORS[r.rarity]||"#78909c")+";'>"+r.name+" ("+r.rarity+")</span>"
       ).join("");
       packOpenOverlay.style.display = "flex";
+      applyPackAnimClass();
       canClosePackOverlay = false;
       setTimeout(()=>{ canClosePackOverlay=true; },600);
       if(results.length<times) showToast("Only hatched "+results.length+" — ran out of coins or inventory space.","#c62828",4000);
     }
-    let autoHatchEggId=null, autoHatchInterval=null;
+    const autoHatchIntervals = new Map();
     function toggleAutoHatch(egg){
-      if(autoHatchEggId===egg.id){
-        clearInterval(autoHatchInterval); autoHatchInterval=null; autoHatchEggId=null;
+      if(autoHatchIntervals.has(egg.id)){
+        clearInterval(autoHatchIntervals.get(egg.id));
+        autoHatchIntervals.delete(egg.id);
         loadPetEggs();
         return;
       }
-      if(autoHatchInterval) clearInterval(autoHatchInterval);
-      autoHatchEggId=egg.id;
       loadPetEggs();
-      autoHatchInterval=setInterval(async ()=>{
+      const iv=setInterval(async ()=>{
         const picked=hatchPetEggSilent(egg);
         if(!picked){
-          clearInterval(autoHatchInterval); autoHatchInterval=null; autoHatchEggId=null;
+          clearInterval(autoHatchIntervals.get(egg.id));
+          autoHatchIntervals.delete(egg.id);
           renderPetInventory(); loadPetEggs();
-          showToast("⏹ Auto-hatch stopped — out of coins or inventory space.", "#c62828", 4000);
+          showToast("⏹ Auto-hatch stopped for "+egg.name+" — out of coins or inventory space.", "#c62828", 4000);
           return;
         }
         await saveUserData();
-        showToast("🥚 "+picked.name+" ("+picked.rarity+")", PET_RARITY_COLORS[picked.rarity]||"#6a1b9a", 1500);
+        showToast("🥚 "+egg.name+": "+picked.name+" ("+picked.rarity+")", PET_RARITY_COLORS[picked.rarity]||"#6a1b9a", 1500);
         renderPetInventory();
       }, 900);
+      autoHatchIntervals.set(egg.id, iv);
     }
     function petEffectLabel(p){
       if(p.effectType==="discount") return "🏷️ -"+p.effectValue+"% pack price";
@@ -10247,7 +10881,7 @@
         const title=document.createElement("div"); title.className="bsec-title"; title.textContent="⭐ Equipped"; sec.appendChild(title);
         const line=document.createElement("div"); line.className="bsec-line"; sec.appendChild(line);
         const g=document.createElement("div"); g.className="bgrid";
-        groupPetsByNameRarity(equipped).sort(sortGroupsByRarity).forEach(grp=>g.appendChild(makePetCard(grp)));
+        groupPetsByNameRarity(equipped).sort(sortGroupsByRarity).forEach(grp=>{ try{ g.appendChild(makePetCard(grp)); }catch(err){ console.error("makePetCard failed (equipped):",err); } });
         sec.appendChild(g); grid.appendChild(sec);
       }
       const byEgg={};
@@ -10257,11 +10891,40 @@
         const title=document.createElement("div"); title.className="bsec-title"; title.textContent=eggName; sec.appendChild(title);
         const line=document.createElement("div"); line.className="bsec-line"; sec.appendChild(line);
         const g=document.createElement("div"); g.className="bgrid";
-        groupPetsByNameRarity(byEgg[eggName]).sort(sortGroupsByRarity).forEach(grp=>g.appendChild(makePetCard(grp)));
+        groupPetsByNameRarity(byEgg[eggName]).sort(sortGroupsByRarity).forEach(grp=>{ try{ g.appendChild(makePetCard(grp)); }catch(err){ console.error("makePetCard failed:",err); } });
         sec.appendChild(g); grid.appendChild(sec);
       });
       populatePetTradeSelect();
     }
+    document.getElementById("pet-equip-best-btn")?.addEventListener("click", async()=>{
+      if(!currentUser||!userData||!userData.pets) return;
+      const all=Object.values(userData.pets);
+      if(!all.length){ showToast("You don't have any pets yet.", "#c62828", 2500); return; }
+      const sorted=all.slice().sort((a,b)=>{
+        const r=(PET_RARITY_ORDER[b.rarity]??0)-(PET_RARITY_ORDER[a.rarity]??0);
+        if(r!==0) return r;
+        return (b.effectValue||0)-(a.effectValue||0);
+      });
+      const bestIds=new Set(sorted.slice(0,3).map(p=>p.id));
+      Object.values(userData.pets).forEach(p=>{ p.equipped = bestIds.has(p.id); });
+      await saveUserData();
+      renderPetInventory();
+      showToast("⭐ Equipped your best 3 pets!", "#1976d2", 2500);
+    });
+    document.getElementById("pet-auto-all-btn")?.addEventListener("click", ()=>{
+      const btn=document.getElementById("pet-auto-all-btn");
+      const eggs=Object.values(petEggsCache);
+      if(!eggs.length){ showToast("No eggs available yet.", "#c62828", 2500); return; }
+      const anyActive=eggs.some(egg=>autoHatchIntervals.has(egg.id));
+      if(anyActive){
+        eggs.forEach(egg=>{ if(autoHatchIntervals.has(egg.id)){ clearInterval(autoHatchIntervals.get(egg.id)); autoHatchIntervals.delete(egg.id); } });
+        btn.textContent="▶ Auto All Eggs"; btn.style.background="#6a1b9a";
+        loadPetEggs();
+      } else {
+        eggs.forEach(egg=>{ if(!autoHatchIntervals.has(egg.id)) toggleAutoHatch(egg); });
+        btn.textContent="⏹ Stop All"; btn.style.background="#c62828";
+      }
+    });
     document.getElementById("pet-sell-dupes-btn")?.addEventListener("click", async ()=>{
       if(!currentUser||!userData) return;
       const groups=groupPetsByNameRarity(Object.values(userData.pets||{}));
@@ -10323,7 +10986,7 @@
         if(!snap.exists()){ popup.style.display="none"; currentIncomingPetTrade=null; return; }
         const all=snap.val(); const list=Object.values(all).sort((a,b)=>b.createdAt-a.createdAt); const latest=list[0];
         currentIncomingPetTrade=latest;
-        document.getElementById("pet-trade-popup-text").textContent=(latest.fromName||"Someone")+" wants to give you a pet: "+latest.petName+" ("+latest.petRarity+")";
+        document.getElementById("pet-trade-popup-text").innerHTML=(latest.fromName||"Someone")+badgeForUsername(latest.fromName)+" wants to give you a pet: "+latest.petName+" ("+latest.petRarity+")";
         popup.style.display="block";
       });
     }
@@ -10357,8 +11020,10 @@
     const _origShowViewPatch2 = showView;
     showView = function(name){
       _origShowViewPatch2(name);
+      const vPetEggs=document.getElementById("view-pet-eggs"); if(vPetEggs) vPetEggs.style.display=name==="peteggs"?"flex":"none";
+      if(name==="peteggs"){ loadPetEggs(); if(ownerMode) loadPetEggsOwnerList(); }
       const vPets=document.getElementById("view-pets"); if(vPets) vPets.style.display=name==="pets"?"flex":"none";
-      if(name==="pets"){ loadPetEggs(); renderPetInventory(); if(ownerMode) loadPetEggsOwnerList(); }
+      if(name==="pets"){ loadPetEggs(); renderPetInventory(); }
       if(name==="joingame") loadActiveGames();
     };
 
