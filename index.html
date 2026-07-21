@@ -623,6 +623,7 @@
         <button class="nav" data-view="quests">&#127919; Quests</button>
         <button class="nav" data-view="vip">&#11088; VIP</button>
         <button class="nav" data-view="lives">📺 Lives</button>
+        <button class="nav" data-view="chests">💵 IRL Buys</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
         <button id="owner-panel-btn">Owner panel</button>
@@ -648,6 +649,7 @@
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <button id="daily-wheel-btn" style="font-size:12px;padding:6px 10px;">Daily Wheel</button>
+            <button id="game-info-btn" style="font-size:12px;padding:6px 10px;background:#0d47a1;">ℹ️ Info</button>
             <button id="stop-stream-btn" style="display:none;background:#c62828;font-size:12px;padding:6px 10px;">🔴 Stop Stream</button>
             <button id="host-game-btn" style="font-size:12px;padding:6px 10px;background:#e65100;">🎮 Host Game</button>
             <button id="admin-panel-btn" style="display:none;font-size:12px;padding:6px 10px;">Admin</button>
@@ -848,7 +850,7 @@
         
         <!-- RNG VIEW -->
         <div id="view-rng" class="card" style="display:none;">
-          <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">🎲 RNG Spinner <button id="game-info-btn" style="background:#0d47a1;font-size:12px;padding:6px 14px;">ℹ️ Info</button></div>
+          <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">🎲 RNG Spinner</div>
           <div class="section-sub">Spin for a random rarity. Costs 10 coins. Upgrade luck to shift odds toward rarer results!</div>
           <div style="display:flex;gap:16px;flex:1;min-height:0;">
             <!-- LEFT: Luck -->
@@ -1097,6 +1099,31 @@
           </div>
         </div>
 
+        <!-- CHESTS VIEW -->
+        <div id="view-chests" class="card" style="display:none;">
+          <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <span>💵 IRL Buys</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;color:#555;">🛒 Cart:</span>
+              <script src="https://www.paypalobjects.com/ncp/cart/cart.js" data-merchant-id="49775QDPFCWNL"></script>
+              <paypal-cart-button data-id="pp-view-cart"></paypal-cart-button>
+              <script>cartPaypal.Cart({ id: "pp-view-cart" });</script>
+            </div>
+          </div>
+          <div class="section-sub">Real-money chests. Personal/testing use only — not verified server-side.</div>
+          <div style="background:linear-gradient(135deg,#6d4c28,#a1734a);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;">
+            <div style="font-size:22px;font-weight:800;">🪵 Wooden Chest</div>
+            <div style="font-size:14px;opacity:.9;text-align:center;">A modest chest of coins &amp; a Rare/Epic blook.</div>
+            <div style="width:100%;margin-top:10px;">
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
+              <paypal-add-to-cart-button data-id="YHNXV98C9T67S"></paypal-add-to-cart-button>
+              <script>cartPaypal.AddToCart({ id: "YHNXV98C9T67S" });</script>
+            </div>
+            <button id="chest-free-btn" style="display:none;width:100%;margin-top:10px;background:#1976d2;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="chest-status" class="err-small"></div>
+          </div>
+        </div>
+
         <div id="view-settings" class="card" style="display:none;">
           <div class="section-title">⚙️ Settings</div>
           <div class="section-sub">Manage your account settings.</div>
@@ -1259,6 +1286,17 @@
               <button id="settings-redeem-btn" style="font-size:12px;padding:6px 14px;background:#43a047;">Redeem</button>
             </div>
             <div id="settings-redeem-status" class="err-small"></div>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>📧 Email Updates</h3>
+            <div style="font-size:12px;color:#555;margin-bottom:8px;">Add your email to get notified about new updates and features.</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <input id="settings-email-input" type="email" placeholder="you@example.com" style="flex:1;min-width:180px;">
+              <button id="settings-email-save-btn" style="font-size:12px;padding:6px 14px;background:#1976d2;">Save Email</button>
+              <button id="settings-email-remove-btn" style="font-size:12px;padding:6px 14px;background:#c62828;">Remove</button>
+            </div>
+            <div id="settings-email-status" class="err-small"></div>
           </div>
 
           <div class="settings-box" style="margin-bottom:12px;">
@@ -1499,7 +1537,12 @@
               <input id="cp-pack-name" type="text" placeholder="Pack name" style="flex:1;min-width:140px;">
               <input id="cp-pack-cost" type="number" placeholder="Cost (coins)" min="1" style="width:110px;">
               <input id="cp-pack-color" type="text" placeholder="#hex or gradient" value="#4b0082" style="width:130px;">
+              <select id="cp-pack-type" style="width:150px;">
+                <option value="normal">Normal Pack</option>
+                <option value="super">🌟 Super Pack</option>
+              </select>
             </div>
+            <div style="font-size:11px;color:#666;margin-bottom:8px;">Super Packs open with several blooks at once instead of just one — add plenty of blooks below for variety.</div>
             <div id="cp-blook-rows" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
             <button id="cp-add-blook-btn" style="font-size:12px;padding:5px 12px;background:#1976d2;margin-bottom:8px;">+ Add Blook</button>
             <div id="cp-total-chance" style="font-size:12px;font-weight:700;margin-bottom:8px;">Total chance: 0%</div>
@@ -1577,6 +1620,18 @@
             <div id="badge-status" class="err-small"></div>
             <div style="font-weight:700;font-size:12px;margin-top:10px;">All Given Custom Badges</div>
             <div id="all-given-badges-list" style="margin-top:4px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
+          </div>
+
+          <div class="owner-single-box" style="background:#e8f5e9;margin-top:14px;">
+            <div><strong>🎁 All Redeem Codes</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Codes players can enter in Settings.</div>
+            <div id="owner-redeem-codes-list" style="margin-top:6px;font-size:12px;max-height:220px;overflow-y:auto;"></div>
+          </div>
+
+          <div class="owner-single-box" style="background:#e3f2fd;margin-top:14px;">
+            <div><strong>📧 Signed Up Emails</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Players who opted in for update emails. (Note: this app doesn't send emails itself — you'd need to export this list and use an email service to actually send anything.)</div>
+            <div id="owner-emails-list" style="margin-top:6px;font-size:12px;max-height:220px;overflow-y:auto;"></div>
           </div>
 
           <!-- Global Booster (moved from admin) -->
@@ -1668,7 +1723,7 @@
                 <option value="luck">Pack luck booster</option>
                 <option value="commonshiny">More common shinys %</option>
               </select>
-              <input id="pet-effect-value" type="number" min="0" step="0.1" placeholder="Effect value" style="width:100px;">
+              <input id="pet-effect-value" type="number" min="0" max="100" step="0.1" placeholder="Effect value (max 100)" style="width:100px;">
               <input id="pet-chance-value" type="number" min="0.01" max="100" step="0.01" placeholder="Pull chance %" style="width:110px;">
               <button id="pet-add-to-egg-btn" style="background:#f57c00;">+ Add Pet</button>
             </div>
@@ -1677,6 +1732,7 @@
             <button id="pet-egg-cancel-edit-btn" style="display:none;background:#888;margin-top:8px;margin-left:6px;">Cancel Edit</button>
             <button id="pet-egg-seed-btn" style="background:#00897b;margin-top:8px;margin-left:6px;">🥚 Add 10 Starter Eggs</button>
             <button id="pet-egg-seed-premium-btn" style="background:#6a1b9a;margin-top:8px;margin-left:6px;">💎 Add 20 Premium Eggs</button>
+            <button id="pet-egg-seed-mega-btn" style="background:#ad1457;margin-top:8px;margin-left:6px;">🌌 Add 50 Mega Eggs</button>
             <button id="owner-get-all-pets-btn" style="background:#1976d2;margin-top:8px;margin-left:6px;">🐾 Get All Pets</button>
             <button id="pet-egg-refresh-names-btn" style="background:#c62828;margin-top:8px;margin-left:6px;">🔄 Refresh Existing Egg Pets</button>
             <button id="pet-egg-delete-all-btn" style="background:#b71c1c;margin-top:8px;margin-left:6px;">🗑️ Delete ALL Eggs</button>
@@ -1719,7 +1775,7 @@
               <option value="luck">Pack luck %</option>
               <option value="commonshiny">Shiny chance %</option>
             </select>
-            <input id="admin-pet-effect-value" type="number" min="0" step="0.1" placeholder="Effect value" style="width:90px;">
+            <input id="admin-pet-effect-value" type="number" min="0" max="100" step="0.1" placeholder="Effect value (max 100)" style="width:90px;">
             <button id="admin-give-pet">Give Pet</button>
           </div>
           <div style="margin-bottom:10px;">
@@ -2170,14 +2226,15 @@
     const singleShopRef = () => ref(db, "singleShopBlooks");
     const reportsRef = () => ref(db, "reports");
 
-    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme" };
+    const R = { COMMON:"Common", RARE:"Rare", EPIC:"Epic", LEG:"Legendary", CHR:"Chroma", MYS:"Mystical", SUP:"Supreeme", UNIQUE:"Unique" };
 
     const RARITY_COLORS = {
       [R.COMMON]:"#4caf50",[R.RARE]:"#2196f3",[R.EPIC]:"#9c27b0",
-      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000"
+      [R.LEG]:"#ffb300",[R.CHR]:"#81d4fa",[R.MYS]:"#6a1b9a",[R.SUP]:"#d50000",
+      [R.UNIQUE]:"#1abc9c"
     };
     const SELL_VALUES = {
-      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000
+      [R.COMMON]:5,[R.RARE]:20,[R.EPIC]:80,[R.LEG]:250,[R.SUP]:400,[R.CHR]:400,[R.MYS]:1000,[R.UNIQUE]:850
     };
     function autoSellIfDupeBlook(name, rarity){
       if(!userData?.settings?.autoSellDupeBlooks) return false;
@@ -2200,7 +2257,7 @@
       return false;
     }
     const SUBSCORE_VALUES = {
-      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100
+      [R.COMMON]:5,[R.RARE]:10,[R.EPIC]:15,[R.LEG]:30,[R.CHR]:50,[R.SUP]:45,[R.MYS]:100,[R.UNIQUE]:200
     };
 
     // ══════════════════════════════════════════════════════════════
@@ -2980,7 +3037,7 @@
       viewChat.style.display=name==="chat"?"flex":"none";
       viewLeaderboard.style.display=name==="leaderboard"?"flex":"none";
       ownerPanel.style.display=name==="owner"?"flex":"none";
-      if(name==="owner"){ loadAllGivenBadges(); loadPetEggsOwnerList(); }
+      if(name==="owner"){ loadAllGivenBadges(); loadPetEggsOwnerList(); loadOwnerRedeemCodesList(); loadOwnerEmailsList(); }
       adminPanel.style.display=name==="admin"?"flex":"none";
       if(name==="admin") setTimeout(loadAdminOnlinePlayers, 400);
       const _rngPanel=document.getElementById("view-rng"); if(_rngPanel) _rngPanel.style.display=name==="rng"?"flex":"none";
@@ -3352,6 +3409,19 @@
       if(!userData.blooks) userData.blooks={};
       const blookKey = isShiny ? "✨ "+chosen.name : chosen.name;
       if(!autoSellIfDupeBlook(blookKey, chosen.rarity)) userData.blooks[blookKey]=(userData.blooks[blookKey]||0)+1;
+      let superExtras=[];
+      if(actualPack.packType==="super"){
+        const extraCount=4+Math.floor(Math.random()*6);
+        for(let k=0;k<extraCount;k++){
+          try{
+            const extra=pickFromPack(actualPack);
+            if(extra){
+              if(!autoSellIfDupeBlook(extra.name, extra.rarity)) userData.blooks[extra.name]=(userData.blooks[extra.name]||0)+1;
+              superExtras.push(extra.name);
+            }
+          }catch(e){}
+        }
+      }
       if(isShiny) userData.coins=(parseInt(userData.coins,10)||0)+shinyBonus;
       if(hotBonus > 0) userData.coins=(parseInt(userData.coins,10)||0)+hotBonus;
       userData.nextPackId=null;
@@ -3373,7 +3443,7 @@
       packOpenBlook.textContent=(isShiny?"\u2728 ":"")+chosen.name;
       packOpenBlook.style.background=isShiny?"linear-gradient(135deg,#fff176,#fff9c4,#fff176)":rarityColor(chosen.rarity);
       packOpenBlook.style.color=isShiny?"#7b1fa2":"#fff";
-      packOpenMeta.textContent=isShiny?(`SHINY! ${chosen.rarity} • +${shinyBonus.toLocaleString()} bonus coins!`):(`${chosen.rarity} • from ${actualPack.name}`);
+      packOpenMeta.textContent=(isShiny?(`SHINY! ${chosen.rarity} • +${shinyBonus.toLocaleString()} bonus coins!`):(`${chosen.rarity} • from ${actualPack.name}`))+(superExtras.length?` • 🌟 +${superExtras.length} more: ${superExtras.join(", ")}`:"");
       packOpenOverlay.style.display="flex";
       applyPackAnimClass();
       canClosePackOverlay=false;
@@ -4064,7 +4134,7 @@
       const name=document.getElementById("admin-pet-name").value.trim();
       const rarity=document.getElementById("admin-pet-rarity").value;
       const effectType=document.getElementById("admin-pet-effect-type").value;
-      const effectValue=parseFloat(document.getElementById("admin-pet-effect-value").value)||0;
+      const effectValue=Math.min(100, parseFloat(document.getElementById("admin-pet-effect-value").value)||0);
       if(!name){ adminStatus.textContent="Enter a pet name."; return; }
       if(!userData.pets) userData.pets={};
       const instId=push(ref(db,"users/"+currentUser.uid+"/pets")).key;
@@ -4702,6 +4772,20 @@
       statusEl.textContent="Removed all badges from "+uname+".";
       loadAllGivenBadges();
     });
+    function loadOwnerRedeemCodesList(){
+      const el=document.getElementById("owner-redeem-codes-list"); if(!el||!ownerMode) return;
+      const codes=Object.keys(REDEEM_CODES||{});
+      if(!codes.length){ el.innerHTML="<div style='color:#aaa;'>No codes defined.</div>"; return; }
+      el.innerHTML=codes.map(code=>{
+        const def=REDEEM_CODES[code];
+        const parts=[];
+        if(def.coins) parts.push(def.coins.toLocaleString()+" coins");
+        if(def.badge) parts.push("badge: "+(def.badge.name||def.badge.content));
+        if(def.blook) parts.push("blook: "+def.blook.name+" ("+def.blook.rarity+")");
+        if(def.randomBlookRarity) parts.push("random "+def.randomBlookRarity+" blook");
+        return "<div style='display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.08);gap:6px;'><b>"+code+"</b><span style='color:#555;text-align:right;'>"+parts.join(", ")+"</span></div>";
+      }).join("");
+    }
     async function loadAllGivenBadges(){
       const el=document.getElementById("all-given-badges-list"); if(!el || !ownerMode) return;
       el.innerHTML="Loading...";
@@ -6873,7 +6957,10 @@
       const reel=document.getElementById("rng-reel");
       if(reel){
         reel.innerHTML="";
-        [...RNG_RARITIES,...RNG_RARITIES,...RNG_RARITIES].forEach(r=>{
+        const sampleSize=24;
+        const sample=[];
+        for(let i=0;i<sampleSize;i++) sample.push(RNG_RARITIES[Math.floor(Math.random()*RNG_RARITIES.length)]);
+        sample.forEach(r=>{
           const el=document.createElement("div");
           el.style.cssText="display:inline-flex;align-items:center;justify-content:center;width:120px;height:44px;font-size:10px;font-weight:700;color:#fff;background:"+r.color+";flex-shrink:0;border-right:2px solid rgba(255,255,255,.2);padding:0 4px;text-align:center;";
           el.textContent=r.name;
@@ -6916,12 +7003,21 @@
       const result=RNG_RARITIES[idx];
       const reel=document.getElementById("rng-reel");
       const itemW=122;
-      const targetPos=-(RNG_RARITIES.length*itemW+idx*itemW-60);
+      const spinItems=30;
       if(reel){
+        reel.innerHTML="";
+        for(let i=0;i<spinItems;i++){
+          const r=i===spinItems-1?result:RNG_RARITIES[Math.floor(Math.random()*RNG_RARITIES.length)];
+          const el=document.createElement("div");
+          el.style.cssText="display:inline-flex;align-items:center;justify-content:center;width:120px;height:44px;font-size:10px;font-weight:700;color:#fff;background:"+r.color+";flex-shrink:0;border-right:2px solid rgba(255,255,255,.2);padding:0 4px;text-align:center;";
+          el.textContent=r.name;
+          reel.appendChild(el);
+        }
+        const targetPos=-((spinItems-1)*itemW-60);
         reel.style.transition="none";
         reel.style.transform="translateX(0)";
         void reel.offsetWidth;
-        reel.style.transition="transform 0.5s cubic-bezier(0.17,0.67,0.35,1)";
+        reel.style.transition="transform 1.4s cubic-bezier(0.17,0.67,0.35,1)";
         reel.style.transform="translateX("+targetPos+"px)";
       }
       setTimeout(async()=>{
@@ -6945,7 +7041,7 @@
         loadRngLeaderboard();
         rngSpinning=false;
         btn.disabled=false;btn.textContent="🎲 Spin (10 coins)";
-      },550);
+      },1450);
     });
 
     document.getElementById("rng-upgrade-luck-btn")?.addEventListener("click",async()=>{
@@ -7917,7 +8013,8 @@
         return;
       }
       var packId = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]+/g,'_').slice(0,30) + '_' + Date.now().toString(36);
-      var packData = { id: packId, name: name, color: color, cost: cost, blooks: blooks, custom: true, createdAt: Date.now() };
+      var packType = document.getElementById('cp-pack-type') ? document.getElementById('cp-pack-type').value : 'normal';
+      var packData = { id: packId, name: (packType==='super'?'🌟 '+name:name), color: color, cost: cost, blooks: blooks, custom: true, packType: packType, createdAt: Date.now() };
       try {
         await set(ref(db, 'customPacks/' + packId), packData);
         statusEl.style.color = '#2e7d32';
@@ -8269,6 +8366,8 @@
       if(_hotStreak >= 3) {
         const bonus = _hotStreak * 50;
         showToast('\uD83D\uDD25 HOT STREAK x' + _hotStreak + '! +' + bonus + ' bonus coins', '#e65100', 2500);
+        _hotStreak = 0;
+        _lastPackOpenTime = 0;
         return bonus;
       }
       return 0;
@@ -8428,6 +8527,9 @@
         document.getElementById('settings-autosell-blooks').checked = !!s.autoSellDupeBlooks;
       if(document.getElementById('settings-autosell-pets'))
         document.getElementById('settings-autosell-pets').checked = !!s.autoSellDupePets;
+
+      if(document.getElementById('settings-email-input') && userData.email)
+        document.getElementById('settings-email-input').value = userData.email;
 
       if(document.getElementById('settings-reduce-motion'))
         document.getElementById('settings-reduce-motion').checked = !!s.reduceMotion;
@@ -8611,7 +8713,12 @@
     });
 
     const REDEEM_CODES = {
-      "13rty98klmk94": { coins: 100000, badge: { content: "🎫", rarity: "legendary", name: "Code Badge", how: "Redeem a special code in Settings." } }
+      "13rty98klmk94": { coins: 100000, badge: { content: "🎫", rarity: "legendary", name: "Code Badge", how: "Redeem a special code in Settings." } },
+      "icecold": { randomBlookRarity: "Mystical" },
+      "weditor": { blook: { name: "The Editor", rarity: "Chroma" } },
+      "remember1.0": { blook: { name: "The OG", rarity: "Unique" } },
+      "spaceicemedival": { blook: { name: "Super Rainbow Crab King", rarity: "Supreeme" } },
+      "iatemycart": { chest: true }
     };
     document.getElementById('settings-redeem-btn')?.addEventListener('click', async function() {
       if(!currentUser||!userData) return;
@@ -8637,10 +8744,122 @@
         if(!Array.isArray(userData.badges)) userData.badges = userData.badge ? [userData.badge] : [];
         if(!userData.badges.some(b=>b.content===def.badge.content && b.rarity===def.badge.rarity)) userData.badges.push(def.badge);
       }
+      let grantedBlookName = null;
+      if(def.blook){
+        grantedBlookName = def.blook.name;
+        if(!userData.blooks) userData.blooks={};
+        BLOOK_INFO[def.blook.name] = { packId:"other", packName:"Special Codes", rarity:def.blook.rarity, chance:0 };
+        registerBlookRegistryEntries({ [def.blook.name]: BLOOK_INFO[def.blook.name] });
+        if(!autoSellIfDupeBlook(def.blook.name, def.blook.rarity)) userData.blooks[def.blook.name]=(userData.blooks[def.blook.name]||0)+1;
+      } else if(def.randomBlookRarity){
+        const candidates = Object.keys(BLOOK_INFO).filter(name=>BLOOK_INFO[name].rarity===def.randomBlookRarity);
+        if(candidates.length){
+          grantedBlookName = candidates[Math.floor(Math.random()*candidates.length)];
+          if(!userData.blooks) userData.blooks={};
+          if(!autoSellIfDupeBlook(grantedBlookName, def.randomBlookRarity)) userData.blooks[grantedBlookName]=(userData.blooks[grantedBlookName]||0)+1;
+        }
+      }
+      let chestReward = null;
+      if(def.chest){
+        chestReward = await grantWoodenChestReward();
+      }
       await saveUserData();
+      renderBlooks(); populateTradeOfferSelect();
       document.getElementById('settings-redeem-input').value='';
-      statusEl.style.color='#2e7d32'; statusEl.textContent='Code redeemed! +'+(def.coins||0).toLocaleString()+' coins'+(def.badge?' and a special badge!':'!');
+      if(chestReward){
+        statusEl.style.color='#2e7d32';
+        statusEl.textContent='🧾 Checkout total: $0.00 — Wooden Chest unlocked!';
+        showChestRewardReveal(chestReward);
+        return;
+      }
+      statusEl.style.color='#2e7d32';
+      statusEl.textContent='Code redeemed!'+(def.coins?' +'+def.coins.toLocaleString()+' coins':'')+(def.badge?' + special badge':'')+(grantedBlookName?' + '+grantedBlookName:'')+'!';
     });
+
+    document.getElementById('settings-email-save-btn')?.addEventListener('click', async function() {
+      if(!currentUser||!userData) return;
+      const statusEl = document.getElementById('settings-email-status');
+      const email = document.getElementById('settings-email-input').value.trim();
+      if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ statusEl.style.color='#c62828'; statusEl.textContent='Enter a valid email.'; return; }
+      userData.email = email;
+      userData.emailOptIn = true;
+      await saveUserData();
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Email saved! You\'ll be notified about new updates.';
+    });
+    document.getElementById('settings-email-remove-btn')?.addEventListener('click', async function() {
+      if(!currentUser||!userData) return;
+      const statusEl = document.getElementById('settings-email-status');
+      userData.email = null;
+      userData.emailOptIn = false;
+      await saveUserData();
+      document.getElementById('settings-email-input').value='';
+      statusEl.style.color='#2e7d32'; statusEl.textContent='Email removed.';
+    });
+
+    async function grantWoodenChestReward(){
+      const coins=100000;
+      userData.coins=(parseInt(userData.coins,10)||0)+coins;
+      userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+coins;
+      if(!userData.blooks) userData.blooks={};
+      const mysticalCandidates=Object.keys(BLOOK_INFO).filter(n=>BLOOK_INFO[n].rarity===R.MYS);
+      const allCandidates=Object.keys(BLOOK_INFO);
+      const grantedBlooks=[];
+      const mysticalCount=Math.min(10, mysticalCandidates.length);
+      for(let i=0;i<mysticalCount;i++){
+        const name=mysticalCandidates[Math.floor(Math.random()*mysticalCandidates.length)];
+        if(!autoSellIfDupeBlook(name, R.MYS)) userData.blooks[name]=(userData.blooks[name]||0)+1;
+        grantedBlooks.push({name, rarity:R.MYS});
+      }
+      const remaining=50-mysticalCount;
+      for(let i=0;i<remaining;i++){
+        if(!allCandidates.length) break;
+        const name=allCandidates[Math.floor(Math.random()*allCandidates.length)];
+        const rarity=BLOOK_INFO[name].rarity;
+        if(!autoSellIfDupeBlook(name, rarity)) userData.blooks[name]=(userData.blooks[name]||0)+1;
+        grantedBlooks.push({name, rarity});
+      }
+      await saveUserData();
+      renderBlooks(); populateTradeOfferSelect();
+      return { coins, blooks: grantedBlooks };
+    }
+    document.getElementById('chest-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const statusEl=document.getElementById('chest-status');
+      const reward=await grantWoodenChestReward();
+      statusEl.textContent='';
+      showChestRewardReveal(reward);
+    });
+    function showChestRewardReveal(reward){
+      packOpenBlook.textContent = "🪵 Wooden Chest";
+      packOpenBlook.style.background = "linear-gradient(135deg,#6d4c28,#a1734a)";
+      packOpenBlook.style.color = "#fff";
+      const blooks = reward.blooks || [];
+      const byRarity = {};
+      blooks.forEach(b=>{ byRarity[b.rarity]=(byRarity[b.rarity]||0)+1; });
+      const rarityOrder=[R.MYS,R.SUP,R.CHR,R.LEG,R.EPIC,R.RARE,R.COMMON];
+      const pills = rarityOrder.filter(r=>byRarity[r]).map(r=>
+        "<span style='display:inline-block;margin:2px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;background:"+(rarityColor(r)||"#78909c")+";'>"+byRarity[r]+"x "+r+"</span>"
+      ).join("");
+      packOpenMeta.innerHTML =
+        "<div style='margin:4px 0;'>💰 +"+reward.coins.toLocaleString()+" coins</div>" +
+        "<div style='margin:4px 0;font-weight:700;'>+"+blooks.length+" blooks:</div>" +
+        "<div style='max-width:280px;'>"+pills+"</div>";
+      packOpenOverlay.style.display = "flex";
+      applyPackAnimClass();
+      spawnConfetti("#a1734a");
+      canClosePackOverlay = false;
+      setTimeout(()=>{ canClosePackOverlay=true; },600);
+    }
+    async function loadOwnerEmailsList(){
+      const el=document.getElementById("owner-emails-list"); if(!el||!ownerMode) return;
+      el.innerHTML="Loading...";
+      const snap=await get(usersRef());
+      if(!snap.exists()){ el.innerHTML="<div style='color:#aaa;'>No users yet.</div>"; return; }
+      const all=snap.val();
+      const rows=Object.values(all).filter(u=>u.emailOptIn && u.email).map(u=>({username:u.username||"?", email:u.email}));
+      if(!rows.length){ el.innerHTML="<div style='color:#aaa;'>No emails signed up yet.</div>"; return; }
+      el.innerHTML=rows.map(r=>"<div style='display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.08);'><b>"+r.username+"</b><span style='color:#555;'>"+r.email+"</span></div>").join("");
+    }
 
     function refreshSettingsStats() {
       const el = document.getElementById('settings-stats-snap');
@@ -10357,7 +10576,7 @@
       const name=document.getElementById("pet-name-input").value.trim();
       const rarity=document.getElementById("pet-rarity-select").value;
       const effectType=document.getElementById("pet-effect-select").value;
-      const effectValue=parseFloat(document.getElementById("pet-effect-value").value)||0;
+      const effectValue=Math.min(100, parseFloat(document.getElementById("pet-effect-value").value)||0);
       const chance=parseFloat(document.getElementById("pet-chance-value").value)||1;
       if(!name){ alert("Enter a pet name."); return; }
       petEggBuilderPets.push({name,rarity,effectType,effectValue,chance});
@@ -10434,13 +10653,13 @@
         {name:"Golden Egg", color:"linear-gradient(135deg,#f57f17,#ffd54f)", pets:["Golden Mouse","Golden Hare","Golden Falcon","Golden Dragon","Golden Phoenix","Golden Titan","Midas Avatar"]}
       ];
       const rarityPets=[
-        {rarity:"Common",baseEffect:2,chance:45},
-        {rarity:"Rare",baseEffect:5,chance:25},
-        {rarity:"Epic",baseEffect:8,chance:15},
-        {rarity:"Legendary",baseEffect:3,chance:8},
-        {rarity:"Magical",baseEffect:15,chance:4},
-        {rarity:"Invincible",baseEffect:20,chance:2},
-        {rarity:"Secret",baseEffect:30,chance:0.5}
+        {rarity:"Common",baseEffect:2,chance:70},
+        {rarity:"Rare",baseEffect:5,chance:20},
+        {rarity:"Epic",baseEffect:8,chance:8},
+        {rarity:"Legendary",baseEffect:3,chance:1.5},
+        {rarity:"Magical",baseEffect:15,chance:0.5},
+        {rarity:"Invincible",baseEffect:20,chance:0.2},
+        {rarity:"Secret",baseEffect:30,chance:0.05}
       ];
       const effectTypes=["discount","sellbuff","luck","commonshiny"];
       let created=0;
@@ -10492,13 +10711,13 @@
         ["Rune Mouse","Sigil Hare","Runic Hawk","Rune Stag","Runic Golem","Runic Titan","Rune Sovereign"]
       ];
       const rarityBase=[
-        {rarity:"Common",baseEffect:3,chance:45},
-        {rarity:"Rare",baseEffect:7,chance:25},
-        {rarity:"Epic",baseEffect:11,chance:15},
-        {rarity:"Legendary",baseEffect:5,chance:8},
-        {rarity:"Magical",baseEffect:20,chance:4},
-        {rarity:"Invincible",baseEffect:28,chance:2},
-        {rarity:"Secret",baseEffect:40,chance:0.5}
+        {rarity:"Common",baseEffect:3,chance:70},
+        {rarity:"Rare",baseEffect:7,chance:20},
+        {rarity:"Epic",baseEffect:11,chance:8},
+        {rarity:"Legendary",baseEffect:5,chance:1.5},
+        {rarity:"Magical",baseEffect:20,chance:0.5},
+        {rarity:"Invincible",baseEffect:28,chance:0.2},
+        {rarity:"Secret",baseEffect:40,chance:0.05}
       ];
       const premiumEffectTypes=["discount","sellbuff","luck","commonshiny"];
       let created=0;
@@ -10509,7 +10728,7 @@
           name: eggPetNames[i][j],
           rarity: rb.rarity,
           effectType: premiumEffectTypes[(j+i)%premiumEffectTypes.length],
-          effectValue: Math.round(rb.baseEffect*(1+i*0.12)*10)/10,
+          effectValue: Math.min(100, Math.round(rb.baseEffect*(1+i*0.12)*10)/10),
           chance: rb.chance
         }));
         const hue=(i*47)%360;
@@ -10520,6 +10739,48 @@
       status.textContent="Added "+created+" premium eggs (costs & buffs scale up)!";
       loadPetEggsOwnerList(); loadPetEggs();
       }catch(err){ status.textContent="Error creating eggs: "+(err&&err.message?err.message:err); console.error("Seed premium eggs failed:",err); }
+    });
+
+    document.getElementById("pet-egg-seed-mega-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const status=document.getElementById("pet-egg-status");
+      if(!confirm("Add 50 mega pet eggs? Each has 7 genuinely different pets (not just reskins). This won't remove existing eggs.")) return;
+      try{
+      const adjectives=["Mystic","Feral","Ancient","Rogue","Savage","Noble","Frenzied","Cunning","Vicious","Serene","Grim","Wild","Sly","Bold","Fierce","Ghastly","Regal","Primal","Cryptic","Sinister","Valiant","Rabid","Elusive","Gilded","Sable","Ivory","Crimson","Azure","Verdant","Amber","Onyx","Jade","Coral","Ashen","Marble","Ebon","Pearl","Copper","Bronze","Steel","Cobalt","Violet","Scarlet","Umber","Indigo","Saffron","Ochre","Slate","Charcoal","Frostbite"];
+      const creatureBank=["Mouse","Hare","Fox","Wolf","Bear","Owl","Hawk","Falcon","Raven","Serpent","Viper","Scorpion","Beetle","Spider","Moth","Firefly","Stag","Elk","Ram","Bull","Boar","Lynx","Panther","Tiger","Lion","Cheetah","Jackal","Coyote","Badger","Otter","Seal","Whale","Shark","Eel","Crab","Turtle","Frog","Newt","Salamander","Gecko","Chameleon","Iguana","Cobra","Python","Mantis","Wasp","Hornet","Locust","Dragonfly","Butterfly"];
+      const rarityBase=[
+        {rarity:"Common",baseEffect:2,chance:70},
+        {rarity:"Rare",baseEffect:5,chance:20},
+        {rarity:"Epic",baseEffect:8,chance:8},
+        {rarity:"Legendary",baseEffect:3.5,chance:1.5},
+        {rarity:"Magical",baseEffect:15,chance:0.5},
+        {rarity:"Invincible",baseEffect:20,chance:0.2},
+        {rarity:"Secret",baseEffect:30,chance:0.05}
+      ];
+      const effectTypesPool=["discount","sellbuff","luck","commonshiny"];
+      let created=0;
+      for(let i=0;i<adjectives.length;i++){
+        const adj=adjectives[i];
+        const cost=Math.round(50000*Math.pow(1.18,i));
+        const tierCount=4+((i*3)%4); // varies 4,5,6,7 across eggs instead of always 7
+        const pets=rarityBase.slice(0,tierCount).map((rb,j)=>{
+          const animal=creatureBank[(i*13+j*7)%creatureBank.length];
+          return {
+            name: adj+" "+animal,
+            rarity: rb.rarity,
+            effectType: effectTypesPool[(i+j)%effectTypesPool.length],
+            effectValue: Math.min(100, Math.round(rb.baseEffect*(1+i*0.06)*10)/10),
+            chance: rb.chance
+          };
+        });
+        const hue=(i*73)%360;
+        const eggRef=push(petEggsRef());
+        await set(eggRef,{id:eggRef.key,name:adj+" Egg",cost,color:"hsl("+hue+",60%,42%)",pets,createdAt:Date.now()});
+        created++;
+      }
+      status.textContent="Added "+created+" mega eggs!";
+      loadPetEggsOwnerList(); loadPetEggs();
+      }catch(err){ status.textContent="Error creating eggs: "+(err&&err.message?err.message:err); console.error("Seed mega eggs failed:",err); }
     });
 
     document.getElementById("pet-egg-refresh-names-btn")?.addEventListener("click", async()=>{
@@ -10540,8 +10801,8 @@
         {name:"Golden Egg", pets:["Golden Mouse","Golden Hare","Golden Falcon","Golden Dragon","Golden Phoenix","Golden Titan","Midas Avatar"]}
       ];
       const starterRarityPets=[
-        {rarity:"Common",baseEffect:2,chance:45},{rarity:"Rare",baseEffect:5,chance:25},{rarity:"Epic",baseEffect:8,chance:15},
-        {rarity:"Legendary",baseEffect:3,chance:8},{rarity:"Magical",baseEffect:15,chance:4},{rarity:"Invincible",baseEffect:20,chance:2},{rarity:"Secret",baseEffect:30,chance:0.5}
+        {rarity:"Common",baseEffect:2,chance:70},{rarity:"Rare",baseEffect:5,chance:20},{rarity:"Epic",baseEffect:8,chance:8},
+        {rarity:"Legendary",baseEffect:3,chance:1.5},{rarity:"Magical",baseEffect:15,chance:0.5},{rarity:"Invincible",baseEffect:20,chance:0.2},{rarity:"Secret",baseEffect:30,chance:0.05}
       ];
       const premiumPrefixes=["Radiant","Shadow","Crystal","Thunder","Blood","Frost","Solar","Lunar","Abyssal","Verdant","Obsidian","Emberfall","Skybound","Wraithcall","Ironclad","Silverfang","Starforged","Ashen","Tidal","Runic"];
       const premiumPetNames=[
@@ -10567,8 +10828,8 @@
         ["Rune Mouse","Sigil Hare","Runic Hawk","Rune Stag","Runic Golem","Runic Titan","Rune Sovereign"]
       ];
       const premiumRarityBase=[
-        {rarity:"Common",baseEffect:3,chance:45},{rarity:"Rare",baseEffect:7,chance:25},{rarity:"Epic",baseEffect:11,chance:15},
-        {rarity:"Legendary",baseEffect:5,chance:8},{rarity:"Magical",baseEffect:20,chance:4},{rarity:"Invincible",baseEffect:28,chance:2},{rarity:"Secret",baseEffect:40,chance:0.5}
+        {rarity:"Common",baseEffect:3,chance:70},{rarity:"Rare",baseEffect:7,chance:20},{rarity:"Epic",baseEffect:11,chance:8},
+        {rarity:"Legendary",baseEffect:5,chance:1.5},{rarity:"Magical",baseEffect:20,chance:0.5},{rarity:"Invincible",baseEffect:28,chance:0.2},{rarity:"Secret",baseEffect:40,chance:0.05}
       ];
       const effectTypesPool=["discount","sellbuff","luck","commonshiny"];
       const snap=await get(petEggsRef());
@@ -10586,7 +10847,7 @@
         }
         const pIdx=premiumPrefixes.findIndex(p=>egg.name===p+" Egg");
         if(pIdx>=0){
-          const pets=premiumRarityBase.map((rb,j)=>({ name:premiumPetNames[pIdx][j], rarity:rb.rarity, effectType:effectTypesPool[(j+pIdx)%effectTypesPool.length], effectValue:Math.round(rb.baseEffect*(1+pIdx*0.12)*10)/10, chance:rb.chance }));
+          const pets=premiumRarityBase.map((rb,j)=>({ name:premiumPetNames[pIdx][j], rarity:rb.rarity, effectType:effectTypesPool[(j+pIdx)%effectTypesPool.length], effectValue:Math.min(100, Math.round(rb.baseEffect*(1+pIdx*0.12)*10)/10), chance:rb.chance }));
           await update(ref(db,"petEggs/"+id),{pets});
           updated++;
         }
@@ -11024,6 +11285,8 @@
       if(name==="peteggs"){ loadPetEggs(); if(ownerMode) loadPetEggsOwnerList(); }
       const vPets=document.getElementById("view-pets"); if(vPets) vPets.style.display=name==="pets"?"flex":"none";
       if(name==="pets"){ loadPetEggs(); renderPetInventory(); }
+      const vChests=document.getElementById("view-chests"); if(vChests) vChests.style.display=name==="chests"?"flex":"none";
+      if(name==="chests"){ const freeBtn=document.getElementById("chest-free-btn"); if(freeBtn) freeBtn.style.display=ownerMode?"block":"none"; }
       if(name==="joingame") loadActiveGames();
     };
 
