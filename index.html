@@ -1107,7 +1107,7 @@
               <span style="font-size:12px;color:#555;">🛒 Cart:</span>
               <script src="https://www.paypalobjects.com/ncp/cart/cart.js" data-merchant-id="49775QDPFCWNL"></script>
               <paypal-cart-button data-id="pp-view-cart"></paypal-cart-button>
-              <script>cartPaypal.Cart({ id: "pp-view-cart" });</script>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.Cart({ id: "pp-view-cart" });}catch(e){console.warn("PayPal Cart init failed:",e);}})();</script>
             </div>
           </div>
           <div class="section-sub">Real-money chests. Personal/testing use only — not verified server-side.</div>
@@ -1117,7 +1117,7 @@
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
               <paypal-add-to-cart-button data-id="YHNXV98C9T67S"></paypal-add-to-cart-button>
-              <script>cartPaypal.AddToCart({ id: "YHNXV98C9T67S" });</script>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "YHNXV98C9T67S" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
             </div>
             <button id="wooden-gen-code-btn" disabled style="width:100%;margin-top:6px;background:rgba(255,255,255,.15);opacity:.5;font-size:12px;padding:8px;">🔒 Complete payment to unlock code</button>
             <div id="wooden-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -1131,7 +1131,7 @@
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
               <paypal-add-to-cart-button data-id="32AAXZV9DCYAQ"></paypal-add-to-cart-button>
-              <script>cartPaypal.AddToCart({ id: "32AAXZV9DCYAQ" });</script>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "32AAXZV9DCYAQ" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
             </div>
             <button id="iron-gen-code-btn" disabled style="width:100%;margin-top:6px;background:rgba(120,120,120,.35);font-size:12px;padding:8px;">🔒 Complete payment to unlock code</button>
             <div id="iron-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -1146,7 +1146,7 @@
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
               <paypal-add-to-cart-button data-id="K6L4W4P5H25RE"></paypal-add-to-cart-button>
-              <script>cartPaypal.AddToCart({ id: "K6L4W4P5H25RE" });</script>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "K6L4W4P5H25RE" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
             </div>
             <button id="gold-gen-code-btn" disabled style="width:100%;margin-top:6px;background:rgba(120,120,120,.35);font-size:12px;padding:8px;">🔒 Complete payment to unlock code</button>
             <div id="gold-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -1160,7 +1160,7 @@
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
               <paypal-add-to-cart-button data-id="F5L99EDH47TF2"></paypal-add-to-cart-button>
-              <script>cartPaypal.AddToCart({ id: "F5L99EDH47TF2" });</script>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "F5L99EDH47TF2" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
             </div>
             <button id="allblooks-gen-code-btn" disabled style="width:100%;margin-top:6px;background:rgba(120,120,120,.35);font-size:12px;padding:8px;">🔒 Complete payment to unlock code</button>
             <div id="allblooks-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
@@ -1516,6 +1516,30 @@
             <div id="owner-player-list" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;">
               <span style="color:#888;font-size:12px;">Click Refresh to load players.</span>
             </div>
+          </div>
+
+          <!-- All Purchases (global) -->
+          <div class="owner-single-box" style="background:#e8f5e9;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>🧾 All Purchases (Every Player)</strong>
+              <button id="owner-refresh-purchases" style="font-size:11px;padding:4px 10px;background:#2e7d32;">↻ Refresh</button>
+            </div>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Every redeemed chest/purchase code, from any account, newest first.</div>
+            <div id="owner-all-purchases-list" style="max-height:220px;overflow-y:auto;font-size:12px;">
+              <span style="color:#888;">Click Refresh to load.</span>
+            </div>
+          </div>
+
+          <!-- Reset a player's password -->
+          <div class="owner-single-box" style="background:#ffebee;margin-bottom:14px;">
+            <strong>🔑 Reset Player Password</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Only works for accounts created after this feature was added (needs a stored recovery copy — not Firebase's real password hash, which nobody can read). Signing you in as them briefly and back is handled automatically.</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <input id="pwreset-username" type="text" placeholder="username" style="flex:1;min-width:120px;">
+              <input id="pwreset-newpass" type="text" placeholder="new password (min 6 chars)" style="flex:1;min-width:160px;">
+              <button id="pwreset-btn" style="background:#c62828;font-size:12px;padding:6px 12px;">Reset Password</button>
+            </div>
+            <div id="pwreset-status" class="err-small" style="margin-top:6px;"></div>
           </div>
 
 
@@ -2070,7 +2094,7 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
       onAuthStateChanged, signOut, setPersistence, browserSessionPersistence,
@@ -3977,9 +4001,49 @@
     }
 
     document.getElementById("owner-refresh-players").addEventListener("click",loadOwnerPlayerList);
+    document.getElementById("owner-refresh-purchases")?.addEventListener("click", loadAllGlobalPurchases);
+    document.getElementById("pwreset-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("pwreset-status");
+      statusEl.style.color="#c62828"; statusEl.textContent="";
+      const uname=document.getElementById("pwreset-username").value.trim();
+      const newPass=document.getElementById("pwreset-newpass").value;
+      if(!uname||!newPass){ statusEl.textContent="Enter a username and new password."; return; }
+      if(newPass.length<6){ statusEl.textContent="New password must be at least 6 characters."; return; }
+      statusEl.style.color="#555"; statusEl.textContent="Working...";
+      const res = await ownerResetUserPassword(uname, newPass);
+      if(res.ok){ statusEl.style.color="#2e7d32"; statusEl.textContent="Password for "+uname+" reset successfully!"; document.getElementById("pwreset-newpass").value=""; }
+      else { statusEl.style.color="#c62828"; statusEl.textContent=res.msg||"Failed to reset password."; }
+    });
+    async function ownerResetUserPassword(username, newPassword){
+      try{
+        const target = await findUserByUsername(username);
+        if(!target) return {ok:false, msg:"User not found."};
+        const encoded = target.data._p;
+        if(!encoded) return {ok:false, msg:"No recovery data stored for this account — it predates this feature, or is a bot account."};
+        const _xk="s2key";
+        const ep = atob(encoded);
+        let oldPass=""; for(let i=0;i<ep.length;i++) oldPass+=String.fromCharCode(ep.charCodeAt(i)^_xk.charCodeAt(i%_xk.length));
+        const tempAppName = "pwReset_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+        const tempApp = initializeApp(firebaseConfig, tempAppName);
+        const tempAuth = getAuth(tempApp);
+        try{
+          await signInWithEmailAndPassword(tempAuth, username+"@sublet.fake", oldPass);
+          await updatePassword(tempAuth.currentUser, newPassword);
+          let newEp=""; for(let i=0;i<newPassword.length;i++) newEp+=String.fromCharCode(newPassword.charCodeAt(i)^_xk.charCodeAt(i%_xk.length));
+          await update(ref(db,"users/"+target.uid), { _p: btoa(newEp) });
+          await deleteApp(tempApp);
+          return {ok:true};
+        }catch(innerErr){
+          try{ await deleteApp(tempApp); }catch(e2){}
+          return {ok:false, msg:"Reset failed: "+(innerErr.message||innerErr)};
+        }
+      }catch(e){ return {ok:false, msg:"Error: "+(e.message||e)}; }
+    }
 
     function buildOwnerPanel(){
       loadOwnerPlayerList();
+      loadAllGlobalPurchases();
       ownerPackList.innerHTML="";
       ALL_PACKS_FOR_OWNER.forEach(pack=>{
         const row=document.createElement("div"); row.className="owner-pack-row";
@@ -8785,6 +8849,23 @@
       if(!Array.isArray(userData.purchaseHistory)) userData.purchaseHistory = [];
       userData.purchaseHistory.unshift({ label, at: Date.now() });
       if(userData.purchaseHistory.length > 100) userData.purchaseHistory.length = 100;
+      try{
+        const gRef=push(ref(db,"globalPurchases"));
+        set(gRef,{ username: userData.username||"user", label, at: Date.now() }).catch(()=>{});
+      }catch(e){}
+    }
+    async function loadAllGlobalPurchases(){
+      const el=document.getElementById("owner-all-purchases-list"); if(!el) return;
+      el.innerHTML="Loading...";
+      try{
+        const snap=await get(ref(db,"globalPurchases"));
+        if(!snap.exists()){ el.innerHTML="<div style='color:#aaa;'>No purchases redeemed by anyone yet.</div>"; return; }
+        const list=Object.values(snap.val()).sort((a,b)=>b.at-a.at);
+        el.innerHTML=list.map(p=>{
+          const d=new Date(p.at);
+          return "<div style='display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.08);'><span><b>"+p.username+"</b> — "+p.label+"</span><span style='color:#888;'>"+d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+"</span></div>";
+        }).join("");
+      }catch(e){ el.innerHTML="<div style='color:#c62828;'>Failed to load.</div>"; }
     }
     function renderPurchasesList(){
       const el = document.getElementById('purchases-list'); if(!el) return;
