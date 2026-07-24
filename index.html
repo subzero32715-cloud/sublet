@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet IRL BUYS</title>
+  <title>Sublet 3.0 IRL BUYS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -60,7 +60,10 @@
       background:rgba(255,255,255,.95);padding:20px 16px;
       box-shadow:2px 0 10px rgba(0,0,0,.1);
       display:flex;flex-direction:column;gap:16px;
+      height:100vh;overflow-y:auto;overflow-x:hidden;
     }
+    .sidebar::-webkit-scrollbar{width:6px}
+    .sidebar::-webkit-scrollbar-thumb{background:rgba(13,71,161,.25);border-radius:999px}
     .sidebar-title{font-family:"Titan One";font-size:26px;color:#0d47a1;}
     .nav{
       width:100%;text-align:left;background:transparent;color:#123;
@@ -573,7 +576,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 2.0</div>
+      <div class="start-title">Sublet 3.0</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -604,7 +607,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 2.0</div>
+        <div class="sidebar-title">Sublet 3.0</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -660,10 +663,6 @@
         <div id="view-market" class="card">
           <div class="section-title">Market</div>
           <div class="section-sub">Special shop blooks first, then packs.</div>
-          <div id="login-warning-bar" style="display:none;background:#e65100;color:#fff;padding:10px 16px;border-radius:10px;font-size:12px;margin-bottom:8px;align-items:center;gap:10px;">
-            <span>&#9888;&#65039; <strong>Heads up:</strong> Some stats may be inaccurate — global pack opens and personal open counts are being reset and recalculated. Sorry for the inconvenience!</span>
-            <button onclick="this.parentElement.style.display='none';localStorage.setItem('dismissed_stat_warn','1');" style="background:rgba(255,255,255,.25);font-size:11px;padding:3px 10px;flex-shrink:0;">Dismiss</button>
-          </div>
           <div id="broadcast-bar" style="display:none;background:linear-gradient(90deg,#1a237e,#311b92);border-radius:12px;padding:10px 14px;color:#fff;margin-bottom:10px;align-items:center;gap:10px;">
             <span style="font-size:13px;font-weight:700;">&#127911; Community Broadcast</span>
             <span id="broadcast-label" style="font-size:12px;opacity:.85;flex:1;"></span>
@@ -1430,7 +1429,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 2.0. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.0. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1515,6 +1514,8 @@
           <div class="section-title">Owner Panel</div>
           <div class="section-sub">Full control. Only Subzero32715 has access to this panel.</div>
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">👥 Players &amp; Accounts</div>
           <!-- Bot creator -->
           <div style="padding:10px;border-radius:10px;background:#f3e5f5;font-size:13px;margin-bottom:14px;">
             <strong>🤖 Create Bot Account</strong>
@@ -1538,6 +1539,8 @@
             </div>
           </div>
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">🧾 Purchases, Codes &amp; Recovery</div>
           <!-- All Purchases (global) -->
           <div class="owner-single-box" style="background:#e8f5e9;margin-bottom:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1581,6 +1584,8 @@
           </div>
 
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">🛠️ Server Controls &amp; Communication</div>
           <!-- Maintenance Mode -->
           <div class="owner-single-box" style="background:#fce4ec;margin-bottom:14px;">
             <strong>&#128683; Maintenance / Downtime</strong>
@@ -1595,6 +1600,18 @@
               <button id="maint-end-btn" style="font-size:12px;padding:6px 14px;background:#2e7d32;font-weight:700;">&#10003; End Maintenance</button>
             </div>
             <div id="maint-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
+          <!-- Player messages inbox -->
+          <div class="owner-single-box" style="background:#fff3e0;margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>📨 Messages From Players</strong>
+              <button id="owner-refresh-inbox" style="font-size:11px;padding:4px 10px;background:#ef6c00;">↻ Refresh</button>
+            </div>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Text/image messages sent from IRL Buys → Contact Owner. New ones pop up live while you're online.</div>
+            <div id="owner-inbox-list" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;">
+              <span style="color:#888;font-size:12px;">Click Refresh to load.</span>
+            </div>
           </div>
 
           <!-- Owner: Send notification to all -->
@@ -1649,6 +1666,8 @@
             <div id="owner-end-games-status" class="err-small" style="margin-top:4px;"></div>
           </div>
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">📦 Content Creation</div>
           <!-- Custom Pack Creator -->
           <div class="owner-single-box" style="background:#e8f0fe;margin-bottom:14px;">
             <strong>&#128230; Create Custom Pack</strong>
@@ -1694,6 +1713,8 @@
             <div class="owner-single-list" id="single-list"></div>
           </div>
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">🚫 Moderation</div>
           <!-- Ban -->
           <div class="owner-ban-box">
             <div><strong>Ban player</strong></div>
@@ -1743,6 +1764,8 @@
           </div>
 
           <div class="owner-single-box" style="background:#e8f5e9;margin-top:14px;">
+            
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">🎁 Codes &amp; Data</div>
             <div><strong>🎁 All Redeem Codes</strong></div>
             <div style="font-size:12px;color:#555;margin-top:2px;">Codes players can enter in Settings.</div>
             <div id="owner-redeem-codes-list" style="margin-top:6px;font-size:12px;max-height:220px;overflow-y:auto;"></div>
@@ -1754,6 +1777,8 @@
             <div id="owner-emails-list" style="margin-top:6px;font-size:12px;max-height:220px;overflow-y:auto;"></div>
           </div>
 
+          
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">⚡ Economy &amp; Events</div>
           <!-- Global Booster (moved from admin) -->
           <div class="owner-single-box" style="background:#fff8e1;margin-top:14px;">
             <div><strong>⚡ Set Global Booster</strong></div>
@@ -1819,6 +1844,8 @@
           </div>
 
           <div class="owner-single-box" style="background:#fff3e0;margin-top:14px;">
+            
+          <div style="font-size:13px;font-weight:800;color:#0d47a1;margin:18px 0 8px;padding-bottom:4px;border-bottom:2px solid #90caf9;text-transform:uppercase;letter-spacing:.5px;">🐾 Pets</div>
             <div><strong>🐾 Pet Egg Creator</strong></div>
             <div style="font-size:12px;color:#555;margin-top:2px;">Build an egg's pet pool, set its cost and color, then create it.</div>
             <div class="owner-single-row">
@@ -1987,6 +2014,25 @@
     </div>
   </div>
 
+  <!-- Floating Contact Owner widget — always visible, any view, any scroll position -->
+  <button id="owner-contact-fab" style="position:fixed;bottom:16px;left:16px;z-index:750;width:52px;height:52px;border-radius:50%;background:#1976d2;color:#fff;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.3);display:none;align-items:center;justify-content:center;padding:0;">📨</button>
+  <div id="owner-contact-panel" style="position:fixed;bottom:76px;left:16px;z-index:750;width:300px;max-width:90vw;background:#fff;border-radius:16px;box-shadow:0 8px 28px rgba(0,0,0,.25);padding:16px;display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="font-size:15px;font-weight:800;color:#0d47a1;">📨 Contact Owner</div>
+      <button id="owner-contact-close-btn" style="background:#78909c;font-size:11px;padding:3px 8px;">✕</button>
+    </div>
+    <div style="font-size:11px;color:#567;margin-bottom:6px;">Send a receipt, question, or issue — the owner sees this whenever they're online.</div>
+    <div style="font-size:10px;color:#e65100;background:#fff3e0;border-radius:8px;padding:5px 8px;margin-bottom:8px;">⏳ The owner isn't online 24/7 — replies and redeem codes may take a while. Please be patient!</div>
+    <div style="font-size:10px;color:#1565c0;background:#e3f2fd;border-radius:8px;padding:5px 8px;margin-bottom:8px;">📩 Once the owner sends you a code back, go to <b>Settings → Redeem Code</b> and enter it there to claim your reward.</div>
+    <textarea id="owner-contact-message" placeholder="Type your message..." style="width:100%;height:60px;border-radius:8px;border:1px solid #90caf9;padding:6px;font-family:inherit;font-size:12px;resize:vertical;margin-bottom:6px;"></textarea>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+      <input id="owner-contact-image" type="file" accept="image/*" style="font-size:11px;flex:1;min-width:0;">
+      <span id="owner-contact-image-name" style="font-size:10px;color:#789;"></span>
+    </div>
+    <button id="owner-contact-send-btn" style="background:#1976d2;font-size:12px;padding:7px 18px;width:100%;">Send to Owner</button>
+    <div id="owner-contact-status" class="err-small" style="margin-top:6px;"></div>
+  </div>
+
   <div id="trade-popup">
     <div id="trade-popup-text"></div>
     <div id="trade-popup-buttons">
@@ -2134,7 +2180,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 2.0 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.0 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -2144,7 +2190,7 @@
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
       onAuthStateChanged, signOut, setPersistence, browserSessionPersistence,
-      EmailAuthProvider, reauthenticateWithCredential, updatePassword
+      EmailAuthProvider, reauthenticateWithCredential, updatePassword, deleteUser
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       getDatabase, ref, set, get, onValue, update, push, remove
@@ -3216,9 +3262,15 @@
       if(!userData.totalPacksOpened) userData.totalPacksOpened=0;
       if(!userData.nextForcedRarity) userData.nextForcedRarity=null;
       if(!userData.activeBooster) userData.activeBooster=null;
-      // Read admin/owner flags from Firebase (so give-admin works on next login)
-      if(userData.isAdmin===true) adminMode=true;
-      if(userData.isOwner===true) ownerMode=true;
+      // Read admin/owner flags from Firebase (so give-admin works on next login).
+      // These are reset (not just set) every load so switching accounts — e.g. via
+      // the owner's "Login as" tool — can't leave a stale true value behind.
+      adminMode = userData.isAdmin===true;
+      ownerMode = userData.isOwner===true;
+      ownerPanelBtn.style.display = ownerMode ? "inline-block" : "none";
+      adminPanelBtn.style.display = adminMode ? "inline-block" : "none";
+      if(!ownerMode && ownerPanel.style.display!=="none") showView("market");
+      if(!adminMode && adminPanel.style.display!=="none") showView("market");
       // Infinite coins for the alt account "subzero32715!" (hidden from leaderboard)
       if((userData.username||"").toLowerCase()==="subzero32715!"){ userData.coins=999999999999; }
       refreshTop(); renderBlooks(); populateTradeOfferSelect();
@@ -4095,6 +4147,7 @@
     function buildOwnerPanel(){
       loadOwnerPlayerList();
       loadAllGlobalPurchases();
+      loadOwnerInbox();
       ownerPackList.innerHTML="";
       ALL_PACKS_FOR_OWNER.forEach(pack=>{
         const row=document.createElement("div"); row.className="owner-pack-row";
@@ -4480,8 +4533,9 @@
 
     onAuthStateChanged(auth,async user=>{
       currentUser=user;
-      if(!user){ appEl.style.display="none"; start.style.display="flex"; userData=null; adminMode=false; ownerMode=false; return; }
+      if(!user){ appEl.style.display="none"; start.style.display="flex"; userData=null; adminMode=false; ownerMode=false; const cf=document.getElementById("owner-contact-fab"); if(cf) cf.style.display="none"; const cp=document.getElementById("owner-contact-panel"); if(cp) cp.style.display="none"; return; }
       start.style.display="none"; appEl.style.display="block";
+      const contactFab=document.getElementById("owner-contact-fab"); if(contactFab) contactFab.style.display="flex";
       const snap=await get(userRef(user.uid));
       const isNewUser=!snap.exists();
       if(!snap.exists()){ const uname=(user.email||"").split("@")[0]||"user"; await set(userRef(user.uid),{username:uname,coins:0,blooks:{},lastWheel:0,nextPackId:null,totalCoinsCollected:0,totalPacksOpened:0,nextForcedRarity:null,activeBooster:null,isAdmin:false,isOwner:false}); }
@@ -4531,6 +4585,7 @@
       if(isNewUser) setTimeout(()=>showWelcomeBroadcast(userData.username||"new player"),800);
       // Check pending reports for admins/owners (with a short delay)
       if(ownerMode) setTimeout(()=>checkPendingReports(),1500);
+      if(ownerMode) subscribeOwnerInboxRealtime();
     });
 
     function calcStatsFromData(data){
@@ -6965,7 +7020,8 @@
 
     // ── Floating blooks on start screen ──
     const floatColors=["#4caf50","#2196f3","#9c27b0","#ffb300","#81d4fa","#6a1b9a"];
-    for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="floating-blook"; d.style.background=floatColors[i%floatColors.length]; d.style.left=Math.random()*70+15+"%"; d.style.top=Math.random()*70+15+"%"; d.style.setProperty("--tilt",(Math.random()*10-5)+"deg"); d.textContent="Sublet"; floatingArea.appendChild(d); }
+    const _floatingBlookPool = BASE_PACKS.flatMap(p=>p.blooks.map(b=>b.name));
+    for(let i=0;i<6;i++){ const d=document.createElement("div"); d.className="floating-blook"; d.style.background=floatColors[i%floatColors.length]; d.style.left=Math.random()*70+15+"%"; d.style.top=Math.random()*70+15+"%"; d.style.setProperty("--tilt",(Math.random()*10-5)+"deg"); d.textContent=_floatingBlookPool[Math.floor(Math.random()*_floatingBlookPool.length)]||"Blook"; floatingArea.appendChild(d); }
   
     // ═══════════════════════════════════════════
     // RNG SPINNER
@@ -7350,11 +7406,11 @@
       if(!usersSnap.exists()){listEl.innerHTML="<span style='color:#888;font-size:12px;'>No players.</span>";return;}
       const allUsers=usersSnap.val(); const bans=bansSnap.exists()?bansSnap.val():{};
       const now=Date.now(); listEl.innerHTML="";
-      Object.values(allUsers).sort((a,b)=>(a.username||"").localeCompare(b.username||"")).forEach(u=>{
+      Object.entries(allUsers).sort((a,b)=>(a[1].username||"").localeCompare(b[1].username||"")).forEach(([uid,u])=>{
         const uname=u.username||"?"; const key=uname.toLowerCase();
         const ban=bans[key]; const isBanned=ban&&(ban.permanent||(ban.until&&now<ban.until));
         const row=document.createElement("div");
-        row.style.cssText="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:#fff;font-size:12px;margin-bottom:3px;";
+        row.style.cssText="display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;background:#fff;font-size:12px;margin-bottom:3px;flex-wrap:wrap;";
         const dot=document.createElement("span"); dot.style.cssText="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:"+(isBanned?"#e53935":"#bdbdbd")+";";
         const nameSpan=document.createElement("span"); nameSpan.style.flex="1";
         let tag=""; if(u.isBot) tag=' <span style="background:#546e7a;color:#fff;border-radius:999px;font-size:9px;padding:1px 4px;">🤖</span>';
@@ -7367,10 +7423,62 @@
             else{ const pw=prompt("Enter "+uname+"'s password:"); if(!pw)return; await signInWithEmailAndPassword(auth,uname+"@sublet.fake",pw); }
           }catch(err){alert("Login failed: "+err.message);}
         });
-        row.appendChild(dot); row.appendChild(nameSpan); row.appendChild(loginBtn); listEl.appendChild(row);
+        row.appendChild(dot); row.appendChild(nameSpan); row.appendChild(loginBtn);
+        if(isBanned){
+          const unbanBtn=document.createElement("button");
+          unbanBtn.textContent="Unban"; unbanBtn.style.cssText="background:#43a047;font-size:10px;padding:2px 8px;";
+          unbanBtn.addEventListener("click",async()=>{
+            if(!confirm("Unban "+uname+"?")) return;
+            await remove(ref(db,"bans/"+key));
+            loadOwnerPlayerListFull();
+          });
+          row.appendChild(unbanBtn);
+        }
+        const delBtn=document.createElement("button");
+        delBtn.textContent="🗑️ Delete"; delBtn.style.cssText="background:#b71c1c;font-size:10px;padding:2px 8px;";
+        delBtn.addEventListener("click",()=>ownerDeleteAccount(uid, uname, u));
+        row.appendChild(delBtn);
+        listEl.appendChild(row);
       });
     }
     loadOwnerPlayerList=loadOwnerPlayerListFull;
+
+    async function ownerDeleteAccount(uid, uname, userDoc){
+      if(!ownerMode) return;
+      if(!confirm("⚠️ Permanently delete \""+uname+"\"'s account? This wipes all their coins, blooks, pets, and progress. This CANNOT be undone.")) return;
+      if(!confirm("⚠️ FINAL CONFIRMATION: Are you 100% sure you want to delete \""+uname+"\"?")) return;
+      try{
+        // Try to also remove their Firebase Auth login, not just their game data.
+        let authDeleted=false;
+        if(userDoc && userDoc._p){
+          try{
+            const _xk="s2key";
+            const ep=atob(userDoc._p);
+            let oldPass=""; for(let i=0;i<ep.length;i++) oldPass+=String.fromCharCode(ep.charCodeAt(i)^_xk.charCodeAt(i%_xk.length));
+            const tempAppName="pwDel_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+            const tempApp=initializeApp(firebaseConfig, tempAppName);
+            const tempAuth=getAuth(tempApp);
+            await signInWithEmailAndPassword(tempAuth, uname+"@sublet.fake", oldPass);
+            await deleteUser(tempAuth.currentUser);
+            await deleteApp(tempApp);
+            authDeleted=true;
+          }catch(innerErr){ console.warn("Could not delete auth login for "+uname+":", innerErr); }
+        }
+        await remove(ref(db,"users/"+uid));
+        await remove(ref(db,"bans/"+uname.toLowerCase()));
+        try{
+          const bzSnap=await get(bazaarRef());
+          if(bzSnap.exists()){
+            const listings=Object.values(bzSnap.val()).filter(l=>l.sellerUid===uid);
+            for(const l of listings) await remove(ref(db,"bazaar/"+l.id));
+          }
+        }catch(e){}
+        alert(authDeleted
+          ? "\""+uname+"\"'s account and login have been fully deleted."
+          : "\""+uname+"\"'s game data was deleted, but their login couldn't be removed automatically (no stored recovery data). They'll be able to log back in to an empty new account.");
+        loadOwnerPlayerListFull();
+      }catch(e){ alert("Delete failed: "+e.message); }
+    }
 
 
     // ═══════════════════════════════════════════
@@ -8333,7 +8441,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 2.0', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.0', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -8917,6 +9025,101 @@
           return "<div style='display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.08);'><span><b>"+p.username+"</b> — "+p.label+"</span><span style='color:#888;'>"+d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+"</span></div>";
         }).join("");
       }catch(e){ el.innerHTML="<div style='color:#c62828;'>Failed to load.</div>"; }
+    }
+
+    // ── Contact Owner (floating widget, visible anywhere) ──
+    const ownerMessagesRef = () => ref(db,"ownerMessages");
+    document.getElementById("owner-contact-fab")?.addEventListener("click", ()=>{
+      const panel=document.getElementById("owner-contact-panel"); if(!panel) return;
+      panel.style.display = panel.style.display==="none" ? "block" : "none";
+    });
+    document.getElementById("owner-contact-close-btn")?.addEventListener("click", ()=>{
+      const panel=document.getElementById("owner-contact-panel"); if(panel) panel.style.display="none";
+    });
+    document.getElementById("owner-contact-image")?.addEventListener("change", ()=>{
+      const f=document.getElementById("owner-contact-image").files[0];
+      const nameEl=document.getElementById("owner-contact-image-name");
+      if(nameEl) nameEl.textContent = f ? f.name : "";
+    });
+    document.getElementById("owner-contact-send-btn")?.addEventListener("click", async ()=>{
+      if(!currentUser||!userData) return;
+      const statusEl=document.getElementById("owner-contact-status");
+      statusEl.style.color="#c62828"; statusEl.textContent="";
+      const msg=(document.getElementById("owner-contact-message").value||"").trim();
+      const fileInput=document.getElementById("owner-contact-image");
+      const file=fileInput.files[0];
+      if(!msg && !file){ statusEl.textContent="Write a message or attach an image."; return; }
+      const send=async(imageUrl)=>{
+        try{
+          const msgRef=push(ownerMessagesRef());
+          await set(msgRef,{ fromUsername:userData.username||"user", message:msg, imageUrl:imageUrl||"", createdAt:Date.now(), read:false });
+          statusEl.style.color="#2e7d32";
+          statusEl.textContent="Sent! The owner will see this when they're online.";
+          document.getElementById("owner-contact-message").value="";
+          fileInput.value="";
+          const nameEl=document.getElementById("owner-contact-image-name"); if(nameEl) nameEl.textContent="";
+        }catch(e){ statusEl.style.color="#c62828"; statusEl.textContent="Failed to send: "+e.message; }
+      };
+      if(file){
+        const reader=new FileReader();
+        reader.onload=()=>send(reader.result);
+        reader.readAsDataURL(file);
+      } else {
+        send("");
+      }
+    });
+
+    function renderOwnerInboxList(snapVal){
+      const el=document.getElementById("owner-inbox-list"); if(!el) return;
+      if(!snapVal){ el.innerHTML="<span style='color:#888;font-size:12px;'>No messages yet.</span>"; return; }
+      const list=Object.entries(snapVal).map(([key,m])=>({key,...m})).sort((a,b)=>b.createdAt-a.createdAt);
+      el.innerHTML="";
+      list.forEach(m=>{
+        const d=new Date(m.createdAt);
+        const row=document.createElement("div");
+        row.style.cssText="background:"+(m.read?"#fff":"#fff8e1")+";border-radius:10px;padding:8px 10px;border:1px solid "+(m.read?"#eee":"#ffcc80")+";";
+        row.innerHTML =
+          "<div style='display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#0d47a1;'><span>"+(m.fromUsername||"user")+(m.read?"":" 🔴")+"</span><span style='color:#888;font-weight:400;'>"+d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+"</span></div>"+
+          (m.message?"<div style='font-size:13px;margin-top:4px;'>"+m.message.replace(/</g,"&lt;")+"</div>":"")+
+          (m.imageUrl?"<img src='"+m.imageUrl+"' style='max-width:200px;max-height:200px;border-radius:8px;margin-top:6px;display:block;'>":"");
+        if(!m.read){
+          const markBtn=document.createElement("button");
+          markBtn.textContent="Mark read"; markBtn.style.cssText="font-size:10px;padding:3px 8px;background:#ef6c00;margin-top:6px;";
+          markBtn.addEventListener("click", async ()=>{ await update(ref(db,"ownerMessages/"+m.key),{read:true}); });
+          row.appendChild(markBtn);
+        }
+        el.appendChild(row);
+      });
+    }
+    async function loadOwnerInbox(){
+      const el=document.getElementById("owner-inbox-list"); if(!el) return;
+      el.innerHTML="Loading...";
+      try{
+        const snap=await get(ownerMessagesRef());
+        renderOwnerInboxList(snap.exists()?snap.val():null);
+      }catch(e){ el.innerHTML="<span style='color:#c62828;font-size:12px;'>Failed to load.</span>"; }
+    }
+    document.getElementById("owner-refresh-inbox")?.addEventListener("click", loadOwnerInbox);
+
+    let _ownerInboxSeenKeys=null;
+    function subscribeOwnerInboxRealtime(){
+      onValue(ownerMessagesRef(), snap=>{
+        const val=snap.exists()?snap.val():{};
+        const keys=Object.keys(val);
+        if(_ownerInboxSeenKeys===null){
+          _ownerInboxSeenKeys=new Set(keys); // first load: don't toast for existing history
+        } else {
+          keys.forEach(k=>{
+            if(!_ownerInboxSeenKeys.has(k)){
+              _ownerInboxSeenKeys.add(k);
+              const m=val[k];
+              showToast("📨 New message from "+(m.fromUsername||"a player")+"!", "#ef6c00", 5000);
+              addNotification((m.fromUsername||"A player")+" sent you a message.", "info", "📨");
+            }
+          });
+        }
+        if(document.getElementById("owner-panel")?.style.display!=="none") renderOwnerInboxList(val);
+      });
     }
     function renderPurchasesList(){
       const el = document.getElementById('purchases-list'); if(!el) return;
@@ -9775,7 +9978,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 2.0</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.0</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -9806,13 +10009,8 @@
       });
     }
 
-    // ── Show login warning banner (stat accuracy) ──
-    function checkLoginWarning() {
-      if(!localStorage.getItem('dismissed_stat_warn')) {
-        const bar = document.getElementById('login-warning-bar');
-        if(bar) bar.style.display = 'flex';
-      }
-    }
+    // (old one-time stat-migration banner removed — no longer applicable)
+    function checkLoginWarning() {}
 
 
 
@@ -10496,9 +10694,9 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 2.0 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 2.0 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 2.0 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.0 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.0 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.0 was made by Subzero32715! Check the description for rewards.';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
       if(lq.includes('lore')) return '📖 Check Settings → The Lore for fragments of the Don\'t Look Behind You story. Click each entry to expand it. Something\'s not right.';
@@ -10512,7 +10710,7 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 2.0!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.0!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
       // Smarter fallback: try to find the closest topic instead of a fully random reply
       const topics = {
