@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.0 IRL BUYS</title>
+  <title>Sublet 3.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -1825,6 +1825,14 @@
             <div id="owner-setcoins-status" class="err-small"></div>
           </div>
 
+          <!-- Get All Blooks (owner shortcut) -->
+          <div class="owner-single-box" style="background:#f3e5f5;margin-top:14px;">
+            <div><strong>📖 Get All Blooks</strong></div>
+            <div style="font-size:12px;color:#555;margin-top:2px;">Instantly gives your own account 1x every blook currently in the game (skips ones you already own).</div>
+            <button id="owner-getall-blooks-btn" style="background:#7b1fa2;font-size:12px;padding:6px 14px;margin-top:6px;">📖 Get All Blooks (Me)</button>
+            <div id="owner-getall-blooks-status" class="err-small" style="margin-top:4px;"></div>
+          </div>
+
           <!-- Reset Account -->
           <div class="owner-single-box" style="background:#ffebee;margin-top:14px;">
             <div><strong>💀 Reset Player Account</strong></div>
@@ -3220,6 +3228,7 @@
       if(name==="news") loadNews();
       if(name==="event") loadEvent();
       if(name==="giveaway") loadGiveaways();
+      if(name==="blooks") renderBlooks();
       if(name==="chat"&&!chatLoaded) subscribeChat();
       if(name==="stats") refreshStatsView();
       if(name==="boosters") refreshBoosterView();
@@ -3658,6 +3667,12 @@
 
     packOpenOverlay.addEventListener("click",()=>{ packOpenOverlay.style.display="none"; canClosePackOverlay=true; });
 
+    function refreshBlooksIfVisible(){
+      // Rebuilding the blooks grid is expensive once you own hundreds/thousands
+      // of blooks (e.g. after "Get All Blooks"). Skip it if that tab isn't even
+      // open right now — showView("blooks") re-renders fresh when you visit it.
+      if(viewBlooks && viewBlooks.style.display!=="none") renderBlooks();
+    }
     function renderBlooks(){
       if(!userData){ blooksContainer.innerHTML=""; return; }
       BLOOK_INFO=groupBlooksByPack();
@@ -4892,6 +4907,18 @@
       await update(userRef(found.uid),{coins:amount});
       statusEl.style.color="#2e7d32";
       statusEl.textContent=`Set ${uname}'s coins to ${amount.toLocaleString()}.`;
+    });
+
+    // ── Owner: Get All Blooks (self, instant) ──
+    document.getElementById("owner-getall-blooks-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode||!currentUser||!userData) return;
+      const statusEl=document.getElementById("owner-getall-blooks-status");
+      statusEl.style.color="#555"; statusEl.textContent="Working...";
+      const reward=await grantAllBlooksReward();
+      logPurchase("📖 Get All Blooks (Owner Shortcut)");
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+      statusEl.style.color="#2e7d32"; statusEl.textContent=reward.customMsg;
+      showToast(reward.customMsg, "#7b1fa2", 4000);
     });
 
     // ── Owner: Reset account (3 confirmations) ──
@@ -9184,7 +9211,7 @@
             const reward = await grantSpecialItem(itemKey);
             logPurchase(PENDING_ITEM_LABELS[itemKey] || "Purchase");
             await saveUserData();
-            renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+            refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
             document.getElementById('settings-redeem-input').value='';
             statusEl.style.color='#2e7d32';
             statusEl.textContent='Redeemed! Rewards granted.';
@@ -9227,7 +9254,7 @@
         logPurchase("🪵 Wooden Chest");
       }
       await saveUserData();
-      renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('settings-redeem-input').value='';
       if(chestReward){
         statusEl.style.color='#2e7d32';
@@ -9328,13 +9355,21 @@
     }
     async function grantAllBlooksReward(){
       if(!userData.blooks) userData.blooks={};
-      BLOOK_INFO=groupBlooksByPack();
-      const allNames=Object.keys(BLOOK_INFO);
-      let added=0;
-      allNames.forEach(name=>{
-        if(!(userData.blooks[name]>0)){ userData.blooks[name]=(userData.blooks[name]||0)+1; added++; }
+      const allBlookDefs = {};
+      [...ALL_PACKS_FOR_OWNER, ...(CUSTOM_PACKS_RUNTIME||[])].forEach(pack=>{
+        (pack.blooks||[]).forEach(b=>{ allBlookDefs[b.name] = b.rarity; });
       });
-      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) out of "+allNames.length+" total!" };
+      Object.values(singleShopBlooks||{}).forEach(item=>{ if(!(item.name in allBlookDefs)) allBlookDefs[item.name]=item.rarity; });
+      let added=0;
+      Object.keys(allBlookDefs).forEach(name=>{
+        if(!(userData.blooks[name]>0)){
+          userData.blooks[name]=1;
+          added++;
+          if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
+        }
+      });
+      const total=Object.keys(allBlookDefs).length;
+      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) out of "+total+" total!" };
     }
 
     async function notifyOwnersOfDiamondPurchase(username){
@@ -9437,7 +9472,7 @@
       if(!currentUser||!userData||!ownerMode) return;
       const reward=await grantIronChestReward();
       logPurchase("⚙️ Iron Chest (Owner Free)");
-      await saveUserData(); renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('iron-chest-status').textContent='';
       showChestRewardReveal(reward);
     });
@@ -9445,7 +9480,7 @@
       if(!currentUser||!userData||!ownerMode) return;
       const reward=await grantGoldChestReward();
       logPurchase("🏆 Gold Chest (Owner Free)");
-      await saveUserData(); renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('gold-chest-status').textContent='';
       showChestRewardReveal(reward);
     });
@@ -9453,7 +9488,7 @@
       if(!currentUser||!userData||!ownerMode) return;
       const reward=await grantAllBlooksReward();
       logPurchase("📖 Get All Blooks (Owner Free)");
-      await saveUserData(); renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('allblooks-status').textContent='';
       showToast(reward.customMsg, "#7b1fa2", 4000);
     });
@@ -9461,7 +9496,7 @@
       if(!currentUser||!userData||!ownerMode) return;
       const reward=await grantDiamondChestReward();
       logPurchase("💎 Diamond Chest (Owner Free)");
-      await saveUserData(); renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('diamond-chest-status').textContent='';
       showChestRewardReveal(reward);
     });
@@ -9495,7 +9530,7 @@
       document.getElementById('iron-chest-free-promo-btn').style.display='none';
       const reward=await grantIronChestReward();
       logPurchase("⚙️ Iron Chest (Free promo)");
-      await saveUserData(); renderBlooks(); populateTradeOfferSelect(); renderPurchasesList();
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       showChestRewardReveal(reward);
     });
 
