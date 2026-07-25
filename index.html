@@ -1187,6 +1187,37 @@
             <div id="diamond-chest-status" class="err-small"></div>
           </div>
 
+          <div style="background:linear-gradient(135deg,#ff8f00,#ffca28,#fff176);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
+            <div style="font-size:22px;font-weight:800;">🎖️ MVP Membership (1 month)</div>
+            <div style="font-size:14px;opacity:.9;text-align:center;">1 free Mystical every day, a custom MVP badge, every VIP perk, 1,000–100,000 random coins every week, and every pack costs just 15 coins!</div>
+            <div style="width:100%;margin-top:10px;">
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Pay below, then generate your code</div>
+              <script src="https://www.paypal.com/sdk/js?client-id=BAAEwB774EsnkIKrR7-nqGJSw3HUZXvVVSaPwveGjaqspL4L5jihvZaoc7dHUc77mXqQCV2taZCGY5nnBA&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+              <div id="paypal-container-ALXYF9TYCG3KC"></div>
+              <script>(function ppmInit(){if(typeof paypal==="undefined"||!paypal.HostedButtons){setTimeout(ppmInit,200);return;}try{paypal.HostedButtons({hostedButtonId:"ALXYF9TYCG3KC"}).render("#paypal-container-ALXYF9TYCG3KC");}catch(e){console.warn("PayPal MVP init failed:",e);}})();</script>
+            </div>
+            <button id="mvp-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(0,0,0,.15);color:#3e2a00;font-size:12px;padding:8px;">ℹ️ How to get my code</button>
+            <div id="mvp-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="mvp-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="mvp-status" class="err-small"></div>
+            <div id="mvp-active-banner" style="display:none;width:100%;background:rgba(0,0,0,.1);border-radius:10px;padding:8px 10px;font-size:12px;text-align:center;"></div>
+          </div>
+
+          <div style="background:linear-gradient(135deg,#212121,#4a148c,#0d47a1);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
+            <div style="font-size:22px;font-weight:800;">👑 Ultimate Bundle</div>
+            <div style="font-size:14px;opacity:.9;text-align:center;">5 Iron Chests, 10 Gold Chests, 3 Diamond Chests, infinite VIP, infinite MVP, and a one-of-a-kind Mystical blook with your own username!</div>
+            <div style="width:100%;margin-top:10px;">
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Pay below, then generate your code</div>
+              <script src="https://www.paypal.com/sdk/js?client-id=BAAEwB774EsnkIKrR7-nqGJSw3HUZXvVVSaPwveGjaqspL4L5jihvZaoc7dHUc77mXqQCV2taZCGY5nnBA&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+              <div id="paypal-container-4WLTUQ5TWTG6L"></div>
+              <script>(function ppuInit(){if(typeof paypal==="undefined"||!paypal.HostedButtons){setTimeout(ppuInit,200);return;}try{paypal.HostedButtons({hostedButtonId:"4WLTUQ5TWTG6L"}).render("#paypal-container-4WLTUQ5TWTG6L");}catch(e){console.warn("PayPal Ultimate Bundle init failed:",e);}})();</script>
+            </div>
+            <button id="ultimate-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(255,255,255,.2);font-size:12px;padding:8px;">ℹ️ How to get my code</button>
+            <div id="ultimate-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="ultimate-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="ultimate-status" class="err-small"></div>
+          </div>
+
           <div style="background:#f5f5f5;border-radius:16px;padding:20px;max-width:420px;margin-top:16px;width:100%;">
             <div style="font-size:16px;font-weight:800;color:#0d47a1;margin-bottom:8px;">🧾 My Purchases</div>
             <div id="purchases-list" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#333;max-height:220px;overflow-y:auto;"></div>
@@ -1565,6 +1596,8 @@
                 <option value="goldChest">🏆 Gold Chest</option>
                 <option value="allBlooks">📖 Get All Blooks</option>
                 <option value="diamondChest">💎 Diamond Chest</option>
+                <option value="mvpMembership">🎖️ MVP Membership</option>
+                <option value="ultimateBundle">👑 Ultimate Bundle</option>
               </select>
               <button id="owner-issue-code-btn" style="background:#1976d2;font-size:12px;padding:6px 12px;">Issue Code</button>
             </div>
@@ -3570,6 +3603,7 @@
       if(userData.packDiscountLeft > 0) { discountedPackCost = Math.round(actualPack.cost * 0.75); userData.packDiscountLeft--; showToast('🏷️ 25% discount! ' + userData.packDiscountLeft + ' left', '#1976d2', 2000); }
       var petDiscountPct = getPetBonus("discount");
       if(petDiscountPct>0) discountedPackCost = Math.max(1, Math.round(discountedPackCost * (1 - petDiscountPct/100)));
+      if(isMvpActive()) discountedPackCost = Math.min(discountedPackCost, 15);
       if(currentCoins<discountedPackCost){
         alert(`Not enough coins! You need ${discountedPackCost} but have ${currentCoins}.`);
         return;
@@ -4579,6 +4613,7 @@
       setTimeout(initSeasonalTheme, 1200);
       loadBasePackOverrides();
       setTimeout(applyCoinInterest, 1500);
+      setTimeout(checkMvpPerks, 1700);
       listenForPlayerMessage();
       checkLoginWarning();
       listenForVoiceInvite();
@@ -7990,7 +8025,9 @@
     var vipGoldenMode = false;
     var vipGoldenPackId = null;
 
-    function isVip() { return !!(userData && Date.now() < (userData.vipExpires||0)); }
+    function isVip() { return !!(userData && (Date.now() < (userData.vipExpires||0) || Date.now() < (userData.mvpExpires||0))); }
+    function isMvpActive() { return !!(userData && Date.now() < (userData.mvpExpires||0)); }
+    function mvpDaysLeft() { return userData ? Math.max(0,Math.ceil(((userData.mvpExpires||0)-Date.now())/86400000)) : 0; }
     function vipDaysLeft() { return userData ? Math.max(0,Math.ceil(((userData.vipExpires||0)-Date.now())/86400000)) : 0; }
 
     async function loadVipView() {
@@ -8001,7 +8038,11 @@
       if(!banner) return;
       if(isVip()) {
         banner.style.cssText = "padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,#4a148c22,#1565c022);font-weight:700;color:#4a148c;font-size:13px;margin-bottom:16px;";
-        banner.innerHTML = "&#11088; VIP Active &mdash; " + vipDaysLeft() + " day(s) remaining";
+        if(Date.now() < (userData.vipExpires||0)){
+          banner.innerHTML = "&#11088; VIP Active &mdash; " + vipDaysLeft() + " day(s) remaining";
+        } else {
+          banner.innerHTML = "&#11088; VIP perks active via your 🎖️ MVP Membership &mdash; " + mvpDaysLeft() + " day(s) remaining";
+        }
         dailyBox.style.display = "block";
         goldenBox.style.display = "block";
         buildGoldenPackList();
@@ -8106,6 +8147,7 @@
         var coins = parseInt(userData.coins,10)||0;
         var packCost = pack.cost;
         if(userData.packDiscountLeft > 0) { packCost = Math.round(packCost * 0.75); userData.packDiscountLeft--; showToast('🏷️ 25% discount applied! ' + userData.packDiscountLeft + ' left', '#1976d2', 2000); }
+        if(isMvpActive()) packCost = Math.min(packCost, 15);
         if(coins < packCost) { alert("Not enough coins!"); return; }
         userData.coins = coins - packCost;
         var chosen;
@@ -9029,7 +9071,7 @@
       "spaceicemedival": { blook: { name: "Super Rainbow Crab King", rarity: "Supreeme" } },
       "iatemycart": { chest: true }
     };
-    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", diamondChest: "💎 Diamond Chest" };
+    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle" };
     function logPurchase(label){
       if(!userData) return;
       if(!Array.isArray(userData.purchaseHistory)) userData.purchaseHistory = [];
@@ -9168,6 +9210,8 @@
       if(itemKey==="goldChest") return await grantGoldChestReward();
       if(itemKey==="allBlooks") return await grantAllBlooksReward();
       if(itemKey==="diamondChest") return await grantDiamondChestReward();
+      if(itemKey==="mvpMembership") return await grantMvpReward();
+      if(itemKey==="ultimateBundle") return await grantUltimateBundleReward();
       return null;
     }
     document.getElementById('settings-redeem-btn')?.addEventListener('click', async function() {
@@ -9360,16 +9404,19 @@
         (pack.blooks||[]).forEach(b=>{ allBlookDefs[b.name] = b.rarity; });
       });
       Object.values(singleShopBlooks||{}).forEach(item=>{ if(!(item.name in allBlookDefs)) allBlookDefs[item.name]=item.rarity; });
-      let added=0;
+      // Owning just 1x of everything only totals ~17K subscore (Ruby territory) —
+      // top up every blook to a real stack so the "own everything" purchase
+      // actually reflects a top-tier (Boss) rank, not a middling one.
+      const QTY_EACH = 200;
+      let added=0, toppedUp=0;
       Object.keys(allBlookDefs).forEach(name=>{
-        if(!(userData.blooks[name]>0)){
-          userData.blooks[name]=1;
-          added++;
-          if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
-        }
+        const cur = userData.blooks[name]||0;
+        if(cur<=0) added++;
+        if(cur<QTY_EACH){ userData.blooks[name]=QTY_EACH; toppedUp++; }
+        if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
       });
       const total=Object.keys(allBlookDefs).length;
-      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) out of "+total+" total!" };
+      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) (topped up to "+QTY_EACH+"x each, "+toppedUp+" stacks) out of "+total+" total!" };
     }
 
     async function notifyOwnersOfDiamondPurchase(username){
@@ -9430,10 +9477,40 @@
       return { coins, blooks:[{name:customBlookName, rarity:R.MYS}], label:"💎 Diamond Chest", color:"linear-gradient(135deg,#0d47a1,#4fc3f7,#b3e5fc)", confettiColor:"#4fc3f7" };
     }
 
+    async function grantMvpReward(){
+      const THIRTY_DAYS=30*24*60*60*1000;
+      userData.mvpExpires = Math.max(Date.now(), userData.mvpExpires||0) + THIRTY_DAYS;
+      if(!Array.isArray(userData.badges)) userData.badges = userData.badge ? [userData.badge] : [];
+      const badge={content:"MVP", rarity:"pro", name:"MVP Badge", how:"Purchased MVP membership."};
+      if(!userData.badges.some(b=>b.content===badge.content && b.rarity===badge.rarity)) userData.badges.push(badge);
+      await checkMvpPerks(); // grants today's Mystical + this week's coins immediately
+      return { coins:0, blooks:[], label:"🎖️ MVP Membership", color:"linear-gradient(135deg,#ff8f00,#ffca28,#fff176)", confettiColor:"#ffca28",
+        customMsg:"🎖️ MVP activated for 30 days! Daily Mystical, weekly coins, 15-coin packs, and all VIP perks are live." };
+    }
+
+    async function grantUltimateBundleReward(){
+      let totalCoins=0;
+      const allBlooks=[];
+      for(let i=0;i<5;i++){ const r=await grantIronChestReward(); totalCoins+=r.coins; allBlooks.push(...r.blooks); }
+      for(let i=0;i<10;i++){ const r=await grantGoldChestReward(); totalCoins+=r.coins; allBlooks.push(...r.blooks); }
+      for(let i=0;i<3;i++){ const r=await grantDiamondChestReward(); totalCoins+=r.coins; allBlooks.push(...r.blooks); }
+      const CENTURY=100*365*24*60*60*1000;
+      userData.vipExpires = Date.now() + CENTURY;
+      userData.mvpExpires = Date.now() + CENTURY;
+      await checkMvpPerks();
+      const customBlookName = userData.username || "Ultimate Patron";
+      if(!userData.blooks) userData.blooks={};
+      BLOOK_INFO[customBlookName]={packId:"other", packName:"Special Codes", rarity:R.MYS, chance:0};
+      registerBlookRegistryEntries({ [customBlookName]: BLOOK_INFO[customBlookName] });
+      if(!autoSellIfDupeBlook(customBlookName, R.MYS)) userData.blooks[customBlookName]=(userData.blooks[customBlookName]||0)+1;
+      allBlooks.push({name:customBlookName, rarity:R.MYS});
+      return { coins:totalCoins, blooks:allBlooks, label:"👑 Ultimate Bundle", color:"linear-gradient(135deg,#212121,#4a148c,#0d47a1)", confettiColor:"#7b1fa2" };
+    }
+
     // ── Redeem codes for real-money items are now ONLY issued by the owner ──
     // (self-service generation let anyone claim rewards without ever paying,
     // since there's no backend/webhook to verify a PayPal payment happened).
-    const GEN_CODE_BTN_IDS = ["wooden-gen-code-btn","iron-gen-code-btn","gold-gen-code-btn","allblooks-gen-code-btn","diamond-gen-code-btn"];
+    const GEN_CODE_BTN_IDS = ["wooden-gen-code-btn","iron-gen-code-btn","gold-gen-code-btn","allblooks-gen-code-btn","diamond-gen-code-btn","mvp-gen-code-btn","ultimate-gen-code-btn"];
     function wireGenCodeBtn(btnId, displayId, itemKey, label){
       const btn=document.getElementById(btnId); if(!btn) return;
       btn.textContent="ℹ️ How to get my code";
@@ -9448,6 +9525,8 @@
     wireGenCodeBtn("gold-gen-code-btn","gold-code-display","goldChest","🏆 Gold Chest");
     wireGenCodeBtn("allblooks-gen-code-btn","allblooks-code-display","allBlooks","📖 Get All Blooks");
     wireGenCodeBtn("diamond-gen-code-btn","diamond-code-display","diamondChest","💎 Diamond Chest");
+    wireGenCodeBtn("mvp-gen-code-btn","mvp-code-display","mvpMembership","🎖️ MVP Membership");
+    wireGenCodeBtn("ultimate-gen-code-btn","ultimate-code-display","ultimateBundle","👑 Ultimate Bundle");
 
     // ── Owner tool: issue a redeem code to a specific player after verifying payment yourself ──
     document.getElementById('owner-issue-code-btn')?.addEventListener('click', async ()=>{
@@ -9500,6 +9579,24 @@
       document.getElementById('diamond-chest-status').textContent='';
       showChestRewardReveal(reward);
     });
+    document.getElementById('mvp-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantMvpReward();
+      logPurchase("🎖️ MVP Membership (Owner Free)");
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+      document.getElementById('mvp-status').textContent='';
+      showToast(reward.customMsg, "#ff8f00", 5000);
+      updateMvpBanner();
+    });
+    document.getElementById('ultimate-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantUltimateBundleReward();
+      logPurchase("👑 Ultimate Bundle (Owner Free)");
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+      document.getElementById('ultimate-status').textContent='';
+      showChestRewardReveal(reward);
+      updateMvpBanner();
+    });
 
     // ── Iron Chest 60-second free promo (per-account, via "ididnteatmycart") ──
     let _ironPromoInterval=null;
@@ -9520,6 +9617,17 @@
         }
       } else {
         promoBtn.style.display="none";
+      }
+    }
+    function updateMvpBanner(){
+      const el=document.getElementById("mvp-active-banner"); if(!el||!userData) return;
+      if(isMvpActive()){
+        el.style.display="block";
+        const days=mvpDaysLeft();
+        const isInfinite=(userData.mvpExpires||0) > Date.now()+50*365*24*60*60*1000;
+        el.textContent = isInfinite ? "🎖️ MVP Active — Infinite!" : "🎖️ MVP Active — "+days+" day(s) left";
+      } else {
+        el.style.display="none";
       }
     }
     document.getElementById('iron-chest-free-promo-btn')?.addEventListener('click', async function(){
@@ -10271,6 +10379,39 @@
         await saveUserData();
         showToast('💹 Daily interest: +' + interest.toLocaleString() + ' coins!', '#43a047', 4000);
       }
+    }
+
+    // ── MVP: 1 free Mystical/day + 1000-100,000 random coins/week, while active ──
+    async function checkMvpPerks(){
+      if(!userData || !currentUser) return;
+      if(!isMvpActive() && (userData.mvpExpires||0) > 0 && Date.now() > userData.mvpExpires){
+        // membership lapsed naturally, nothing more to do
+        return;
+      }
+      if(!isMvpActive()) return;
+      let changed=false;
+      const today = new Date().toDateString();
+      if(userData.mvpLastMysticalDay !== today){
+        const mysticalCandidates = Object.keys(BLOOK_INFO).filter(n=>BLOOK_INFO[n].rarity===R.MYS);
+        if(mysticalCandidates.length){
+          const name = mysticalCandidates[Math.floor(Math.random()*mysticalCandidates.length)];
+          if(!userData.blooks) userData.blooks={};
+          if(!autoSellIfDupeBlook(name, R.MYS)) userData.blooks[name]=(userData.blooks[name]||0)+1;
+          userData.mvpLastMysticalDay = today;
+          changed=true;
+          showToast("🎖️ MVP daily gift: "+name+" (Mystical)!", "#6a1b9a", 5000);
+        }
+      }
+      const weekMs = 7*24*60*60*1000;
+      if(!userData.mvpLastWeeklyCoinsAt || Date.now()-userData.mvpLastWeeklyCoinsAt >= weekMs){
+        const amount = 1000 + Math.floor(Math.random()*99001); // 1,000 – 100,000
+        userData.coins = (parseInt(userData.coins,10)||0)+amount;
+        userData.totalCoinsCollected = (userData.totalCoinsCollected||0)+amount;
+        userData.mvpLastWeeklyCoinsAt = Date.now();
+        changed=true;
+        showToast("🎖️ MVP weekly bonus: +"+amount.toLocaleString()+" coins!", "#6a1b9a", 5000);
+      }
+      if(changed){ await saveUserData(); refreshBlooksIfVisible(); }
     }
 
     // Apply pack discount in openPack
@@ -12015,7 +12156,10 @@
         const goldFreeBtn=document.getElementById("gold-chest-free-btn"); if(goldFreeBtn) goldFreeBtn.style.display=ownerMode?"block":"none";
         const allFreeBtn=document.getElementById("allblooks-free-btn"); if(allFreeBtn) allFreeBtn.style.display=ownerMode?"block":"none";
         const diamondFreeBtn=document.getElementById("diamond-chest-free-btn"); if(diamondFreeBtn) diamondFreeBtn.style.display=ownerMode?"block":"none";
+        const mvpFreeBtn=document.getElementById("mvp-free-btn"); if(mvpFreeBtn) mvpFreeBtn.style.display=ownerMode?"block":"none";
+        const ultimateFreeBtn=document.getElementById("ultimate-free-btn"); if(ultimateFreeBtn) ultimateFreeBtn.style.display=ownerMode?"block":"none";
         updateIronPromoUI();
+        updateMvpBanner();
         if(userData && !userData.seenIRLWarning){
           const warnEl=document.getElementById("irl-first-time-warning");
           if(warnEl) warnEl.style.display="block";
