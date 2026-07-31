@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.0</title>
+  <title>Sublet 3.221</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -41,6 +41,16 @@
     .auth-box .err{color:#c62828;font-size:12px;min-height:16px;margin-top:4px}
     .start-right{flex:1;position:relative;overflow:hidden}
 
+    .ultimate-bundle-anim{
+      background:linear-gradient(135deg,#212121,#4a148c,#0d47a1,#7b1fa2,#212121,#0d47a1,#4a148c);
+      background-size:400% 400%;
+      animation:ultimate-bundle-shift 10s ease infinite;
+    }
+    @keyframes ultimate-bundle-shift{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
     .floating-blook{
       position:absolute;width:90px;height:90px;border-radius:14px;
       display:flex;align-items:center;justify-content:center;
@@ -563,6 +573,10 @@
       #app{overflow-y:auto;min-height:100vh;}
       .top{flex-wrap:wrap;gap:6px;}
     }
+    .clan-tab-btn{background:#ece5fb;color:#5e35b1;border:none;font-weight:600;transition:background .15s,color .15s;}
+    .clan-tab-btn.active{background:#5e35b1;color:#fff;}
+    .clan-card{border-radius:14px;padding:16px;color:#fff;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.15);transition:transform .15s;}
+    .clan-card:hover{transform:translateY(-2px);}
   </style>
 </head>
 <body>
@@ -576,7 +590,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 3.0</div>
+      <div class="start-title">Sublet 3.221</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -607,7 +621,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 3.0</div>
+        <div class="sidebar-title">Sublet 3.221</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -627,6 +641,7 @@
         <button class="nav" data-view="vip">&#11088; VIP</button>
         <button class="nav" data-view="lives">📺 Lives</button>
         <button class="nav" data-view="chests">💵 IRL Buys</button>
+        <button class="nav" data-view="clans">🛡️ Clans</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
         <button id="owner-panel-btn">Owner panel</button>
@@ -1115,8 +1130,15 @@
             <div style="font-size:13px;line-height:1.5;">Everything on this page uses actual PayPal payments. This is not a joke or a simulation — please don't mess around or buy anything unless you genuinely intend to pay. All sales are final.</div>
             <button id="irl-warning-ok-btn" style="margin-top:8px;background:rgba(255,255,255,.25);font-size:12px;padding:6px 16px;">I understand</button>
           </div>
-          <div style="background:linear-gradient(135deg,#6d4c28,#a1734a);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;">
+          <div id="irl-closed-banner" style="display:none;background:#455a64;color:#fff;border-radius:12px;padding:18px 16px;margin-bottom:14px;max-width:420px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:6px;">🚧</div>
+            <div style="font-weight:800;font-size:15px;">IRL Buys is currently closed</div>
+            <div style="font-size:12px;opacity:.85;margin-top:4px;">Check back later!</div>
+          </div>
+          <div id="irl-items-container">
+          <div data-item-key="woodenChest" style="background:linear-gradient(135deg,#6d4c28,#a1734a);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;">
             <div style="font-size:22px;font-weight:800;">🪵 Wooden Chest</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">A modest chest of coins &amp; a Rare/Epic blook.</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
@@ -1129,8 +1151,9 @@
             <div id="chest-status" class="err-small"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#5a5a5a,#8d8d8d);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
+          <div data-item-key="ironChest" style="background:linear-gradient(135deg,#5a5a5a,#8d8d8d);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">⚙️ Iron Chest</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">500,000 coins, a shiny chat username, 50 free pack opens &amp; 20 Chroma blooks.</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
@@ -1144,8 +1167,9 @@
             <div id="iron-chest-status" class="err-small"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#b8860b,#ffd700);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
+          <div data-item-key="goldChest" style="background:linear-gradient(135deg,#b8860b,#ffd700);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">🏆 Gold Chest</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">1,000,000 coins, an exclusive "$10 Supporter" badge &amp; 20 Mystical blooks.</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
@@ -1158,8 +1182,9 @@
             <div id="gold-chest-status" class="err-small"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#4a148c,#7b1fa2);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
+          <div data-item-key="allBlooks" style="background:linear-gradient(135deg,#4a148c,#7b1fa2);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">📖 Get All Blooks</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">Unlocks every blook currently in the game (1 of each). Blooks added in future new packs are not included.</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
@@ -1172,8 +1197,9 @@
             <div id="allblooks-status" class="err-small"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#0d47a1,#4fc3f7,#b3e5fc);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#04263e;max-width:420px;margin-top:16px;">
+          <div data-item-key="diamondChest" style="background:linear-gradient(135deg,#0d47a1,#4fc3f7,#b3e5fc);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#04263e;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">💎 Diamond Chest</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">10,000,000 coins, 10 random Secret pets &amp; a custom Diamond blook. Buying announces you in-game!</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Pay below, then generate your code</div>
@@ -1187,8 +1213,9 @@
             <div id="diamond-chest-status" class="err-small"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#ff8f00,#ffca28,#fff176);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
+          <div data-item-key="mvpMembership" style="background:linear-gradient(135deg,#ff8f00,#ffca28,#fff176);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">🎖️ MVP Membership (1 month)</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">1 free Mystical every day, a custom MVP badge, every VIP perk, 1,000–100,000 random coins every week, and every pack costs just 15 coins!</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Pay below, then generate your code</div>
@@ -1203,8 +1230,9 @@
             <div id="mvp-active-banner" style="display:none;width:100%;background:rgba(0,0,0,.1);border-radius:10px;padding:8px 10px;font-size:12px;text-align:center;"></div>
           </div>
 
-          <div style="background:linear-gradient(135deg,#212121,#4a148c,#0d47a1);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
+          <div data-item-key="ultimateBundle" class="ultimate-bundle-anim" style="border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">👑 Ultimate Bundle</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
             <div style="font-size:14px;opacity:.9;text-align:center;">5 Iron Chests, 10 Gold Chests, 3 Diamond Chests, infinite VIP, infinite MVP, and a one-of-a-kind Mystical blook with your own username!</div>
             <div style="width:100%;margin-top:10px;">
               <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Pay below, then generate your code</div>
@@ -1217,6 +1245,7 @@
             <button id="ultimate-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
             <div id="ultimate-status" class="err-small"></div>
           </div>
+          </div>
 
           <div style="background:#f5f5f5;border-radius:16px;padding:20px;max-width:420px;margin-top:16px;width:100%;">
             <div style="font-size:16px;font-weight:800;color:#0d47a1;margin-bottom:8px;">🧾 My Purchases</div>
@@ -1227,6 +1256,10 @@
         <div id="view-settings" class="card" style="display:none;">
           <div class="section-title">⚙️ Settings</div>
           <div class="section-sub">Manage your account settings.</div>
+          <div class="settings-box" style="margin-bottom:12px;">
+            <h3>ℹ️ About</h3>
+            <div id="game-launch-date-display" style="font-size:12px;color:#555;">Loading...</div>
+          </div>
           <div class="settings-box" style="margin-bottom:12px;">
             <h3>🔔 Notifications</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Get browser notifications when away — boosters, rare pulls, trades, streams, giveaways, new players.</div>
@@ -1460,7 +1493,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.0. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.221. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1527,6 +1560,138 @@
           <div id="giveaway-list" style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:calc(100vh - 220px);"></div>
           <div id="giveaway-empty" style="font-size:13px;color:#888;display:none;text-align:center;padding:20px;">No active giveaways right now.</div>
         </div>
+
+        <div id="view-clans" class="card" style="display:none;">
+          <div class="section-title">🛡️ Clans</div>
+
+          <div id="clan-mine-card" style="display:none;border-radius:16px;padding:20px;color:#fff;margin-bottom:18px;box-shadow:0 6px 18px rgba(0,0,0,.18);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+              <div>
+                <div id="clan-mine-name" style="font-family:'Titan One',system-ui;font-size:22px;"></div>
+                <div id="clan-mine-desc" style="font-size:13px;opacity:.9;margin-top:6px;max-width:420px;"></div>
+              </div>
+              <div id="clan-mine-badge" style="background:rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;white-space:nowrap;"></div>
+            </div>
+            <div id="clan-mine-meta" style="font-size:12px;opacity:.85;margin-top:12px;"></div>
+            <button id="clan-mine-open-btn" style="background:#fff;color:#333;font-weight:700;margin-top:14px;padding:9px 18px;border-radius:22px;">Open Clan Menu →</button>
+          </div>
+
+          <div id="clan-browse-wrap">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div class="section-sub" style="margin:0;">Browse clans or start your own.</div>
+              <button id="clan-create-open-btn" style="background:#5e35b1;font-size:13px;padding:8px 18px;border-radius:22px;">+ Create Clan</button>
+            </div>
+            <div id="clan-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;"></div>
+            <div id="clan-list-empty" style="font-size:13px;color:#888;display:none;text-align:center;padding:30px;">No clans yet — be the first to create one!</div>
+          </div>
+        </div>
+
+  <div id="clan-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:84;">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:360px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+      <div style="font-family:'Titan One',system-ui;font-size:20px;color:#5e35b1;margin-bottom:12px;">🛡️ Create Your Clan</div>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Name</label>
+      <input id="clan-new-name" placeholder="e.g. Shadow Wolves" maxlength="24" style="width:100%;margin-bottom:8px;">
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Description</label>
+      <textarea id="clan-new-desc" placeholder="Describe your clan..." maxlength="200" style="width:100%;height:60px;border-radius:6px;border:1px solid #90caf9;padding:6px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:8px;"></textarea>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Join Type</label>
+      <select id="clan-new-jointype" style="width:100%;margin-bottom:8px;">
+        <option value="free">Free Join (no requirements)</option>
+        <option value="invite">Invitation Only</option>
+        <option value="request">Request to Join</option>
+      </select>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Color</label>
+      <input id="clan-new-color" type="color" value="#5e35b1" style="width:100%;margin-bottom:8px;">
+      <div id="clan-create-status" class="err-small"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button id="clan-create-submit-btn" style="flex:1;background:#43a047;">Create Clan</button>
+        <button id="clan-create-cancel-btn" style="background:#78909c;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clan-menu-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:84;">
+    <div style="background:#fff;border-radius:16px;width:440px;max-width:94vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+      <div id="clan-menu-header" style="border-radius:16px 16px 0 0;padding:18px 20px;color:#fff;position:relative;">
+        <button id="clan-menu-close-btn" style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.25);width:28px;height:28px;padding:0;border-radius:50%;font-size:13px;">✕</button>
+      </div>
+      <div style="padding:16px 20px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+          <button class="clan-tab-btn active" data-tab="info" style="font-size:12px;padding:7px 14px;border-radius:18px;">Info</button>
+          <button class="clan-tab-btn" data-tab="members" style="font-size:12px;padding:7px 14px;border-radius:18px;">Members</button>
+          <button class="clan-tab-btn" data-tab="chat" style="font-size:12px;padding:7px 14px;border-radius:18px;">Chat</button>
+          <button class="clan-tab-btn" data-tab="achievements" style="font-size:12px;padding:7px 14px;border-radius:18px;">Achievements</button>
+        </div>
+        <div id="clan-tab-info"></div>
+        <div id="clan-tab-members" style="display:none;"></div>
+        <div id="clan-tab-chat" style="display:none;">
+          <div id="clan-chat-messages" style="height:240px;overflow-y:auto;background:#f5f5f5;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;"></div>
+          <div id="clan-chat-locked" style="display:none;font-size:13px;color:#888;text-align:center;padding:20px;">Clan Chat hasn't been unlocked by the owner (requires MVP).</div>
+          <div id="clan-chat-input-row" style="display:flex;gap:6px;">
+            <input id="clan-chat-input" placeholder="Message your clan..." style="flex:1;padding:7px 9px;border-radius:6px;border:1px solid #ccc;">
+            <button id="clan-chat-send-btn" style="background:#5e35b1;">Send</button>
+          </div>
+        </div>
+        <div id="clan-tab-achievements" style="display:none;"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;border-top:1px solid #eee;padding-top:14px;">
+          <button id="clan-manage-open-btn" style="background:#ff8f00;font-size:12px;padding:7px 14px;display:none;">⚙️ Edit Clan Settings</button>
+          <button id="clan-leave-btn" style="background:#c62828;font-size:12px;padding:7px 14px;margin-left:auto;">Leave Clan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="clan-manage-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:85;">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:380px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+      <div style="font-family:'Titan One',system-ui;font-size:20px;color:#5e35b1;margin-bottom:12px;">🛡️ Edit Clan Settings</div>
+
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Name</label>
+      <input id="clan-edit-name" style="width:100%;margin-bottom:8px;">
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Description</label>
+      <textarea id="clan-edit-desc" style="width:100%;height:60px;border-radius:6px;border:1px solid #90caf9;padding:6px;font-family:inherit;font-size:13px;resize:vertical;margin-bottom:8px;"></textarea>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Join Type</label>
+      <select id="clan-edit-jointype" style="width:100%;margin-bottom:8px;">
+        <option value="free">Free Join (no requirements)</option>
+        <option value="invite">Invitation Only</option>
+        <option value="request">Request to Join</option>
+      </select>
+      <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Color</label>
+      <input id="clan-edit-color" type="color" style="width:100%;margin-bottom:8px;">
+      <button id="clan-edit-basic-save-btn" style="width:100%;background:#43a047;margin-bottom:14px;">Save Basic Settings</button>
+
+      <div id="clan-mvp-section-locked" style="display:none;background:#f0f0f0;border-radius:10px;padding:12px;font-size:12px;color:#666;">
+        🔒 The settings below require MVP membership to edit.
+      </div>
+      <div id="clan-mvp-section" style="display:none;border-top:1px solid #eee;padding-top:12px;">
+        <div style="font-family:'Titan One',system-ui;font-size:15px;color:#ff8f00;margin-bottom:8px;">🎖️ MVP Settings</div>
+        <label style="font-size:12px;display:block;margin-bottom:2px;">Max Members</label>
+        <input id="clan-edit-maxmembers" type="number" min="2" max="500" style="width:100%;margin-bottom:8px;">
+        <label style="font-size:12px;display:block;margin-bottom:2px;">Minimum Rank to Join</label>
+        <select id="clan-edit-minrank" style="width:100%;margin-bottom:8px;"><option value="">None</option></select>
+        <label style="font-size:12px;display:flex;align-items:center;gap:6px;margin-bottom:8px;"><input id="clan-edit-chatenabled" type="checkbox"> Enable Clan Chat</label>
+        <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Name Color</label>
+        <input id="clan-edit-namecolor" type="color" style="width:100%;margin-bottom:8px;">
+        <button id="clan-edit-mvp-save-btn" style="width:100%;background:#43a047;margin-bottom:14px;">Save MVP Settings</button>
+
+        <div style="font-family:'Titan One',system-ui;font-size:15px;color:#ff8f00;margin-bottom:6px;">📢 Send Clan Event</div>
+        <div style="display:flex;gap:6px;margin-bottom:14px;">
+          <input id="clan-event-text" placeholder="Event message..." style="flex:1;">
+          <button id="clan-event-send-btn" style="background:#5e35b1;">Send</button>
+        </div>
+
+        <div style="font-family:'Titan One',system-ui;font-size:15px;color:#ff8f00;margin-bottom:6px;">🏆 5 Custom Achievements</div>
+        <div id="clan-ach-editor" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+        <button id="clan-ach-save-btn" style="width:100%;background:#43a047;margin-bottom:14px;">Save Achievements</button>
+
+        <div style="font-family:'Titan One',system-ui;font-size:15px;color:#ff8f00;margin-bottom:6px;">✅ Grant Achievements to Members</div>
+        <div id="clan-ach-grant-list" style="display:flex;flex-direction:column;gap:4px;"></div>
+      </div>
+
+      <div id="clan-manage-err" class="err-small" style="margin-top:8px;"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button id="clan-manage-close-btn" style="flex:1;background:#78909c;">Close</button>
+      </div>
+    </div>
+  </div>
 
         <div id="view-bazaar" class="card" style="display:none;">
           <div class="section-title">🛒 Bazaar</div>
@@ -1602,6 +1767,40 @@
               <button id="owner-issue-code-btn" style="background:#1976d2;font-size:12px;padding:6px 12px;">Issue Code</button>
             </div>
             <div id="owner-issue-code-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
+          <!-- IRL Buys settings: master switch + per-item enable/stock -->
+          <div class="owner-single-box" style="background:#e0f2f1;margin-bottom:14px;">
+            <strong>🛒 IRL Buys Settings</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Turn the whole IRL Buys page on/off, and enable/disable or stock-limit individual items. Items are shown to players cheapest-to-priciest by the price you set here.</div>
+            <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:10px;font-weight:700;">
+              <input type="checkbox" id="irlbuys-global-toggle" checked> IRL Buys is open
+            </label>
+            <div id="irlbuys-item-config-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div id="irlbuys-config-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
+          <!-- SubAI settings: real AI backend (owner-supplied API key) -->
+          <div class="owner-single-box" style="background:#ede7f6;margin-bottom:14px;">
+            <strong>🤖 SubAI Settings</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Paste an Anthropic API key to make SubAI answer with real AI instead of the built-in canned answers. Key is stored in Firebase and only used from players' browsers to call Anthropic directly. Leave blank to use the built-in answers.</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <input type="password" id="subai-apikey-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
+              <button id="subai-apikey-save-btn" style="background:#5e35b1;font-size:12px;padding:6px 12px;">Save</button>
+              <button id="subai-apikey-clear-btn" style="background:#757575;font-size:12px;padding:6px 12px;">Clear</button>
+            </div>
+            <div id="subai-apikey-status" class="err-small" style="margin-top:6px;"></div>
+          </div>
+
+          <!-- Game launch date (shown in Settings → About) -->
+          <div class="owner-single-box" style="background:#e8eaf6;margin-bottom:14px;">
+            <strong>📅 Game Launch Date</strong>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Shown to players in Settings → About. Couldn't find an actual recorded launch date anywhere in the game's data, so set the real one here.</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <input id="game-launch-date-input" type="date" style="font-size:12px;">
+              <button id="game-launch-date-save-btn" style="background:#3949ab;font-size:12px;padding:6px 12px;">Save</button>
+            </div>
+            <div id="game-launch-date-status" class="err-small" style="margin-top:6px;"></div>
           </div>
 
           <!-- Reset a player's password -->
@@ -2221,7 +2420,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.0 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.221 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -2471,21 +2670,21 @@
     // RANK SYSTEM
     // ══════════════════════════════════════════════════════════════
     const RANKS = [
-      { name:"Wood",    color:"#8d6e63", bg:"#efebe9", thresholds:[0,   30,  60]  },
-      { name:"Bronze",  color:"#a1887f", bg:"#fbe9e7", thresholds:[100, 180, 280] },
-      { name:"Silver",  color:"#78909c", bg:"#eceff1", thresholds:[400, 560, 750] },
-      { name:"Gold",    color:"#f9a825", bg:"#fffde7", thresholds:[1000,1400,1900]},
-      { name:"Diamond", color:"#29b6f6", bg:"#e1f5fe", thresholds:[2500,3300,4300]},
-      { name:"Quartz",  color:"#ce93d8", bg:"#f3e5f5", thresholds:[5500,7000,9000]},
-      { name:"Ruby",    color:"#e53935", bg:"#ffebee", thresholds:[11000,14000,18000]},
-      { name:"Emerald", color:"#43a047", bg:"#e8f5e9", thresholds:[22000,28000,35000]},
-      { name:"Super",   color:"#ff7043", bg:"#fbe9e7", thresholds:[43000,53000,65000]},
-      { name:"Omega",   color:"#7e57c2", bg:"#ede7f6", thresholds:[80000,100000,125000]},
-      { name:"Shiny",   color:"#00acc1", bg:"#e0f7fa", thresholds:[155000,190000,230000]},
-      { name:"Unreal",  color:"#f06292", bg:"#fce4ec", thresholds:[280000,340000,410000]},
-      { name:"Rainbow", color:"linear-gradient(90deg,#e53935,#ff9800,#fdd835,#43a047,#1e88e5,#8e24aa)", bg:"#fff8e1", thresholds:[500000,620000,760000]},
-      { name:"Master",  color:"#0d47a1", bg:"#e3f2fd", thresholds:[930000,1150000,1400000]},
-      { name:"Boss",    color:"linear-gradient(90deg,#212121,#b71c1c,#212121)", bg:"#fafafa", thresholds:[1700000,2100000,2600000]},
+      { name:"Wood",    color:"#8d6e63", bg:"#efebe9", thresholds:[0,    30,   100]  },
+      { name:"Bronze",  color:"#a1887f", bg:"#fbe9e7", thresholds:[200,  325,  475] },
+      { name:"Silver",  color:"#78909c", bg:"#eceff1", thresholds:[650,  850,  1050] },
+      { name:"Gold",    color:"#f9a825", bg:"#fffde7", thresholds:[1250, 1500, 1800]},
+      { name:"Diamond", color:"#29b6f6", bg:"#e1f5fe", thresholds:[2100, 2400, 2700]},
+      { name:"Quartz",  color:"#ce93d8", bg:"#f3e5f5", thresholds:[3000, 3400, 3800]},
+      { name:"Ruby",    color:"#e53935", bg:"#ffebee", thresholds:[4100, 4500, 5000]},
+      { name:"Emerald", color:"#43a047", bg:"#e8f5e9", thresholds:[5400, 5800, 6250]},
+      { name:"Super",   color:"#ff7043", bg:"#fbe9e7", thresholds:[6750, 7250, 7750]},
+      { name:"Omega",   color:"#7e57c2", bg:"#ede7f6", thresholds:[8250, 8750, 9250]},
+      { name:"Shiny",   color:"#00acc1", bg:"#e0f7fa", thresholds:[9750, 10500,11000]},
+      { name:"Unreal",  color:"#f06292", bg:"#fce4ec", thresholds:[11500,12250,12750]},
+      { name:"Rainbow", color:"linear-gradient(90deg,#e53935,#ff9800,#fdd835,#43a047,#1e88e5,#8e24aa)", bg:"#fff8e1", thresholds:[13500,14000,14750]},
+      { name:"Master",  color:"#0d47a1", bg:"#e3f2fd", thresholds:[15500,16000,16750]},
+      { name:"Boss",    color:"linear-gradient(90deg,#212121,#b71c1c,#212121)", bg:"#fafafa", thresholds:[17500,18250,18925]},
     ];
 
     function getRankFromSubscore(subscore){
@@ -3045,7 +3244,7 @@
       {name:"Commons Bat",chance:20.4,rarity:R.COMMON},{name:"CV Skeleton",chance:19.34,rarity:R.COMMON},
       {name:"CV Zombie",chance:19.2,rarity:R.COMMON},{name:"Bone Pillar",chance:18.93,rarity:R.COMMON},
       {name:"Blood Skeleton",chance:8.1,rarity:R.RARE},{name:"Medusa Head",chance:7.98,rarity:R.RARE},
-      {name:"Mr. Ed",chance:6.0,rarity:R.RARE},{name:"Rowdain",chance:2.1,rarity:R.EPIC},
+      {name:"Mr Ed",chance:6.0,rarity:R.RARE},{name:"Rowdain",chance:2.1,rarity:R.EPIC},
       {name:"Armored Skeleton",chance:2.09,rarity:R.EPIC},{name:"Medusa",chance:0.7,rarity:R.LEG},
       {name:"Orphic Vipers",chance:0.5,rarity:R.LEG},{name:"CV Golem",chance:0.06,rarity:R.CHR},
       {name:"Gold Skeleton",chance:0.02,rarity:R.CHR},{name:"Dracula",chance:0.008,rarity:R.MYS}
@@ -3323,7 +3522,26 @@
       if(!currentUser||!userData) return;
       if((userData.username||"").toLowerCase()==="subzero32715!"){ userData.coins=999999999999; }
       evaluateBadges();
-      await update(userRef(currentUser.uid),userData);
+      // Safety net: Firebase keys can't contain . # $ [ ] — silently rename any
+      // blook key that slips through with one of those (this exact bug once broke
+      // ALL future saves for anyone holding such a blook, with zero visible error).
+      if(userData.blooks){
+        const badKeyRe=/[.#$\[\]]/;
+        Object.keys(userData.blooks).forEach(name=>{
+          if(badKeyRe.test(name)){
+            const safeName=name.replace(badKeyRe,"");
+            userData.blooks[safeName]=(userData.blooks[safeName]||0)+userData.blooks[name];
+            delete userData.blooks[name];
+          }
+        });
+      }
+      try{
+        await update(userRef(currentUser.uid),userData);
+      }catch(e){
+        console.error("saveUserData failed:", e);
+        showToast("⚠️ Save failed — changes may not persist! ("+(e.message||e)+")", "#c62828", 6000);
+        throw e;
+      }
       refreshTop(); refreshStatsView(); refreshBoosterView();
     }
 
@@ -3418,15 +3636,36 @@
       return list[Math.floor(Math.random()*list.length)];
     }
 
+    let _globalBlookRegistryCache = {};
+    function subscribeGlobalBlookRegistry(){
+      onValue(ref(db,"blookRegistry"), snap=>{
+        _globalBlookRegistryCache = snap.exists() ? snap.val() : {};
+      });
+    }
     function getBlookRegistry(){
-      try{ return JSON.parse(localStorage.getItem("blookRarityRegistry")||"{}"); }catch(e){ return {}; }
+      let local={};
+      try{ local=JSON.parse(localStorage.getItem("blookRarityRegistry")||"{}"); }catch(e){}
+      // Global (Firebase) entries win — they're shared across every device/browser,
+      // unlike localStorage, which only ever protected the browser that pulled a
+      // blook. Anyone opening the game somewhere else always defaulted back to
+      // "Common" for blooks their local cache never saw.
+      return { ...local, ..._globalBlookRegistryCache };
     }
     function registerBlookRegistryEntries(map){
       try{
         const reg=getBlookRegistry();
         let changed=false;
-        Object.keys(map).forEach(name=>{ if(!reg[name]){ reg[name]={packId:map[name].packId,packName:map[name].packName,rarity:map[name].rarity,chance:map[name].chance||0}; changed=true; } });
-        if(changed) localStorage.setItem("blookRarityRegistry", JSON.stringify(reg));
+        const newEntries={};
+        Object.keys(map).forEach(name=>{
+          if(!reg[name]){
+            const entry={packId:map[name].packId,packName:map[name].packName,rarity:map[name].rarity,chance:map[name].chance||0};
+            reg[name]=entry; newEntries[name]=entry; changed=true;
+          }
+        });
+        if(changed){
+          localStorage.setItem("blookRarityRegistry", JSON.stringify(reg));
+          update(ref(db,"blookRegistry"), newEntries).catch(()=>{});
+        }
       }catch(e){}
     }
     function groupBlooksByPack(){
@@ -3876,6 +4115,14 @@
       currentIncomingTrade=null; tradePopup.style.display="none"; alert("Trade completed!");
     });
 
+    function linkifyBotText(text){
+      const escDiv=document.createElement("div");
+      escDiv.textContent=text||"";
+      const escaped=escDiv.innerHTML;
+      return escaped.replace(/(https?:\/\/[^\s<]+)/g, function(url){
+        return "<a href=\""+url+"\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color:#7c4dff;text-decoration:underline;font-weight:700;\">"+url+"</a>";
+      });
+    }
     function subscribeChat(){
       chatLoaded=true;
       onValue(chatRef(),snap=>{
@@ -3903,7 +4150,12 @@
             }
           }
           name.innerHTML=starPrefix+(msg.username||"user")+badgeForUsername(msg.username)+": "; div.appendChild(name);
-          if(msg.text){const t=document.createElement("span");t.textContent=msg.text;div.appendChild(t);}
+          if(msg.text){
+            const t=document.createElement("span");
+            if(msg.isBot) t.innerHTML=linkifyBotText(msg.text);
+            else t.textContent=msg.text;
+            div.appendChild(t);
+          }
           if(msg.imageUrl){const img=document.createElement("img");img.src=msg.imageUrl;img.className="chat-image";div.appendChild(document.createElement("br"));div.appendChild(img);}
           chatMessages.appendChild(div);
         });
@@ -4197,6 +4449,7 @@
       loadOwnerPlayerList();
       loadAllGlobalPurchases();
       loadOwnerInbox();
+      renderOwnerIrlBuysConfigList();
       ownerPackList.innerHTML="";
       ALL_PACKS_FOR_OWNER.forEach(pack=>{
         const row=document.createElement("div"); row.className="owner-pack-row";
@@ -4603,6 +4856,9 @@
       subscribeIncomingTrades(user.uid); subscribeGlobalBooster(); updateWheelButtonState();
       subscribeIncomingPetTrades(user.uid);
       subscribeBadgeCache();
+      subscribeGlobalBlookRegistry();
+      subscribeIrlBuysConfig();
+      subscribeGameLaunchDate();
       checkMonthlyChatReset();
       checkPastEventResults();
       startSubletBotInterval();
@@ -7186,7 +7442,7 @@
       outer:
       for(let p=0;p<prefixes.length;p++){
         for(let s=0;s<suffixes.length;s++){
-          if(idx>=550) break outer;
+          if(idx>=1050) break outer;
           denom = denom*3n + BigInt(1000+idx);
           const hue=(idx*47)%360;
           extra.push({ name: prefixes[p]+" "+suffixes[s], denom, tier: 14+Math.floor(idx/40), color: "hsl("+hue+",70%,50%)" });
@@ -8510,7 +8766,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 3.0', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.221', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -9082,6 +9338,173 @@
         set(gRef,{ username: userData.username||"user", label, at: Date.now() }).catch(()=>{});
       }catch(e){}
     }
+    // ── IRL Buys: owner-configurable availability, price (for sort order), and stock ──
+    const IRL_ITEM_DEFS = [
+      { key:"woodenChest",   label:"🪵 Wooden Chest",       defaultPrice:1 },
+      { key:"ironChest",     label:"⚙️ Iron Chest",         defaultPrice:5 },
+      { key:"goldChest",     label:"🏆 Gold Chest",         defaultPrice:10 },
+      { key:"allBlooks",     label:"📖 Get All Blooks",     defaultPrice:15 },
+      { key:"diamondChest",  label:"💎 Diamond Chest",      defaultPrice:25 },
+      { key:"mvpMembership", label:"🎖️ MVP Membership",     defaultPrice:20 },
+      { key:"ultimateBundle",label:"👑 Ultimate Bundle",    defaultPrice:100 },
+    ];
+    let _irlBuysConfig = { global:true, items:{} };
+
+    function subscribeIrlBuysConfig(){
+      onValue(ref(db,"irlBuysConfig"), snap=>{
+        _irlBuysConfig = snap.exists() ? snap.val() : { global:true, items:{} };
+        if(!_irlBuysConfig.items) _irlBuysConfig.items = {};
+        applyIrlBuysConfig();
+        if(ownerMode) renderOwnerIrlBuysConfigList();
+      });
+    }
+
+    function getIrlItemCfg(key){
+      const def=IRL_ITEM_DEFS.find(d=>d.key===key);
+      const c=_irlBuysConfig.items?.[key] || {};
+      return {
+        enabled: c.enabled!==false,
+        price: (typeof c.price==="number") ? c.price : (def?def.defaultPrice:0),
+        stock: (typeof c.stock==="number") ? c.stock : -1, // -1 = infinite
+      };
+    }
+
+    function applyIrlBuysConfig(){
+      const container=document.getElementById("irl-items-container");
+      const closedBanner=document.getElementById("irl-closed-banner");
+      if(!container) return;
+      const globalOpen = _irlBuysConfig.global !== false;
+      if(closedBanner) closedBanner.style.display = globalOpen ? "none" : "block";
+      container.style.display = globalOpen ? "block" : "none";
+      if(!globalOpen) return;
+
+      // Sort cards cheapest → priciest based on owner-set price.
+      const cards = IRL_ITEM_DEFS.map(def=>({
+        def, cfg:getIrlItemCfg(def.key),
+        el: container.querySelector('[data-item-key="'+def.key+'"]')
+      })).filter(c=>c.el);
+      cards.sort((a,b)=>a.cfg.price-b.cfg.price);
+      cards.forEach(c=>container.appendChild(c.el)); // re-append in sorted order
+
+      cards.forEach(({def,cfg,el})=>{
+        const badge=el.querySelector(".irl-stock-badge");
+        if(!cfg.enabled){
+          el.style.display="none";
+          return;
+        }
+        el.style.display="flex";
+        const soldOut = cfg.stock!==-1 && cfg.stock<=0;
+        el.style.opacity = soldOut ? "0.55" : "1";
+        if(badge){
+          if(soldOut) badge.textContent = "❌ SOLD OUT";
+          else if(cfg.stock===-1) badge.textContent = "";
+          else badge.textContent = "📦 "+cfg.stock+" left in stock";
+        }
+        // Disable the purchase-related buttons for this card when sold out.
+        el.querySelectorAll("button").forEach(btn=>{
+          const isBuyRelated = /gen-code-btn$|free-btn$/.test(btn.id||"");
+          if(isBuyRelated) btn.disabled = soldOut;
+        });
+      });
+    }
+
+    async function consumeIrlStock(itemKey){
+      try{
+        const cfg=getIrlItemCfg(itemKey);
+        if(cfg.stock===-1) return; // infinite, nothing to decrement
+        const newStock=Math.max(0, cfg.stock-1);
+        await update(ref(db,"irlBuysConfig/items/"+itemKey), { stock:newStock });
+      }catch(e){ console.error("consumeIrlStock failed:",e); }
+    }
+
+    function renderOwnerIrlBuysConfigList(){
+      const listEl=document.getElementById("irlbuys-item-config-list"); if(!listEl) return;
+      const globalToggle=document.getElementById("irlbuys-global-toggle");
+      if(globalToggle) globalToggle.checked = _irlBuysConfig.global !== false;
+      listEl.innerHTML="";
+      IRL_ITEM_DEFS.forEach(def=>{
+        const cfg=getIrlItemCfg(def.key);
+        const row=document.createElement("div");
+        row.style.cssText="display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#fff;border-radius:8px;padding:6px 8px;";
+        row.innerHTML =
+          "<label style='display:flex;align-items:center;gap:4px;font-size:12px;flex:1;min-width:150px;'>"+
+            "<input type='checkbox' class='irl-item-enabled' data-key='"+def.key+"' "+(cfg.enabled?"checked":"")+"> "+def.label+
+          "</label>"+
+          "<label style='font-size:11px;color:#666;'>Price</label>"+
+          "<input type='number' class='irl-item-price' data-key='"+def.key+"' value='"+cfg.price+"' min='0' style='width:70px;font-size:12px;'>"+
+          "<label style='font-size:11px;color:#666;'>Stock</label>"+
+          "<input type='number' class='irl-item-stock' data-key='"+def.key+"' value='"+cfg.stock+"' style='width:70px;font-size:12px;'>"+
+          "<button class='irl-item-infinite' data-key='"+def.key+"' style='font-size:11px;padding:4px 8px;background:#00897b;'>∞ Infinite</button>";
+        listEl.appendChild(row);
+      });
+    }
+
+    async function saveIrlItemField(key, field, value){
+      const update_={}; update_[field]=value;
+      await update(ref(db,"irlBuysConfig/items/"+key), update_);
+    }
+
+    // ── SubAI: owner-supplied Anthropic API key for real AI answers ──
+    let _subaiConfig = { apiKey: "" };
+    onValue(ref(db,"subaiConfig"), snap=>{
+      _subaiConfig = snap.exists() ? snap.val() : { apiKey:"" };
+      const input = document.getElementById("subai-apikey-input");
+      if(input && document.activeElement!==input) input.value = _subaiConfig.apiKey ? "••••••••" : "";
+    });
+    document.getElementById("subai-apikey-save-btn")?.addEventListener("click", async ()=>{
+      const statusEl=document.getElementById("subai-apikey-status");
+      const val=document.getElementById("subai-apikey-input")?.value.trim();
+      if(!val || val==="••••••••"){ if(statusEl) statusEl.textContent="Enter a key first."; return; }
+      try{ await set(ref(db,"subaiConfig/apiKey"), val); if(statusEl) statusEl.textContent="Saved."; }
+      catch(e){ if(statusEl) statusEl.textContent="Failed to save: "+e.message; }
+    });
+    document.getElementById("subai-apikey-clear-btn")?.addEventListener("click", async ()=>{
+      const statusEl=document.getElementById("subai-apikey-status");
+      try{ await set(ref(db,"subaiConfig/apiKey"), ""); if(statusEl) statusEl.textContent="Cleared."; }
+      catch(e){ if(statusEl) statusEl.textContent="Failed: "+e.message; }
+    });
+
+    document.getElementById("irlbuys-global-toggle")?.addEventListener("change", async e=>{
+      if(!ownerMode) return;
+      await update(ref(db,"irlBuysConfig"), { global:e.target.checked });
+    });
+    document.getElementById("irlbuys-item-config-list")?.addEventListener("change", async e=>{
+      if(!ownerMode) return;
+      const key=e.target.dataset.key; if(!key) return;
+      if(e.target.classList.contains("irl-item-enabled")) await saveIrlItemField(key,"enabled",e.target.checked);
+      else if(e.target.classList.contains("irl-item-price")) await saveIrlItemField(key,"price",parseFloat(e.target.value)||0);
+      else if(e.target.classList.contains("irl-item-stock")) await saveIrlItemField(key,"stock",parseInt(e.target.value,10));
+    });
+    document.getElementById("irlbuys-item-config-list")?.addEventListener("click", async e=>{
+      if(!ownerMode) return;
+      if(!e.target.classList.contains("irl-item-infinite")) return;
+      const key=e.target.dataset.key; if(!key) return;
+      await saveIrlItemField(key,"stock",-1);
+    });
+
+    // ── Game launch date (owner-set, shown in Settings → About) ──
+    function subscribeGameLaunchDate(){
+      onValue(ref(db,"gameInfo/launchDate"), snap=>{
+        const el=document.getElementById("game-launch-date-display");
+        const val=snap.exists()?snap.val():null;
+        if(el){
+          el.textContent = val
+            ? "🚀 Sublet first launched: "+new Date(val+"T00:00:00").toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})
+            : "🚀 Launch date not set yet.";
+        }
+        const input=document.getElementById("game-launch-date-input");
+        if(input && val) input.value = val;
+      });
+    }
+    document.getElementById("game-launch-date-save-btn")?.addEventListener("click", async()=>{
+      if(!ownerMode) return;
+      const statusEl=document.getElementById("game-launch-date-status");
+      const val=document.getElementById("game-launch-date-input").value;
+      if(!val){ statusEl.style.color="#c62828"; statusEl.textContent="Pick a date."; return; }
+      await set(ref(db,"gameInfo/launchDate"), val);
+      statusEl.style.color="#2e7d32"; statusEl.textContent="Saved!";
+    });
+
     async function loadAllGlobalPurchases(){
       const el=document.getElementById("owner-all-purchases-list"); if(!el) return;
       el.innerHTML="Loading...";
@@ -9228,16 +9651,19 @@
         statusEl.style.color='#2e7d32'; statusEl.textContent='Admin panel unlocked!';
         return;
       }
+
+      // ── Every code is single-use per account — except the owner, who has infinite uses (for testing) ──
+      if(!userData.redeemedCodes) userData.redeemedCodes = {};
+      if(userData.redeemedCodes[code] && !ownerMode){
+        statusEl.style.color='#c62828';
+        statusEl.textContent='This code has already been redeemed on your account.';
+        return;
+      }
+
       // ── Secret promo: makes the Iron Chest free for 60s, only for this account ──
       if(raw.replace(/\s+/g,'').toLowerCase()==="ididnteatmycart"){
-        const cooldownLeft = 300000 - (Date.now() - (userData.lastIronFreeCodeUse||0));
-        if(userData.lastIronFreeCodeUse && cooldownLeft>0){
-          statusEl.style.color='#c62828';
-          statusEl.textContent='That promo is on cooldown for you — try again in '+Math.ceil(cooldownLeft/1000)+'s.';
-          return;
-        }
         userData.ironChestFreeUntil = Date.now() + 60000;
-        userData.lastIronFreeCodeUse = Date.now();
+        userData.redeemedCodes[code]=true;
         await saveUserData();
         document.getElementById('settings-redeem-input').value='';
         statusEl.style.color='#2e7d32';
@@ -9251,7 +9677,8 @@
         for(const itemKey in userData.pendingRedeemCodes){
           const pending = userData.pendingRedeemCodes[itemKey];
           if(pending && pending.code && pending.code.toLowerCase()===code){
-            delete userData.pendingRedeemCodes[itemKey];
+            if(!ownerMode) delete userData.pendingRedeemCodes[itemKey]; // owner keeps their issued code reusable
+            userData.redeemedCodes[code]=true;
             const reward = await grantSpecialItem(itemKey);
             logPurchase(PENDING_ITEM_LABELS[itemKey] || "Purchase");
             await saveUserData();
@@ -9269,8 +9696,6 @@
       }
       const def = REDEEM_CODES[code];
       if(!def){ statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return; }
-      if(!userData.redeemedCodes) userData.redeemedCodes = {};
-      if(userData.redeemedCodes[code]){ statusEl.style.color='#c62828'; statusEl.textContent='Code already redeemed.'; return; }
       userData.redeemedCodes[code] = true;
       if(def.coins){ userData.coins=(parseInt(userData.coins,10)||0)+def.coins; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+def.coins; }
       if(def.badge){
@@ -9404,32 +9829,23 @@
         (pack.blooks||[]).forEach(b=>{ allBlookDefs[b.name] = b.rarity; });
       });
       Object.values(singleShopBlooks||{}).forEach(item=>{ if(!(item.name in allBlookDefs)) allBlookDefs[item.name]=item.rarity; });
-      // Owning just 1x of everything only totals ~17K subscore (Ruby territory) —
-      // top up every blook to a real stack so the "own everything" purchase
-      // actually reflects a top-tier (Boss) rank, not a middling one.
-      const QTY_EACH = 200;
-      let added=0, toppedUp=0;
+      let added=0;
       Object.keys(allBlookDefs).forEach(name=>{
-        const cur = userData.blooks[name]||0;
-        if(cur<=0) added++;
-        if(cur<QTY_EACH){ userData.blooks[name]=QTY_EACH; toppedUp++; }
+        if(!(userData.blooks[name]>0)){ userData.blooks[name]=1; added++; }
         if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
       });
       const total=Object.keys(allBlookDefs).length;
-      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) (topped up to "+QTY_EACH+"x each, "+toppedUp+" stacks) out of "+total+" total!" };
+      return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) out of "+total+" total!" };
     }
 
     async function notifyOwnersOfDiamondPurchase(username){
       try{
-        const snap=await get(usersRef());
-        if(!snap.exists()) return;
-        const owners=Object.entries(snap.val()).filter(([,u])=>u.isOwner===true);
-        for(const [ownerUid] of owners){
-          await set(ref(db,"playerMessages/"+ownerUid),{
-            message: "💎 "+username+" just bought the Diamond Chest!",
-            type:"reward", from:"System", sentAt:Date.now(), read:false
-          });
-        }
+        const msgRef=push(ownerMessagesRef());
+        await set(msgRef,{
+          fromUsername:"🤖 System",
+          message: "💎 "+username+" just bought the Diamond Chest!",
+          imageUrl:"", createdAt:Date.now(), read:false
+        });
       }catch(e){ console.error("notifyOwnersOfDiamondPurchase failed:",e); }
     }
     async function postDiamondNewsShoutout(username){
@@ -9470,8 +9886,8 @@
         petNames.push(p.name);
       }
       if(currentUser && userData.username){
-        notifyOwnersOfDiamondPurchase(userData.username);
-        postDiamondNewsShoutout(userData.username);
+        await notifyOwnersOfDiamondPurchase(userData.username);
+        await postDiamondNewsShoutout(userData.username);
         showToast("🐾 Secret pets received: "+petNames.join(", "), "#0d47a1", 5500);
       }
       return { coins, blooks:[{name:customBlookName, rarity:R.MYS}], label:"💎 Diamond Chest", color:"linear-gradient(135deg,#0d47a1,#4fc3f7,#b3e5fc)", confettiColor:"#4fc3f7" };
@@ -9536,12 +9952,15 @@
       const uname=document.getElementById('owner-issue-code-username').value.trim();
       const itemKey=document.getElementById('owner-issue-code-item').value;
       if(!uname){ statusEl.textContent="Enter a username."; return; }
+      const itemCfg=getIrlItemCfg(itemKey);
+      if(itemCfg.stock!==-1 && itemCfg.stock<=0){ statusEl.textContent="This item is out of stock — restock it in IRL Buys Settings first."; return; }
       const target=await findUserByUsername(uname);
       if(!target){ statusEl.textContent="User not found."; return; }
       const code=generateRandomCode();
       const pending = target.data.pendingRedeemCodes || {};
       pending[itemKey] = { code, createdAt: Date.now() };
       await update(userRef(target.uid), { pendingRedeemCodes: pending });
+      await consumeIrlStock(itemKey);
       statusEl.style.color="#2e7d32";
       statusEl.textContent="Code for "+uname+" ("+(PENDING_ITEM_LABELS[itemKey]||itemKey)+"): "+code+" — send this to them.";
     });
@@ -10121,7 +10540,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.0</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.221</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -10846,10 +11265,38 @@
       // Small delay for effect
       await new Promise(function(r){ setTimeout(r, 900); });
       await remove(typingRef);
-      const answer = subAIAnswer(question);
+      const answer = await subAIAnswerSmart(question);
       const ansRef = push(chatRef());
       await set(ansRef, { username:'🤖 SubAI', text: answer, imageUrl:'', createdAt:Date.now(), isBot:true });
       return true;
+    }
+
+    async function subAIAnswerSmart(q) {
+      const key = _subaiConfig && _subaiConfig.apiKey;
+      if(!key) return subAIAnswer(q);
+      try{
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "x-api-key": key,
+            "anthropic-version":"2023-06-01",
+            "anthropic-dangerous-direct-browser-access":"true"
+          },
+          body: JSON.stringify({
+            model:"claude-sonnet-4-6",
+            max_tokens:300,
+            system:"You are SubAI, the in-game assistant for the browser game Sublet 3.221 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.",
+            messages:[{ role:"user", content:q }]
+          })
+        });
+        const data = await resp.json();
+        const text = (data.content||[]).map(b=>b.text||"").join(" ").trim();
+        return text || subAIAnswer(q);
+      }catch(e){
+        console.warn("SubAI real-AI call failed, falling back:", e);
+        return subAIAnswer(q);
+      }
     }
 
     function subAIAnswer(q) {
@@ -10870,9 +11317,10 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.0 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.0 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.0 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.221 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.221 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.221 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('youtube') || lq.includes('channel') || lq.includes('subzero')) return '🎬 Go to https://www.youtube.com/@Subzero32715 to see Subzero\'s YT channel!';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
       if(lq.includes('lore')) return '📖 Check Settings → The Lore for fragments of the Don\'t Look Behind You story. Click each entry to expand it. Something\'s not right.';
@@ -10886,7 +11334,7 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.0!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.221!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
       // Smarter fallback: try to find the closest topic instead of a fully random reply
       const topics = {
@@ -11168,13 +11616,31 @@
       navigator.getBattery().then(function(batt) {
         const battEl = document.getElementById('top-battery');
         if(!battEl) return;
+        let _warned20 = false, _warned5 = false;
         function updateBatt() {
           const pct = Math.round(batt.level * 100);
           const charging = batt.charging;
-          const icon = charging ? '⚡' : pct > 60 ? '🔋' : pct > 20 ? '🪫' : '🪫';
+          let icon;
+          if(charging) icon = pct>=100 ? '🔌' : '⚡';
+          else if(pct>90) icon = '🔋';
+          else if(pct>70) icon = '🟢';
+          else if(pct>45) icon = '🟡';
+          else if(pct>20) icon = '🟠';
+          else if(pct>10) icon = '🪫';
+          else icon = '🔴';
           battEl.textContent = icon + ' ' + pct + '%';
           battEl.style.display = 'inline-block';
           battEl.style.color = pct <= 20 && !charging ? '#c62828' : '';
+
+          if(charging || pct > 20) _warned20 = false;
+          if(charging || pct > 5) _warned5 = false;
+          if(!charging && pct <= 5 && !_warned5) {
+            _warned5 = true; _warned20 = true;
+            showToast('🔴 Battery critically low: ' + pct + '%! Plug in now.', '#c62828', 6000);
+          } else if(!charging && pct <= 20 && !_warned20) {
+            _warned20 = true;
+            showToast('🟠 Battery low: ' + pct + '%. Consider charging soon.', '#e65100', 5000);
+          }
         }
         updateBatt();
         batt.addEventListener('levelchange', updateBatt);
@@ -12160,6 +12626,7 @@
         const ultimateFreeBtn=document.getElementById("ultimate-free-btn"); if(ultimateFreeBtn) ultimateFreeBtn.style.display=ownerMode?"block":"none";
         updateIronPromoUI();
         updateMvpBanner();
+        applyIrlBuysConfig();
         if(userData && !userData.seenIRLWarning){
           const warnEl=document.getElementById("irl-first-time-warning");
           if(warnEl) warnEl.style.display="block";
@@ -12251,6 +12718,452 @@
         catch(e){}
       });
     })();
+
+    // ══════════════════════════════════════════
+    // CLANS
+    // ══════════════════════════════════════════
+    let _clansCache = {};
+    let _clanChatUnsub = null;
+    let _clanActiveTab = "info";
+
+    function clansRef(){ return ref(db,"clans"); }
+    function clanRef(id){ return ref(db,"clans/"+id); }
+    function myClanId(){ return userData && userData.clanId ? userData.clanId : null; }
+    function myClan(){ const id=myClanId(); return id ? _clansCache[id] : null; }
+    function isClanOwner(clan){ return !!(clan && currentUser && clan.ownerUid===currentUser.uid); }
+
+    onValue(clansRef(), snap=>{
+      _clansCache = snap.exists() ? snap.val() : {};
+      const wrapVisible = document.getElementById("view-clans") && document.getElementById("view-clans").style.display!=="none";
+      if(!wrapVisible) return;
+      showClanRoot();
+      const menuOpen = document.getElementById("clan-menu-overlay").style.display!=="none";
+      if(menuOpen) renderClanMenu();
+    });
+
+    function showClanRoot(){
+      const c = myClan();
+      document.getElementById("clan-mine-card").style.display = c ? "block" : "none";
+      document.getElementById("clan-browse-wrap").style.display = c ? "none" : "block";
+      if(c){
+        document.getElementById("clan-mine-card").style.background = c.color || "#5e35b1";
+        document.getElementById("clan-mine-name").textContent = c.name;
+        document.getElementById("clan-mine-name").style.color = c.nameColor || "#fff";
+        document.getElementById("clan-mine-desc").textContent = c.description || "";
+        const joinLabel = c.joinType==="free" ? "Free Join" : c.joinType==="invite" ? "Invitation Only" : "Request to Join";
+        document.getElementById("clan-mine-badge").textContent = joinLabel;
+        document.getElementById("clan-mine-meta").textContent = Object.keys(c.members||{}).length+"/"+(c.maxMembers||20)+" members • Owner: "+c.ownerUsername;
+      } else {
+        renderClanBrowse();
+      }
+    }
+    document.getElementById("clan-mine-open-btn")?.addEventListener("click", ()=>{
+      _clanActiveTab="info"; openClanMenuOverlay();
+    });
+
+    function renderClanBrowse(){
+      const list = document.getElementById("clan-list");
+      const empty = document.getElementById("clan-list-empty");
+      const clans = Object.entries(_clansCache).filter(([id,c])=> !(currentUser && c.members && c.members[currentUser.uid]));
+      list.innerHTML = "";
+      empty.style.display = clans.length ? "none" : "block";
+      const ICONS = ["🛡️","⚔️","🐺","🔥","🌊","⭐","🦅","🐉","👑","☄️"];
+      clans.forEach(([id, c], idx)=>{
+        const memberCount = Object.keys(c.members||{}).length;
+        const cap = c.maxMembers || 20;
+        const full = memberCount>=cap;
+        const joinLabel = c.joinType==="free" ? "🔓 Free Join" : c.joinType==="invite" ? "✉️ Invite Only" : "🙋 Request to Join";
+        const div = document.createElement("div");
+        div.className = "clan-card";
+        div.style.background = "linear-gradient(145deg,"+(c.color||"#5e35b1")+",rgba(0,0,0,.25))";
+        div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+            '<span style="font-size:26px;">'+ICONS[idx%ICONS.length]+'</span>'+
+            '<span style="background:rgba(255,255,255,.25);border-radius:14px;padding:3px 10px;font-size:11px;font-weight:700;">'+memberCount+'/'+cap+'</span>'+
+          '</div>'+
+          '<div style="font-weight:800;font-size:16px;">'+escapeHtml(c.name||"Unnamed Clan")+'</div>'+
+          '<div style="font-size:12px;opacity:.9;min-height:18px;">'+escapeHtml(c.description||"")+'</div>'+
+          '<div style="font-size:11px;opacity:.85;">'+joinLabel+'</div>';
+        const btnRow = document.createElement("div");
+        btnRow.style.cssText = "margin-top:2px;";
+        if(full){
+          const s=document.createElement("span"); s.textContent="Clan Full"; s.style.cssText="font-size:12px;opacity:.85;font-style:italic;";
+          btnRow.appendChild(s);
+        } else if(c.joinType==="free"){
+          const b=document.createElement("button"); b.textContent="Join Clan"; b.style.cssText="width:100%;background:#fff;color:#333;font-size:12px;padding:7px;font-weight:700;border-radius:8px;";
+          b.addEventListener("click", ()=>joinClanFree(id));
+          btnRow.appendChild(b);
+        } else if(c.joinType==="request"){
+          const already = c.requests && currentUser && c.requests[currentUser.uid];
+          const b=document.createElement("button"); b.textContent= already ? "Requested ✓" : "Request to Join"; b.disabled=!!already;
+          b.style.cssText="width:100%;background:#fff;color:#333;font-size:12px;padding:7px;font-weight:700;border-radius:8px;"+(already?"opacity:.6;":"");
+          b.addEventListener("click", ()=>requestJoinClan(id));
+          btnRow.appendChild(b);
+        } else {
+          const s=document.createElement("span"); s.textContent="Owner invites members only"; s.style.cssText="font-size:12px;opacity:.85;font-style:italic;";
+          btnRow.appendChild(s);
+        }
+        div.appendChild(btnRow);
+        list.appendChild(div);
+      });
+    }
+
+    function escapeHtml(s){ const d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
+
+    document.getElementById("clan-create-open-btn")?.addEventListener("click", ()=>{
+      const statusEl=document.getElementById("clan-create-status");
+      if(!isVip()){ statusEl.textContent="You must have VIP to create a clan."; document.getElementById("clan-create-overlay").style.display="flex"; return; }
+      statusEl.textContent="";
+      document.getElementById("clan-new-name").value="";
+      document.getElementById("clan-new-desc").value="";
+      document.getElementById("clan-new-jointype").value="free";
+      document.getElementById("clan-new-color").value="#5e35b1";
+      document.getElementById("clan-create-overlay").style.display="flex";
+    });
+    document.getElementById("clan-create-cancel-btn")?.addEventListener("click", ()=>{
+      document.getElementById("clan-create-overlay").style.display="none";
+    });
+    document.getElementById("clan-create-submit-btn")?.addEventListener("click", async ()=>{
+      const statusEl=document.getElementById("clan-create-status");
+      if(!currentUser||!userData){ statusEl.textContent="Log in first."; return; }
+      if(!isVip()){ statusEl.textContent="You must have VIP to create a clan."; return; }
+      if(myClanId()){ statusEl.textContent="You're already in a clan — leave it first."; return; }
+      const name=document.getElementById("clan-new-name").value.trim();
+      const desc=document.getElementById("clan-new-desc").value.trim();
+      const joinType=document.getElementById("clan-new-jointype").value;
+      const color=document.getElementById("clan-new-color").value;
+      if(!name){ statusEl.textContent="Enter a clan name."; return; }
+      const newRef = push(clansRef());
+      const clanData = {
+        id:newRef.key, name, description:desc, color, joinType,
+        ownerUid:currentUser.uid, ownerUsername:userData.username, createdAt:Date.now(),
+        maxMembers:20, minRank:"", chatEnabled:false, nameColor:"#ffffff",
+        achievements:[null,null,null,null,null],
+        members:{ [currentUser.uid]: { username:userData.username, role:"owner", joinedAt:Date.now() } }
+      };
+      try{
+        await set(newRef, clanData);
+        userData.clanId = newRef.key;
+        await saveUserData();
+        document.getElementById("clan-create-overlay").style.display="none";
+        statusEl.textContent="";
+        showClanRoot();
+      }catch(e){ statusEl.textContent="Failed: "+e.message; }
+    });
+
+    async function joinClanFree(id){
+      if(!currentUser||!userData) return;
+      if(myClanId()){ alert("You're already in a clan — leave it first."); return; }
+      const c=_clansCache[id]; if(!c) return;
+      const cap=c.maxMembers||20; const count=Object.keys(c.members||{}).length;
+      if(count>=cap){ alert("This clan is full."); return; }
+      if(c.minRank){ const myRank=getRankFromSubscore(userData.subscore||0).name; if(RANKS.findIndex(r=>r.name===myRank) < RANKS.findIndex(r=>r.name===c.minRank)){ alert("You need at least "+c.minRank+" rank to join this clan."); return; } }
+      await set(ref(db,"clans/"+id+"/members/"+currentUser.uid), { username:userData.username, role:"member", joinedAt:Date.now() });
+      userData.clanId = id;
+      await saveUserData();
+      showClanRoot();
+    }
+    async function requestJoinClan(id){
+      if(!currentUser||!userData) return;
+      if(myClanId()){ alert("You're already in a clan — leave it first."); return; }
+      await set(ref(db,"clans/"+id+"/requests/"+currentUser.uid), { username:userData.username, requestedAt:Date.now() });
+      renderClanBrowse();
+    }
+    async function leaveClan(){
+      const c=myClan(); if(!c||!currentUser) return;
+      if(isClanOwner(c)){
+        if(!confirm("You're the owner — leaving will permanently delete this clan for everyone. Continue?")) return;
+        await remove(clanRef(c.id));
+      } else {
+        if(!confirm("Leave "+c.name+"?")) return;
+        await remove(ref(db,"clans/"+c.id+"/members/"+currentUser.uid));
+      }
+      userData.clanId = null;
+      await saveUserData();
+      if(_clanChatUnsub){ _clanChatUnsub(); _clanChatUnsub=null; }
+      closeClanMenuOverlay();
+      showClanRoot();
+    }
+    document.getElementById("clan-leave-btn")?.addEventListener("click", leaveClan);
+
+    function openClanMenuOverlay(){
+      const c = myClan(); if(!c) return;
+      document.getElementById("clan-menu-overlay").style.display = "flex";
+      renderClanMenu();
+    }
+    function closeClanMenuOverlay(){
+      document.getElementById("clan-menu-overlay").style.display = "none";
+      if(_clanChatUnsub){ _clanChatUnsub(); _clanChatUnsub=null; }
+    }
+    document.getElementById("clan-menu-close-btn")?.addEventListener("click", closeClanMenuOverlay);
+
+    function renderClanMenu(){
+      const c = myClan(); if(!c){ closeClanMenuOverlay(); showClanRoot(); return; }
+      const owner = isClanOwner(c);
+      const header = document.getElementById("clan-menu-header");
+      header.style.background = c.color || "#5e35b1";
+      header.innerHTML = '<div style="font-size:20px;font-weight:800;padding-right:30px;'+(c.nameColor?('color:'+c.nameColor+';'):'')+'">'+escapeHtml(c.name)+'</div><div style="font-size:13px;opacity:.9;margin-top:4px;">'+escapeHtml(c.description||"")+'</div><div style="font-size:11px;opacity:.8;margin-top:6px;">Owner: '+escapeHtml(c.ownerUsername)+' • '+Object.keys(c.members||{}).length+'/'+(c.maxMembers||20)+' members</div>' +
+        document.getElementById("clan-menu-close-btn").outerHTML;
+      document.getElementById("clan-menu-close-btn").addEventListener("click", closeClanMenuOverlay);
+      document.getElementById("clan-manage-open-btn").style.display = owner ? "inline-block" : "none";
+      document.querySelectorAll(".clan-tab-btn").forEach(btn=>btn.classList.toggle("active", btn.dataset.tab===_clanActiveTab));
+      renderClanTab(_clanActiveTab);
+    }
+
+    document.querySelectorAll(".clan-tab-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        _clanActiveTab=btn.dataset.tab;
+        document.querySelectorAll(".clan-tab-btn").forEach(b=>b.classList.toggle("active", b===btn));
+        renderClanTab(_clanActiveTab);
+      });
+    });
+
+    function renderClanTab(tab){
+      ["info","members","chat","achievements"].forEach(t=>{
+        const el=document.getElementById("clan-tab-"+t); if(el) el.style.display = (t===tab)?"block":"none";
+      });
+      const c=myClan(); if(!c) return;
+      if(tab==="info") renderClanInfoTab(c);
+      if(tab==="members") renderClanMembersTab(c);
+      if(tab==="chat") renderClanChatTab(c);
+      if(tab==="achievements") renderClanAchievementsTab(c);
+    }
+
+    function renderClanInfoTab(c){
+      const el=document.getElementById("clan-tab-info");
+      const events = c.events ? Object.values(c.events).sort((a,b)=>b.createdAt-a.createdAt).slice(0,10) : [];
+      let html = '<div style="font-size:12px;color:#666;margin-bottom:8px;">Join type: '+(c.joinType==="free"?"Free Join":c.joinType==="invite"?"Invitation Only":"Request to Join")+'</div>';
+      if(c.minRank) html += '<div style="font-size:12px;color:#666;">Minimum rank: '+c.minRank+'</div>';
+      html += '<div style="margin-top:10px;"><strong style="font-size:13px;">📢 Clan Events</strong></div>';
+      if(!events.length) html += '<div style="font-size:12px;color:#888;margin-top:4px;">No events yet.</div>';
+      else events.forEach(e=>{ html += '<div style="background:#f5f5f5;border-radius:8px;padding:8px;margin-top:6px;font-size:12px;"><div>'+escapeHtml(e.text)+'</div><div style="color:#999;font-size:10px;margin-top:2px;">'+new Date(e.createdAt).toLocaleString()+'</div></div>'; });
+      el.innerHTML = html;
+    }
+
+    function renderClanMembersTab(c){
+      const el=document.getElementById("clan-tab-members");
+      const owner = isClanOwner(c);
+      const members = Object.entries(c.members||{});
+      let html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+      members.forEach(([uid,m])=>{
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;background:#f5f5f5;border-radius:8px;padding:8px;font-size:13px;">'+
+          '<span>'+escapeHtml(m.username)+(m.role==="owner"?" 👑":"")+'</span>'+
+          (owner && m.role!=="owner" ? '<button data-kick="'+uid+'" style="background:#c62828;font-size:11px;padding:4px 10px;">Kick</button>' : '')+
+          '</div>';
+      });
+      html += '</div>';
+      if(owner && c.joinType==="request"){
+        const reqs = Object.entries(c.requests||{});
+        html += '<div style="margin-top:14px;"><strong style="font-size:13px;">Pending Requests</strong></div>';
+        if(!reqs.length) html += '<div style="font-size:12px;color:#888;margin-top:4px;">None right now.</div>';
+        reqs.forEach(([uid,r])=>{
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;background:#fff3e0;border-radius:8px;padding:8px;margin-top:6px;font-size:13px;">'+
+            '<span>'+escapeHtml(r.username)+'</span><span style="display:flex;gap:6px;">'+
+            '<button data-approve="'+uid+'" style="background:#43a047;font-size:11px;padding:4px 10px;">Approve</button>'+
+            '<button data-deny="'+uid+'" style="background:#c62828;font-size:11px;padding:4px 10px;">Deny</button></span></div>';
+        });
+      }
+      if(owner && c.joinType==="invite"){
+        html += '<div style="margin-top:14px;"><strong style="font-size:13px;">Invite a Player</strong></div>'+
+          '<div style="display:flex;gap:6px;margin-top:6px;"><input id="clan-invite-username" placeholder="Username" style="flex:1;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">'+
+          '<button id="clan-invite-send-btn" style="background:#5e35b1;font-size:12px;">Send Invite</button></div>'+
+          '<div id="clan-invite-status" class="err-small" style="margin-top:4px;"></div>';
+      }
+      el.innerHTML = html;
+      el.querySelectorAll("[data-kick]").forEach(b=>b.addEventListener("click", async ()=>{
+        await remove(ref(db,"clans/"+c.id+"/members/"+b.dataset.kick));
+      }));
+      el.querySelectorAll("[data-approve]").forEach(b=>b.addEventListener("click", async ()=>{
+        const uid=b.dataset.approve; const r=(c.requests||{})[uid]; if(!r) return;
+        const cap=c.maxMembers||20; if(Object.keys(c.members||{}).length>=cap){ alert("Clan is full."); return; }
+        await set(ref(db,"clans/"+c.id+"/members/"+uid), { username:r.username, role:"member", joinedAt:Date.now() });
+        await remove(ref(db,"clans/"+c.id+"/requests/"+uid));
+      }));
+      el.querySelectorAll("[data-deny]").forEach(b=>b.addEventListener("click", async ()=>{
+        await remove(ref(db,"clans/"+c.id+"/requests/"+b.dataset.deny));
+      }));
+      document.getElementById("clan-invite-send-btn")?.addEventListener("click", async ()=>{
+        const statusEl=document.getElementById("clan-invite-status");
+        const uname=document.getElementById("clan-invite-username").value.trim();
+        if(!uname){ statusEl.textContent="Enter a username."; return; }
+        const usersSnap = await get(ref(db,"users"));
+        let targetUid=null;
+        if(usersSnap.exists()){ const all=usersSnap.val(); for(const uid in all){ if((all[uid].username||"").toLowerCase()===uname.toLowerCase()){ targetUid=uid; break; } } }
+        if(!targetUid){ statusEl.textContent="Player not found."; return; }
+        await set(ref(db,"clanInvites/"+targetUid+"/"+c.id), { clanId:c.id, clanName:c.name, fromUsername:userData.username, createdAt:Date.now() });
+        statusEl.textContent="Invite sent!";
+      });
+    }
+
+    function renderClanChatTab(c){
+      const locked = !c.chatEnabled;
+      document.getElementById("clan-chat-locked").style.display = locked ? "block" : "none";
+      document.getElementById("clan-chat-input-row").style.display = locked ? "none" : "flex";
+      document.getElementById("clan-chat-messages").style.display = locked ? "none" : "block";
+      if(locked) return;
+      if(_clanChatUnsub){ _clanChatUnsub(); }
+      const chatEl = document.getElementById("clan-chat-messages");
+      _clanChatUnsub = onValue(ref(db,"clans/"+c.id+"/chatMessages"), snap=>{
+        chatEl.innerHTML="";
+        if(!snap.exists()) return;
+        const arr = Object.values(snap.val()).sort((a,b)=>a.createdAt-b.createdAt);
+        arr.forEach(m=>{
+          const d=document.createElement("div"); d.style.marginBottom="4px";
+          d.innerHTML = '<strong>'+escapeHtml(m.username)+':</strong> '+escapeHtml(m.text);
+          chatEl.appendChild(d);
+        });
+        chatEl.scrollTop = chatEl.scrollHeight;
+      });
+    }
+    document.getElementById("clan-chat-send-btn")?.addEventListener("click", async ()=>{
+      const c=myClan(); if(!c||!c.chatEnabled||!currentUser||!userData) return;
+      const input=document.getElementById("clan-chat-input");
+      const text=input.value.trim(); if(!text) return;
+      if(containsBadWord(text)){ input.value=""; return; }
+      await push(ref(db,"clans/"+c.id+"/chatMessages"), { username:userData.username, text, createdAt:Date.now() });
+      input.value="";
+    });
+
+    function renderClanAchievementsTab(c){
+      const el=document.getElementById("clan-tab-achievements");
+      const achievements = (c.achievements||[]).filter(Boolean);
+      const mine = (c.memberAchievements||{})[currentUser?currentUser.uid:""]||{};
+      if(!achievements.length){ el.innerHTML='<div style="font-size:12px;color:#888;padding:10px;">This clan hasn\'t set up any custom achievements yet.</div>'; return; }
+      let html='<div style="display:flex;flex-direction:column;gap:8px;">';
+      achievements.forEach((a,i)=>{
+        const unlocked = !!mine[i];
+        html += '<div style="display:flex;align-items:center;gap:10px;background:'+(unlocked?"#e8f5e9":"#f5f5f5")+';border-radius:8px;padding:8px;">'+
+          '<span style="font-size:20px;">'+(a.icon||"🏆")+'</span><div><div style="font-weight:700;font-size:13px;">'+escapeHtml(a.name)+'</div><div style="font-size:11px;color:#666;">'+escapeHtml(a.desc||"")+'</div></div>'+
+          (unlocked?'<span style="margin-left:auto;font-size:11px;color:#2e7d32;">✔ Unlocked</span>':'<span style="margin-left:auto;font-size:11px;color:#999;">Locked</span>')+
+          '</div>';
+      });
+      html+='</div>';
+      el.innerHTML=html;
+    }
+
+    // ── Edit Clan Settings modal (giveaway-style overlay) ──
+    async function refreshMvpStatus(){
+      if(!currentUser) return;
+      try{
+        const snap = await get(userRef(currentUser.uid));
+        if(snap.exists()){
+          const fresh = snap.val();
+          userData.mvpExpires = fresh.mvpExpires || 0;
+          userData.vipExpires = fresh.vipExpires || 0;
+        }
+      }catch(e){ console.warn("Couldn't refresh MVP status:", e); }
+    }
+
+    async function openClanManageModal(){
+      const c = myClan(); if(!c || !isClanOwner(c)) return;
+      document.getElementById("clan-manage-err").textContent = "";
+      await refreshMvpStatus();
+      document.getElementById("clan-edit-name").value = c.name || "";
+      document.getElementById("clan-edit-desc").value = c.description || "";
+      document.getElementById("clan-edit-jointype").value = c.joinType || "free";
+      document.getElementById("clan-edit-color").value = c.color || "#5e35b1";
+
+      const mvp = isMvpActive();
+      document.getElementById("clan-mvp-section").style.display = mvp ? "block" : "none";
+      document.getElementById("clan-mvp-section-locked").style.display = mvp ? "none" : "block";
+      if(mvp){
+        document.getElementById("clan-edit-maxmembers").value = c.maxMembers || 20;
+        const rankSel = document.getElementById("clan-edit-minrank");
+        rankSel.innerHTML = '<option value="">None</option>' + RANKS.map(r=>'<option value="'+r.name+'" '+(c.minRank===r.name?"selected":"")+'>'+r.name+'</option>').join('');
+        document.getElementById("clan-edit-chatenabled").checked = !!c.chatEnabled;
+        document.getElementById("clan-edit-namecolor").value = c.nameColor || c.color || "#5e35b1";
+
+        const achEditor = document.getElementById("clan-ach-editor");
+        achEditor.innerHTML = [0,1,2,3,4].map(i=>{
+          const a=(c.achievements||[])[i]||{};
+          return '<div style="display:flex;gap:6px;">'+
+            '<input data-ach-icon="'+i+'" value="'+escapeHtml(a.icon||"🏆")+'" style="width:44px;padding:6px;border-radius:6px;border:1px solid #ccc;">'+
+            '<input data-ach-name="'+i+'" placeholder="Name" value="'+escapeHtml(a.name||"")+'" style="flex:1;padding:6px;border-radius:6px;border:1px solid #ccc;">'+
+            '<input data-ach-desc="'+i+'" placeholder="Description" value="'+escapeHtml(a.desc||"")+'" style="flex:1;padding:6px;border-radius:6px;border:1px solid #ccc;">'+
+            '</div>';
+        }).join('');
+
+        const grantList = document.getElementById("clan-ach-grant-list");
+        grantList.innerHTML = "";
+        const achievements = (c.achievements||[]).filter(Boolean);
+        Object.entries(c.members||{}).forEach(([uid,m])=>{
+          const mine=(c.memberAchievements||{})[uid]||{};
+          const row=document.createElement("div");
+          row.style.cssText="display:flex;align-items:center;gap:8px;font-size:12px;background:#f5f5f5;border-radius:6px;padding:6px;";
+          row.innerHTML='<span style="min-width:90px;">'+escapeHtml(m.username)+'</span>';
+          achievements.forEach((a,i)=>{
+            const label=document.createElement("label"); label.style.cssText="display:flex;align-items:center;gap:3px;";
+            label.innerHTML='<input type="checkbox" data-grant-uid="'+uid+'" data-grant-idx="'+i+'" '+(mine[i]?"checked":"")+'> '+(a.icon||"🏆");
+            row.appendChild(label);
+          });
+          grantList.appendChild(row);
+        });
+        grantList.querySelectorAll('[data-grant-uid]').forEach(cb=>{
+          cb.addEventListener("change", async ()=>{
+            await set(ref(db,"clans/"+c.id+"/memberAchievements/"+cb.dataset.grantUid+"/"+cb.dataset.grantIdx), cb.checked);
+          });
+        });
+      }
+      document.getElementById("clan-manage-overlay").style.display = "flex";
+    }
+
+    document.getElementById("clan-manage-open-btn")?.addEventListener("click", openClanManageModal);
+    document.getElementById("clan-manage-close-btn")?.addEventListener("click", ()=>{
+      document.getElementById("clan-manage-overlay").style.display = "none";
+    });
+    document.getElementById("clan-edit-basic-save-btn")?.addEventListener("click", async ()=>{
+      const c=myClan(); if(!c) return;
+      const errEl=document.getElementById("clan-manage-err");
+      const name=document.getElementById("clan-edit-name").value.trim();
+      if(!name){ errEl.textContent="Enter a clan name."; return; }
+      try{
+        await update(clanRef(c.id), {
+          name, description:document.getElementById("clan-edit-desc").value.trim(),
+          joinType:document.getElementById("clan-edit-jointype").value,
+          color:document.getElementById("clan-edit-color").value
+        });
+        errEl.textContent="Saved!";
+      }catch(e){ errEl.textContent="Failed: "+e.message; }
+    });
+    document.getElementById("clan-edit-mvp-save-btn")?.addEventListener("click", async ()=>{
+      const c=myClan(); if(!c) return;
+      const errEl=document.getElementById("clan-manage-err");
+      if(!isMvpActive()){ errEl.textContent="Your MVP has expired."; return; }
+      try{
+        await update(clanRef(c.id), {
+          maxMembers: parseInt(document.getElementById("clan-edit-maxmembers").value)||20,
+          minRank: document.getElementById("clan-edit-minrank").value,
+          chatEnabled: document.getElementById("clan-edit-chatenabled").checked,
+          nameColor: document.getElementById("clan-edit-namecolor").value
+        });
+        errEl.textContent="Saved!";
+      }catch(e){ errEl.textContent="Failed: "+e.message; }
+    });
+    document.getElementById("clan-event-send-btn")?.addEventListener("click", async ()=>{
+      const c=myClan(); if(!c || !isMvpActive()) return;
+      const input=document.getElementById("clan-event-text");
+      const text=input.value.trim(); if(!text) return;
+      await push(ref(db,"clans/"+c.id+"/events"), { text, createdAt:Date.now(), fromUsername:userData.username });
+      input.value="";
+      document.getElementById("clan-manage-err").textContent="Event sent!";
+    });
+    document.getElementById("clan-ach-save-btn")?.addEventListener("click", async ()=>{
+      const c=myClan(); if(!c || !isMvpActive()) return;
+      const achievements=[0,1,2,3,4].map(i=>{
+        const name=document.querySelector('[data-ach-name="'+i+'"]').value.trim();
+        if(!name) return null;
+        return { icon:document.querySelector('[data-ach-icon="'+i+'"]').value.trim()||"🏆", name, desc:document.querySelector('[data-ach-desc="'+i+'"]').value.trim() };
+      });
+      await update(clanRef(c.id), { achievements });
+      document.getElementById("clan-manage-err").textContent="Achievements saved!";
+    });
+
+    // ── Wire Clans view into navigation ──
+    const _origShowViewPatch3 = showView;
+    showView = function(name){
+      _origShowViewPatch3(name);
+      const vClans=document.getElementById("view-clans"); if(vClans) vClans.style.display=name==="clans"?"flex":"none";
+      if(name==="clans") showClanRoot();
+    };
 
   </script>
 </body>
