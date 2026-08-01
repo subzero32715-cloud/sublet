@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.312</title>
+  <title>Sublet 3.421</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -590,7 +590,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 3.312</div>
+      <div class="start-title">Sublet 3.421</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -621,7 +621,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 3.312</div>
+        <div class="sidebar-title">Sublet 3.421</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -1197,6 +1197,36 @@
             <div id="allblooks-status" class="err-small"></div>
           </div>
 
+          <div data-item-key="allShinys" style="background:linear-gradient(135deg,#7b1fa2,#fff176,#7b1fa2);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#4a148c;max-width:420px;margin-top:16px;">
+            <div style="font-size:22px;font-weight:800;">✨ Get All Shinys</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
+            <div style="font-size:14px;opacity:.9;text-align:center;">Unlocks the ✨ shiny version of every blook currently in the game that you don't already have.</div>
+            <div style="width:100%;margin-top:10px;">
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
+              <paypal-add-to-cart-button data-id="CSM9ZMGKQLY3E"></paypal-add-to-cart-button>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "CSM9ZMGKQLY3E" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            </div>
+            <button id="allshinys-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(120,120,120,.35);font-size:12px;padding:8px;">🔑 Generate My Redeem Code (after paying)</button>
+            <div id="allshinys-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="allshinys-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="allshinys-status" class="err-small"></div>
+          </div>
+
+          <div data-item-key="allGolds" style="background:linear-gradient(135deg,#b8860b,#fff9c4,#b8860b);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#3e2a00;max-width:420px;margin-top:16px;">
+            <div style="font-size:22px;font-weight:800;">⭐ Get All Golds</div>
+            <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
+            <div style="font-size:14px;opacity:.9;text-align:center;">Unlocks the ⭐ golden version of every blook currently in the game that you don't already have.</div>
+            <div style="width:100%;margin-top:10px;">
+              <div style="font-size:13px;opacity:.85;margin-bottom:4px;">Add to cart, then use the 🛒 Cart button up top to pay</div>
+              <paypal-add-to-cart-button data-id="9CF5CR4H65EBS"></paypal-add-to-cart-button>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "9CF5CR4H65EBS" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            </div>
+            <button id="allgolds-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(0,0,0,.15);color:#3e2a00;font-size:12px;padding:8px;">🔑 Generate My Redeem Code (after paying)</button>
+            <div id="allgolds-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="allgolds-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="allgolds-status" class="err-small"></div>
+          </div>
+
           <div data-item-key="diamondChest" style="background:linear-gradient(135deg,#0d47a1,#4fc3f7,#b3e5fc);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;color:#04263e;max-width:420px;margin-top:16px;">
             <div style="font-size:22px;font-weight:800;">💎 Diamond Chest</div>
             <div class="irl-stock-badge" style="font-size:11px;font-weight:700;"></div>
@@ -1493,7 +1523,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.312. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.421. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1641,6 +1671,10 @@
             <div style="font-size:12px;color:#555;margin:6px 0 10px;">Once active, SubAI has a 20% chance each time it answers a question to shout out your clan to everyone.</div>
             <paypal-add-to-cart-button data-id="3VY8X89ZFE3V6"></paypal-add-to-cart-button>
             <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "3VY8X89ZFE3V6" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            <button id="clanshoutout-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(120,120,120,.25);font-size:12px;padding:8px;">ℹ️ How to get my code</button>
+            <div id="clanshoutout-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="clanshoutout-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="clanshoutout-status" class="err-small"></div>
           </div>
 
           <div style="border-radius:12px;padding:14px;background:#e0f2f1;">
@@ -1648,6 +1682,10 @@
             <div style="font-size:12px;color:#555;margin:6px 0 10px;">CODEAI drops 5 redeem codes into your clan chat, 5 seconds apart — 3 are IRL Buys rewards (pricier items are rarer) and 2 are mystery prizes. First come, first served for your clanmates.</div>
             <paypal-add-to-cart-button data-id="45H22ZS6JM3BW"></paypal-add-to-cart-button>
             <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "45H22ZS6JM3BW" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            <button id="clancodegiver-gen-code-btn" style="width:100%;margin-top:6px;background:rgba(0,0,0,.1);font-size:12px;padding:8px;">ℹ️ How to get my code</button>
+            <div id="clancodegiver-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="clancodegiver-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Get Free (Admin/Owner)</button>
+            <div id="clancodegiver-status" class="err-small"></div>
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:16px;border-top:1px solid #eee;padding-top:14px;">
@@ -1778,6 +1816,8 @@
                 <option value="ironChest">⚙️ Iron Chest</option>
                 <option value="goldChest">🏆 Gold Chest</option>
                 <option value="allBlooks">📖 Get All Blooks</option>
+                <option value="allShinys">✨ Get All Shinys</option>
+                <option value="allGolds">⭐ Get All Golds</option>
                 <option value="diamondChest">💎 Diamond Chest</option>
                 <option value="mvpMembership">🎖️ MVP Membership</option>
                 <option value="ultimateBundle">👑 Ultimate Bundle</option>
@@ -1803,11 +1843,27 @@
           <!-- SubAI settings: real AI backend (owner-supplied API key) -->
           <div class="owner-single-box" style="background:#ede7f6;margin-bottom:14px;">
             <strong>🤖 SubAI Settings</strong>
-            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Paste an Anthropic API key to make SubAI answer with real AI instead of the built-in canned answers. Key is stored in Firebase and only used from players' browsers to call Anthropic directly. Leave blank to use the built-in answers.</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-              <input type="password" id="subai-apikey-input" placeholder="sk-ant-..." style="flex:1;min-width:200px;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
-              <button id="subai-apikey-save-btn" style="background:#5e35b1;font-size:12px;padding:6px 12px;">Save</button>
-              <button id="subai-apikey-clear-btn" style="background:#757575;font-size:12px;padding:6px 12px;">Clear</button>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Pick a provider and paste that provider's API key to make SubAI answer with real AI instead of the built-in canned answers. Key is stored in Firebase and only used from players' browsers to call that provider directly. Leave blank to use the built-in answers. Anthropic, Groq, OpenRouter, and Gemini all allow direct browser calls — OpenAI blocks it (CORS) for almost everyone, so that option will usually just silently fall back to the built-in answers.</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <select id="subai-provider-select" style="padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
+                <option value="anthropic">Anthropic (Claude) — works</option>
+                <option value="groq">Groq (Llama, free & fast) — works</option>
+                <option value="openrouter">OpenRouter (access to many models) — works</option>
+                <option value="gemini">Google Gemini — works</option>
+                <option value="openai">OpenAI (ChatGPT) — usually blocked</option>
+                <option value="custom">Custom (any OpenAI-compatible endpoint)</option>
+              </select>
+              <div id="subai-baseurl-row" style="display:none;">
+                <input type="text" id="subai-baseurl-input" placeholder="https://api.example.com/v1/chat/completions" style="width:100%;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <input type="text" id="subai-model-input" placeholder="model name (optional, provider default used if blank)" style="flex:1;min-width:160px;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
+                <input type="password" id="subai-apikey-input" placeholder="API key" style="flex:1;min-width:200px;padding:6px 8px;border-radius:6px;border:1px solid #ccc;">
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button id="subai-apikey-save-btn" style="background:#5e35b1;font-size:12px;padding:6px 12px;">Save</button>
+                <button id="subai-apikey-clear-btn" style="background:#757575;font-size:12px;padding:6px 12px;">Clear</button>
+              </div>
             </div>
             <div id="subai-apikey-status" class="err-small" style="margin-top:6px;"></div>
           </div>
@@ -2440,7 +2496,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.312 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.421 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -4903,7 +4959,7 @@
       if(adminMode) adminPanelBtn.style.display="inline-block";
       if(ownerMode) ownerPanelBtn.style.display="inline-block";
       if(ownerMode){
-        ["chest-free-btn","iron-chest-free-btn","gold-chest-free-btn","allblooks-free-btn"].forEach(id=>{
+        ["chest-free-btn","iron-chest-free-btn","gold-chest-free-btn","allblooks-free-btn","allshinys-free-btn","allgolds-free-btn","clanshoutout-free-btn","clancodegiver-free-btn"].forEach(id=>{
           const el=document.getElementById(id); if(el) el.style.display="block";
         });
       }
@@ -8786,7 +8842,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 3.312', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.421', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -9347,7 +9403,7 @@
       "spaceicemedival": { blook: { name: "Super Rainbow Crab King", rarity: "Supreeme" } },
       "iatemycart": { chest: true }
     };
-    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle", clanShoutout: "📣 Clan Shoutout", clanCodeGiver: "🎟️ Clan Code Giver", randomSmall: "🎲 Mystery Prize" };
+    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", allShinys: "✨ Get All Shinys", allGolds: "⭐ Get All Golds", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle", clanShoutout: "📣 Clan Shoutout", clanCodeGiver: "🎟️ Clan Code Giver", randomSmall: "🎲 Mystery Prize" };
     function logPurchase(label){
       if(!userData) return;
       if(!Array.isArray(userData.purchaseHistory)) userData.purchaseHistory = [];
@@ -9364,6 +9420,8 @@
       { key:"ironChest",     label:"⚙️ Iron Chest",         defaultPrice:5 },
       { key:"goldChest",     label:"🏆 Gold Chest",         defaultPrice:10 },
       { key:"allBlooks",     label:"📖 Get All Blooks",     defaultPrice:15 },
+      { key:"allShinys",     label:"✨ Get All Shinys",     defaultPrice:18 },
+      { key:"allGolds",      label:"⭐ Get All Golds",      defaultPrice:18 },
       { key:"diamondChest",  label:"💎 Diamond Chest",      defaultPrice:25 },
       { key:"mvpMembership", label:"🎖️ MVP Membership",     defaultPrice:20 },
       { key:"ultimateBundle",label:"👑 Ultimate Bundle",    defaultPrice:100 },
@@ -9464,23 +9522,39 @@
       await update(ref(db,"irlBuysConfig/items/"+key), update_);
     }
 
-    // ── SubAI: owner-supplied Anthropic API key for real AI answers ──
-    let _subaiConfig = { apiKey: "" };
+    // ── SubAI: owner-supplied API key for real AI answers (any OpenAI-compatible provider, or Anthropic) ──
+    let _subaiConfig = { provider:"anthropic", apiKey:"", model:"", baseUrl:"" };
     onValue(ref(db,"subaiConfig"), snap=>{
-      _subaiConfig = snap.exists() ? snap.val() : { apiKey:"" };
+      _subaiConfig = snap.exists() ? Object.assign({provider:"anthropic",apiKey:"",model:"",baseUrl:""}, snap.val()) : { provider:"anthropic", apiKey:"", model:"", baseUrl:"" };
       const input = document.getElementById("subai-apikey-input");
       if(input && document.activeElement!==input) input.value = _subaiConfig.apiKey ? "••••••••" : "";
+      const providerSel = document.getElementById("subai-provider-select");
+      if(providerSel && document.activeElement!==providerSel){ providerSel.value = _subaiConfig.provider||"anthropic"; toggleSubaiBaseUrlRow(); }
+      const modelInput = document.getElementById("subai-model-input");
+      if(modelInput && document.activeElement!==modelInput) modelInput.value = _subaiConfig.model||"";
+      const baseUrlInput = document.getElementById("subai-baseurl-input");
+      if(baseUrlInput && document.activeElement!==baseUrlInput) baseUrlInput.value = _subaiConfig.baseUrl||"";
     });
+    function toggleSubaiBaseUrlRow(){
+      const row=document.getElementById("subai-baseurl-row");
+      const sel=document.getElementById("subai-provider-select");
+      if(row && sel) row.style.display = sel.value==="custom" ? "block" : "none";
+    }
+    document.getElementById("subai-provider-select")?.addEventListener("change", toggleSubaiBaseUrlRow);
     document.getElementById("subai-apikey-save-btn")?.addEventListener("click", async ()=>{
       const statusEl=document.getElementById("subai-apikey-status");
       const val=document.getElementById("subai-apikey-input")?.value.trim();
+      const provider=document.getElementById("subai-provider-select")?.value||"anthropic";
+      const model=document.getElementById("subai-model-input")?.value.trim()||"";
+      const baseUrl=document.getElementById("subai-baseurl-input")?.value.trim()||"";
       if(!val || val==="••••••••"){ if(statusEl) statusEl.textContent="Enter a key first."; return; }
-      try{ await set(ref(db,"subaiConfig/apiKey"), val); if(statusEl) statusEl.textContent="Saved."; }
+      if(provider==="custom" && !baseUrl){ if(statusEl) statusEl.textContent="Enter the API endpoint URL for a custom provider."; return; }
+      try{ await set(ref(db,"subaiConfig"), { provider, apiKey:val, model, baseUrl }); if(statusEl) statusEl.textContent="Saved."; }
       catch(e){ if(statusEl) statusEl.textContent="Failed to save: "+e.message; }
     });
     document.getElementById("subai-apikey-clear-btn")?.addEventListener("click", async ()=>{
       const statusEl=document.getElementById("subai-apikey-status");
-      try{ await set(ref(db,"subaiConfig/apiKey"), ""); if(statusEl) statusEl.textContent="Cleared."; }
+      try{ await set(ref(db,"subaiConfig"), { provider:"anthropic", apiKey:"", model:"", baseUrl:"" }); if(statusEl) statusEl.textContent="Cleared."; }
       catch(e){ if(statusEl) statusEl.textContent="Failed: "+e.message; }
     });
 
@@ -9693,6 +9767,8 @@
       if(itemKey==="ironChest") return await grantIronChestReward();
       if(itemKey==="goldChest") return await grantGoldChestReward();
       if(itemKey==="allBlooks") return await grantAllBlooksReward();
+      if(itemKey==="allShinys") return await grantAllShinysReward();
+      if(itemKey==="allGolds") return await grantAllGoldsReward();
       if(itemKey==="diamondChest") return await grantDiamondChestReward();
       if(itemKey==="mvpMembership") return await grantMvpReward();
       if(itemKey==="ultimateBundle") return await grantUltimateBundleReward();
@@ -9927,6 +10003,39 @@
       return { coins:0, blooks:[], customMsg:"📖 Unlocked "+added+" new blook(s) out of "+total+" total!" };
     }
 
+    async function grantAllShinysReward(){
+      if(!userData.blooks) userData.blooks={};
+      const allBlookDefs = {};
+      [...ALL_PACKS_FOR_OWNER, ...(CUSTOM_PACKS_RUNTIME||[])].forEach(pack=>{
+        (pack.blooks||[]).forEach(b=>{ allBlookDefs[b.name] = b.rarity; });
+      });
+      Object.values(singleShopBlooks||{}).forEach(item=>{ if(!(item.name in allBlookDefs)) allBlookDefs[item.name]=item.rarity; });
+      let added=0;
+      Object.keys(allBlookDefs).forEach(name=>{
+        const shinyKey="✨ "+name;
+        if(!(userData.blooks[shinyKey]>0)){ userData.blooks[shinyKey]=1; added++; }
+        if(!BLOOK_INFO[shinyKey]) BLOOK_INFO[shinyKey]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
+      });
+      const total=Object.keys(allBlookDefs).length;
+      return { coins:0, blooks:[], customMsg:"✨ Unlocked "+added+" new shiny blook(s) out of "+total+" total!" };
+    }
+    async function grantAllGoldsReward(){
+      if(!userData.blooks) userData.blooks={};
+      const allBlookDefs = {};
+      [...ALL_PACKS_FOR_OWNER, ...(CUSTOM_PACKS_RUNTIME||[])].forEach(pack=>{
+        (pack.blooks||[]).forEach(b=>{ allBlookDefs[b.name] = b.rarity; });
+      });
+      Object.values(singleShopBlooks||{}).forEach(item=>{ if(!(item.name in allBlookDefs)) allBlookDefs[item.name]=item.rarity; });
+      let added=0;
+      Object.keys(allBlookDefs).forEach(name=>{
+        const goldKey="⭐ "+name;
+        if(!(userData.blooks[goldKey]>0)){ userData.blooks[goldKey]=1; added++; }
+        if(!BLOOK_INFO[goldKey]) BLOOK_INFO[goldKey]={packId:"other", packName:"Other Blooks", rarity:allBlookDefs[name], chance:0};
+      });
+      const total=Object.keys(allBlookDefs).length;
+      return { coins:0, blooks:[], customMsg:"⭐ Unlocked "+added+" new golden blook(s) out of "+total+" total!" };
+    }
+
     async function notifyOwnersOfDiamondPurchase(username){
       try{
         const msgRef=push(ownerMessagesRef());
@@ -10029,6 +10138,10 @@
     wireGenCodeBtn("iron-gen-code-btn","iron-code-display","ironChest","⚙️ Iron Chest");
     wireGenCodeBtn("gold-gen-code-btn","gold-code-display","goldChest","🏆 Gold Chest");
     wireGenCodeBtn("allblooks-gen-code-btn","allblooks-code-display","allBlooks","📖 Get All Blooks");
+    wireGenCodeBtn("allshinys-gen-code-btn","allshinys-code-display","allShinys","✨ Get All Shinys");
+    wireGenCodeBtn("allgolds-gen-code-btn","allgolds-code-display","allGolds","⭐ Get All Golds");
+    wireGenCodeBtn("clanshoutout-gen-code-btn","clanshoutout-code-display","clanShoutout","📣 Clan Shoutout");
+    wireGenCodeBtn("clancodegiver-gen-code-btn","clancodegiver-code-display","clanCodeGiver","🎟️ Clan Code Giver");
     wireGenCodeBtn("diamond-gen-code-btn","diamond-code-display","diamondChest","💎 Diamond Chest");
     wireGenCodeBtn("mvp-gen-code-btn","mvp-code-display","mvpMembership","🎖️ MVP Membership");
     wireGenCodeBtn("ultimate-gen-code-btn","ultimate-code-display","ultimateBundle","👑 Ultimate Bundle");
@@ -10088,6 +10201,38 @@
       await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
       document.getElementById('allblooks-status').textContent='';
       showToast(reward.customMsg, "#7b1fa2", 4000);
+    });
+    document.getElementById('allshinys-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantAllShinysReward();
+      logPurchase("✨ Get All Shinys (Owner Free)");
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+      document.getElementById('allshinys-status').textContent='';
+      showToast(reward.customMsg, "#7b1fa2", 4000);
+    });
+    document.getElementById('allgolds-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantAllGoldsReward();
+      logPurchase("⭐ Get All Golds (Owner Free)");
+      await saveUserData(); refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+      document.getElementById('allgolds-status').textContent='';
+      showToast(reward.customMsg, "#b8860b", 4000);
+    });
+    document.getElementById('clanshoutout-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantClanShoutoutReward();
+      logPurchase("📣 Clan Shoutout (Owner Free)");
+      await saveUserData();
+      document.getElementById('clanshoutout-status').textContent='';
+      showToast(reward.customMsg, "#5e35b1", 4000);
+    });
+    document.getElementById('clancodegiver-free-btn')?.addEventListener('click', async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      const reward=await grantClanCodeGiverReward();
+      logPurchase("🎟️ Clan Code Giver (Owner Free)");
+      await saveUserData();
+      document.getElementById('clancodegiver-status').textContent='';
+      showToast(reward.customMsg, "#43a047", 4000);
     });
     document.getElementById('diamond-chest-free-btn')?.addEventListener('click', async function(){
       if(!currentUser||!userData||!ownerMode) return;
@@ -10639,7 +10784,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.312</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.421</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -11377,30 +11522,66 @@
       const c = eligible[Math.floor(Math.random()*eligible.length)];
       return answer + "\n\n📣 Shoutout to clan " + c.name + "!";
     }
+    const SUBAI_SYSTEM_PROMPT = "You are SubAI, the in-game assistant for the browser game Sublet 3.421 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.";
+
     async function subAIAnswerSmart(q) {
-      const key = _subaiConfig && _subaiConfig.apiKey;
+      const cfg = _subaiConfig || {};
+      const key = cfg.apiKey;
       if(!key) return subAIAnswer(q);
       try{
-        const resp = await fetch("https://api.anthropic.com/v1/messages", {
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
-            "x-api-key": key,
-            "anthropic-version":"2023-06-01",
-            "anthropic-dangerous-direct-browser-access":"true"
-          },
-          body: JSON.stringify({
-            model:"claude-sonnet-4-6",
-            max_tokens:300,
-            system:"You are SubAI, the in-game assistant for the browser game Sublet 3.312 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.",
-            messages:[{ role:"user", content:q }]
-          })
-        });
-        const data = await resp.json();
-        const text = (data.content||[]).map(b=>b.text||"").join(" ").trim();
+        let text = "";
+        if(cfg.provider==="gemini"){
+          const model = cfg.model || "gemini-2.0-flash";
+          const resp = await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+model+":generateContent?key="+key, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({
+              systemInstruction:{ parts:[{ text:SUBAI_SYSTEM_PROMPT }] },
+              contents:[{ role:"user", parts:[{ text:q }] }]
+            })
+          });
+          const data = await resp.json();
+          const cand = data.candidates && data.candidates[0];
+          text = (cand && cand.content && cand.content.parts && cand.content.parts.map(p=>p.text||"").join(" ")) || "";
+        } else if(cfg.provider==="openai" || cfg.provider==="groq" || cfg.provider==="openrouter" || cfg.provider==="custom"){
+          const url = cfg.provider==="custom" ? cfg.baseUrl
+            : cfg.provider==="groq" ? "https://api.groq.com/openai/v1/chat/completions"
+            : cfg.provider==="openrouter" ? "https://openrouter.ai/api/v1/chat/completions"
+            : "https://api.openai.com/v1/chat/completions";
+          const model = cfg.model || (cfg.provider==="groq" ? "llama-3.3-70b-versatile" : cfg.provider==="openrouter" ? "meta-llama/llama-3.3-70b-instruct:free" : cfg.provider==="openai" ? "gpt-4o-mini" : "");
+          const resp = await fetch(url, {
+            method:"POST",
+            headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+key },
+            body: JSON.stringify({
+              model,
+              max_tokens:300,
+              messages:[{ role:"system", content:SUBAI_SYSTEM_PROMPT }, { role:"user", content:q }]
+            })
+          });
+          const data = await resp.json();
+          text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+        } else {
+          const resp = await fetch("https://api.anthropic.com/v1/messages", {
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+              "x-api-key": key,
+              "anthropic-version":"2023-06-01",
+              "anthropic-dangerous-direct-browser-access":"true"
+            },
+            body: JSON.stringify({
+              model: cfg.model || "claude-sonnet-4-6",
+              max_tokens:300,
+              system:SUBAI_SYSTEM_PROMPT,
+              messages:[{ role:"user", content:q }]
+            })
+          });
+          const data = await resp.json();
+          text = (data.content||[]).map(b=>b.text||"").join(" ").trim();
+        }
         return text || subAIAnswer(q);
       }catch(e){
-        console.warn("SubAI real-AI call failed, falling back:", e);
+        console.warn("SubAI real-AI call failed (likely blocked by the provider's CORS policy), falling back:", e);
         return subAIAnswer(q);
       }
     }
@@ -11423,9 +11604,9 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.312 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.312 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.312 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.421 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.421 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.421 was made by Subzero32715! Check the description for rewards.';
       if(lq.includes('youtube') || lq.includes('channel') || lq.includes('subzero')) return '🎬 Go to https://www.youtube.com/@Subzero32715 to see Subzero\'s YT channel!';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
@@ -11440,7 +11621,7 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.312!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.421!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
       // Smarter fallback: try to find the closest topic instead of a fully random reply
       const topics = {
@@ -12727,6 +12908,8 @@
         const ironFreeBtn=document.getElementById("iron-chest-free-btn"); if(ironFreeBtn) ironFreeBtn.style.display=ownerMode?"block":"none";
         const goldFreeBtn=document.getElementById("gold-chest-free-btn"); if(goldFreeBtn) goldFreeBtn.style.display=ownerMode?"block":"none";
         const allFreeBtn=document.getElementById("allblooks-free-btn"); if(allFreeBtn) allFreeBtn.style.display=ownerMode?"block":"none";
+        const allShinysFreeBtn=document.getElementById("allshinys-free-btn"); if(allShinysFreeBtn) allShinysFreeBtn.style.display=ownerMode?"block":"none";
+        const allGoldsFreeBtn=document.getElementById("allgolds-free-btn"); if(allGoldsFreeBtn) allGoldsFreeBtn.style.display=ownerMode?"block":"none";
         const diamondFreeBtn=document.getElementById("diamond-chest-free-btn"); if(diamondFreeBtn) diamondFreeBtn.style.display=ownerMode?"block":"none";
         const mvpFreeBtn=document.getElementById("mvp-free-btn"); if(mvpFreeBtn) mvpFreeBtn.style.display=ownerMode?"block":"none";
         const ultimateFreeBtn=document.getElementById("ultimate-free-btn"); if(ultimateFreeBtn) ultimateFreeBtn.style.display=ownerMode?"block":"none";
@@ -12830,6 +13013,7 @@
     // ══════════════════════════════════════════
     let _clansCache = {};
     let _clanChatUnsub = null;
+    let _clansUnsub = null;
     let _clanActiveTab = "info";
 
     function clansRef(){ return ref(db,"clans"); }
@@ -12838,14 +13022,19 @@
     function myClan(){ const id=myClanId(); return id ? _clansCache[id] : null; }
     function isClanOwner(clan){ return !!(clan && currentUser && clan.ownerUid===currentUser.uid); }
 
-    onValue(clansRef(), snap=>{
-      _clansCache = snap.exists() ? snap.val() : {};
-      const wrapVisible = document.getElementById("view-clans") && document.getElementById("view-clans").style.display!=="none";
-      if(!wrapVisible) return;
-      showClanRoot();
-      const menuOpen = document.getElementById("clan-menu-overlay").style.display!=="none";
-      if(menuOpen) renderClanMenu();
-    });
+    function subscribeClansIfNeeded(){
+      if(_clansUnsub) return; // already subscribed
+      _clansUnsub = onValue(clansRef(), snap=>{
+        _clansCache = snap.exists() ? snap.val() : {};
+        showClanRoot();
+        const menuOpen = document.getElementById("clan-menu-overlay").style.display!=="none";
+        if(menuOpen) renderClanMenu();
+      });
+    }
+    function unsubscribeClans(){
+      if(_clansUnsub){ _clansUnsub(); _clansUnsub=null; }
+      if(_clanChatUnsub){ _clanChatUnsub(); _clanChatUnsub=null; }
+    }
 
     function showClanRoot(){
       const c = myClan();
@@ -13272,7 +13461,8 @@
     showView = function(name){
       _origShowViewPatch3(name);
       const vClans=document.getElementById("view-clans"); if(vClans) vClans.style.display=name==="clans"?"flex":"none";
-      if(name==="clans") showClanRoot();
+      if(name==="clans") subscribeClansIfNeeded();
+      else unsubscribeClans();
     };
 
   </script>
