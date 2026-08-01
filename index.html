@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.221</title>
+  <title>Sublet 3.312</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -590,7 +590,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 3.221</div>
+      <div class="start-title">Sublet 3.312</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -621,7 +621,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 3.221</div>
+        <div class="sidebar-title">Sublet 3.312</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -1493,7 +1493,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.221. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.312. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1620,6 +1620,7 @@
           <button class="clan-tab-btn" data-tab="members" style="font-size:12px;padding:7px 14px;border-radius:18px;">Members</button>
           <button class="clan-tab-btn" data-tab="chat" style="font-size:12px;padding:7px 14px;border-radius:18px;">Chat</button>
           <button class="clan-tab-btn" data-tab="achievements" style="font-size:12px;padding:7px 14px;border-radius:18px;">Achievements</button>
+          <button class="clan-tab-btn" data-tab="buys" style="font-size:12px;padding:7px 14px;border-radius:18px;">Clan Buys</button>
         </div>
         <div id="clan-tab-info"></div>
         <div id="clan-tab-members" style="display:none;"></div>
@@ -1632,6 +1633,23 @@
           </div>
         </div>
         <div id="clan-tab-achievements" style="display:none;"></div>
+        <div id="clan-tab-buys" style="display:none;">
+          <div class="section-sub" style="margin:0 0 10px;">Real-money items that benefit the whole clan. After paying, message the owner your receipt — they'll issue your redeem code (usable in Settings → Redeem Code).</div>
+
+          <div style="border-radius:12px;padding:14px;background:#ede7f6;margin-bottom:12px;">
+            <strong style="font-size:14px;">📣 SubAI Clan Shoutout</strong>
+            <div style="font-size:12px;color:#555;margin:6px 0 10px;">Once active, SubAI has a 20% chance each time it answers a question to shout out your clan to everyone.</div>
+            <paypal-add-to-cart-button data-id="3VY8X89ZFE3V6"></paypal-add-to-cart-button>
+            <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "3VY8X89ZFE3V6" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+          </div>
+
+          <div style="border-radius:12px;padding:14px;background:#e0f2f1;">
+            <strong style="font-size:14px;">🎟️ Clan Code Giver</strong>
+            <div style="font-size:12px;color:#555;margin:6px 0 10px;">CODEAI drops 5 redeem codes into your clan chat, 5 seconds apart — 3 are IRL Buys rewards (pricier items are rarer) and 2 are mystery prizes. First come, first served for your clanmates.</div>
+            <paypal-add-to-cart-button data-id="45H22ZS6JM3BW"></paypal-add-to-cart-button>
+            <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "45H22ZS6JM3BW" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+          </div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:16px;border-top:1px solid #eee;padding-top:14px;">
           <button id="clan-manage-open-btn" style="background:#ff8f00;font-size:12px;padding:7px 14px;display:none;">⚙️ Edit Clan Settings</button>
           <button id="clan-leave-btn" style="background:#c62828;font-size:12px;padding:7px 14px;margin-left:auto;">Leave Clan</button>
@@ -1752,9 +1770,9 @@
           <!-- Issue a redeem code after verifying a real payment yourself -->
           <div class="owner-single-box" style="background:#e3f2fd;margin-bottom:14px;">
             <strong>🎟️ Issue Purchase Redeem Code</strong>
-            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Only issue this after you've personally confirmed the payment (e.g. checked your PayPal activity for their receipt).</div>
+            <div style="font-size:11px;color:#666;margin:4px 0 8px;">Only issue this after you've personally confirmed the payment (e.g. checked your PayPal activity for their receipt). Type <strong>all</strong> as the username to make a code the first person to enter it can claim (works for anyone, but only once total). You can't issue a code to your own username.</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <input id="owner-issue-code-username" type="text" placeholder="username" style="flex:1;min-width:120px;">
+              <input id="owner-issue-code-username" type="text" placeholder="username or 'all'" style="flex:1;min-width:120px;">
               <select id="owner-issue-code-item" style="min-width:140px;">
                 <option value="woodenChest">🪵 Wooden Chest</option>
                 <option value="ironChest">⚙️ Iron Chest</option>
@@ -1763,6 +1781,8 @@
                 <option value="diamondChest">💎 Diamond Chest</option>
                 <option value="mvpMembership">🎖️ MVP Membership</option>
                 <option value="ultimateBundle">👑 Ultimate Bundle</option>
+                <option value="clanShoutout">📣 Clan Shoutout</option>
+                <option value="clanCodeGiver">🎟️ Clan Code Giver</option>
               </select>
               <button id="owner-issue-code-btn" style="background:#1976d2;font-size:12px;padding:6px 12px;">Issue Code</button>
             </div>
@@ -2420,7 +2440,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.221 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.312 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -8766,7 +8786,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 3.221', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.312', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -9327,7 +9347,7 @@
       "spaceicemedival": { blook: { name: "Super Rainbow Crab King", rarity: "Supreeme" } },
       "iatemycart": { chest: true }
     };
-    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle" };
+    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle", clanShoutout: "📣 Clan Shoutout", clanCodeGiver: "🎟️ Clan Code Giver", randomSmall: "🎲 Mystery Prize" };
     function logPurchase(label){
       if(!userData) return;
       if(!Array.isArray(userData.purchaseHistory)) userData.purchaseHistory = [];
@@ -9627,6 +9647,47 @@
       let out=""; for(let i=0;i<10;i++) out+=chars[Math.floor(Math.random()*chars.length)];
       return out;
     }
+    async function grantRandomSmallReward(){
+      const coins = 50 + Math.floor(Math.random()*350);
+      userData.coins = (parseInt(userData.coins,10)||0) + coins;
+      userData.totalCoinsCollected = (userData.totalCoinsCollected||0) + coins;
+      return { coins, blooks:[], label:"🎲 Mystery Prize", color:"linear-gradient(135deg,#8e24aa,#d81b60)", confettiColor:"#d81b60", customMsg:"🎲 Mystery Prize: +"+coins+" coins!" };
+    }
+    async function grantClanShoutoutReward(){
+      const clanId = userData && userData.clanId;
+      if(!clanId) return { coins:0, blooks:[], label:"📣 Clan Shoutout", customMsg:"You'll need to be in a clan for this to take effect — join or create one, then redeem again." };
+      await update(ref(db,"clans/"+clanId), { shoutoutEnabled:true });
+      return { coins:0, blooks:[], label:"📣 Clan Shoutout", color:"linear-gradient(135deg,#5e35b1,#3949ab)", confettiColor:"#5e35b1", customMsg:"📣 SubAI will now shout out your clan roughly 1 in 5 times it answers a question!" };
+    }
+    async function grantClanCodeGiverReward(){
+      const clanId = userData && userData.clanId;
+      if(!clanId) return { coins:0, blooks:[], label:"🎟️ Clan Code Giver", customMsg:"You'll need to be in a clan for this to take effect — join or create one, then redeem again." };
+      dropClanCodes(clanId);
+      return { coins:0, blooks:[], label:"🎟️ Clan Code Giver", color:"linear-gradient(135deg,#00897b,#43a047)", confettiColor:"#43a047", customMsg:"🎟️ CODEAI will drop 5 codes in your clan chat, 5 seconds apart!" };
+    }
+    // Weighted pick of an IRL Buys item: cheaper items are more common, pricier are rarer.
+    function pickWeightedIrlItemKey(){
+      const weighted = IRL_ITEM_DEFS.map(d=>({ key:d.key, weight: 1/Math.max(1,getIrlItemCfg(d.key).price) }));
+      const total = weighted.reduce((s,w)=>s+w.weight,0);
+      let r = Math.random()*total;
+      for(const w of weighted){ r -= w.weight; if(r<=0) return w.key; }
+      return weighted[weighted.length-1].key;
+    }
+    async function dropClanCodes(clanId){
+      const drops = [];
+      for(let i=0;i<3;i++) drops.push(pickWeightedIrlItemKey());
+      drops.push("randomSmall","randomSmall");
+      for(let i=drops.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [drops[i],drops[j]]=[drops[j],drops[i]]; }
+      for(let i=0;i<drops.length;i++){
+        setTimeout(async ()=>{
+          const code = generateRandomCode();
+          try{
+            await set(ref(db,"globalRedeemCodes/"+code), { itemKey:drops[i], createdAt:Date.now(), source:"clanCodeGiver", clanId });
+            await push(ref(db,"clans/"+clanId+"/chatMessages"), { username:"🤖 CODEAI", text:"Code drop! "+(PENDING_ITEM_LABELS[drops[i]]||"Prize")+" — redeem in Settings: "+code+" (first come, first served — only 1 person can use it!)", createdAt:Date.now() });
+          }catch(e){ console.warn("Clan code drop failed:", e); }
+        }, i*5000);
+      }
+    }
     async function grantSpecialItem(itemKey){
       if(itemKey==="woodenChest") return await grantWoodenChestReward();
       if(itemKey==="ironChest") return await grantIronChestReward();
@@ -9635,6 +9696,9 @@
       if(itemKey==="diamondChest") return await grantDiamondChestReward();
       if(itemKey==="mvpMembership") return await grantMvpReward();
       if(itemKey==="ultimateBundle") return await grantUltimateBundleReward();
+      if(itemKey==="clanShoutout") return await grantClanShoutoutReward();
+      if(itemKey==="clanCodeGiver") return await grantClanCodeGiverReward();
+      if(itemKey==="randomSmall") return await grantRandomSmallReward();
       return null;
     }
     document.getElementById('settings-redeem-btn')?.addEventListener('click', async function() {
@@ -9695,7 +9759,32 @@
         }
       }
       const def = REDEEM_CODES[code];
-      if(!def){ statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return; }
+      if(!def){
+        // ── Global codes: issued as "all" by the owner, or dropped by CODEAI in clan chat — single-use total, first person to redeem gets it ──
+        try{
+          const gKey = raw.trim().toUpperCase();
+          const gSnap = await get(ref(db,"globalRedeemCodes/"+gKey));
+          if(gSnap.exists()){
+            const gData = gSnap.val();
+            // Claim it immediately so a second person can't also redeem it.
+            await remove(ref(db,"globalRedeemCodes/"+gKey));
+            userData.redeemedCodes[code]=true;
+            const reward = await grantSpecialItem(gData.itemKey);
+            logPurchase(PENDING_ITEM_LABELS[gData.itemKey] || "Purchase");
+            await saveUserData();
+            refreshBlooksIfVisible(); populateTradeOfferSelect(); renderPurchasesList();
+            document.getElementById('settings-redeem-input').value='';
+            statusEl.style.color='#2e7d32';
+            statusEl.textContent='Redeemed! Rewards granted.';
+            if(reward){
+              if(reward.blooks && reward.blooks.length) showChestRewardReveal(reward);
+              else showToast(reward.customMsg || ((PENDING_ITEM_LABELS[gData.itemKey]||"Item")+" claimed!"), "#7b1fa2", 4000);
+            }
+            return;
+          }
+        }catch(e){ console.warn("Global code lookup failed:", e); }
+        statusEl.style.color='#c62828'; statusEl.textContent='Invalid code.'; return;
+      }
       userData.redeemedCodes[code] = true;
       if(def.coins){ userData.coins=(parseInt(userData.coins,10)||0)+def.coins; userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+def.coins; }
       if(def.badge){
@@ -9951,12 +10040,22 @@
       statusEl.style.color="#c62828"; statusEl.textContent="";
       const uname=document.getElementById('owner-issue-code-username').value.trim();
       const itemKey=document.getElementById('owner-issue-code-item').value;
-      if(!uname){ statusEl.textContent="Enter a username."; return; }
+      if(!uname){ statusEl.textContent="Enter a username (or 'all')."; return; }
+      if(userData && uname.toLowerCase()===  (userData.username||"").toLowerCase()){ statusEl.textContent="You can't issue a code to yourself."; return; }
       const itemCfg=getIrlItemCfg(itemKey);
       if(itemCfg.stock!==-1 && itemCfg.stock<=0){ statusEl.textContent="This item is out of stock — restock it in IRL Buys Settings first."; return; }
+      const code=generateRandomCode();
+      if(uname.toLowerCase()==="all"){
+        try{
+          await set(ref(db,"globalRedeemCodes/"+code), { itemKey, createdAt:Date.now(), source:"ownerIssuedAll" });
+          await consumeIrlStock(itemKey);
+          statusEl.style.color="#2e7d32";
+          statusEl.textContent="Global code for "+(PENDING_ITEM_LABELS[itemKey]||itemKey)+" (only 1 person can use it — first to enter it): "+code;
+        }catch(e){ statusEl.textContent="Failed: "+e.message; }
+        return;
+      }
       const target=await findUserByUsername(uname);
       if(!target){ statusEl.textContent="User not found."; return; }
-      const code=generateRandomCode();
       const pending = target.data.pendingRedeemCodes || {};
       pending[itemKey] = { code, createdAt: Date.now() };
       await update(userRef(target.uid), { pendingRedeemCodes: pending });
@@ -10540,7 +10639,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.221</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.312</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -11265,12 +11364,19 @@
       // Small delay for effect
       await new Promise(function(r){ setTimeout(r, 900); });
       await remove(typingRef);
-      const answer = await subAIAnswerSmart(question);
+      let answer = await subAIAnswerSmart(question);
+      answer = maybeAddClanShoutout(answer);
       const ansRef = push(chatRef());
       await set(ansRef, { username:'🤖 SubAI', text: answer, imageUrl:'', createdAt:Date.now(), isBot:true });
       return true;
     }
 
+    function maybeAddClanShoutout(answer){
+      const eligible = Object.values(_clansCache||{}).filter(c=>c.shoutoutEnabled);
+      if(!eligible.length || Math.random()>=0.2) return answer;
+      const c = eligible[Math.floor(Math.random()*eligible.length)];
+      return answer + "\n\n📣 Shoutout to clan " + c.name + "!";
+    }
     async function subAIAnswerSmart(q) {
       const key = _subaiConfig && _subaiConfig.apiKey;
       if(!key) return subAIAnswer(q);
@@ -11286,7 +11392,7 @@
           body: JSON.stringify({
             model:"claude-sonnet-4-6",
             max_tokens:300,
-            system:"You are SubAI, the in-game assistant for the browser game Sublet 3.221 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.",
+            system:"You are SubAI, the in-game assistant for the browser game Sublet 3.312 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.",
             messages:[{ role:"user", content:q }]
           })
         });
@@ -11317,9 +11423,9 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.221 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.221 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.221 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.312 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.312 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.312 was made by Subzero32715! Check the description for rewards.';
       if(lq.includes('youtube') || lq.includes('channel') || lq.includes('subzero')) return '🎬 Go to https://www.youtube.com/@Subzero32715 to see Subzero\'s YT channel!';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
@@ -11334,7 +11440,7 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.221!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.312!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
       // Smarter fallback: try to find the closest topic instead of a fully random reply
       const topics = {
@@ -12744,7 +12850,7 @@
     function showClanRoot(){
       const c = myClan();
       document.getElementById("clan-mine-card").style.display = c ? "block" : "none";
-      document.getElementById("clan-browse-wrap").style.display = c ? "none" : "block";
+      document.getElementById("clan-browse-wrap").style.display = "block";
       if(c){
         document.getElementById("clan-mine-card").style.background = c.color || "#5e35b1";
         document.getElementById("clan-mine-name").textContent = c.name;
@@ -12753,9 +12859,8 @@
         const joinLabel = c.joinType==="free" ? "Free Join" : c.joinType==="invite" ? "Invitation Only" : "Request to Join";
         document.getElementById("clan-mine-badge").textContent = joinLabel;
         document.getElementById("clan-mine-meta").textContent = Object.keys(c.members||{}).length+"/"+(c.maxMembers||20)+" members • Owner: "+c.ownerUsername;
-      } else {
-        renderClanBrowse();
       }
+      renderClanBrowse();
     }
     document.getElementById("clan-mine-open-btn")?.addEventListener("click", ()=>{
       _clanActiveTab="info"; openClanMenuOverlay();
@@ -12885,9 +12990,14 @@
     }
     document.getElementById("clan-leave-btn")?.addEventListener("click", leaveClan);
 
-    function openClanMenuOverlay(){
+    async function openClanMenuOverlay(){
       const c = myClan(); if(!c) return;
       document.getElementById("clan-menu-overlay").style.display = "flex";
+      try{
+        const snap = await get(clanRef(c.id));
+        if(snap.exists()) _clansCache[c.id] = snap.val();
+        else { userData.clanId=null; await saveUserData(); closeClanMenuOverlay(); showClanRoot(); return; }
+      }catch(e){ console.warn("Couldn't refresh clan data:", e); }
       renderClanMenu();
     }
     function closeClanMenuOverlay(){
@@ -12918,7 +13028,7 @@
     });
 
     function renderClanTab(tab){
-      ["info","members","chat","achievements"].forEach(t=>{
+      ["info","members","chat","achievements","buys"].forEach(t=>{
         const el=document.getElementById("clan-tab-"+t); if(el) el.style.display = (t===tab)?"block":"none";
       });
       const c=myClan(); if(!c) return;
