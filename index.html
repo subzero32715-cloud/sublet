@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.421</title>
+  <title>Sublet 3.601</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -590,7 +590,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 3.421</div>
+      <div class="start-title">Sublet 3.601</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -621,7 +621,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 3.421</div>
+        <div class="sidebar-title">Sublet 3.601</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -641,6 +641,7 @@
         <button class="nav" data-view="vip">&#11088; VIP</button>
         <button class="nav" data-view="lives">📺 Lives</button>
         <button class="nav" data-view="chests">💵 IRL Buys</button>
+        <button class="nav" data-view="passes">🎫 Passes</button>
         <button class="nav" data-view="clans">🛡️ Clans</button>
         <button class="nav" data-view="settings">⚙️ Settings</button>
         <div class="side-foot">Trading • Packs • Chat • Wheel • Leaderboard • and more!</div>
@@ -1031,7 +1032,7 @@
 
         <!-- PACK EDITOR OVERLAY -->
         <div id="pack-editor-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:200;">
-          <div style="background:#fff;border-radius:16px;padding:22px;width:420px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+          <div style="background:#fff;border-radius:16px;padding:22px;width:420px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
             <div style="font-family:'Titan One',system-ui;font-size:18px;color:#1976d2;margin-bottom:14px;">✏️ Edit Pack</div>
             <label style="font-size:12px;">Pack Name</label>
             <input id="pe-pack-name" style="width:100%;margin-bottom:8px;">
@@ -1452,6 +1453,12 @@
           </div>
 
           <div class="settings-box" style="margin-bottom:12px;">
+            <h3>📜 History</h3>
+            <div style="font-size:12px;color:#666;margin-bottom:8px;">View your past trades and Bazaar activity.</div>
+            <button id="history-open-btn" style="font-size:12px;padding:6px 14px;background:#5e35b1;">Open History</button>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
             <h3>📧 Email Updates</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Add your email to get notified about new updates and features.</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -1523,7 +1530,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.421. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.601. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1591,6 +1598,43 @@
           <div id="giveaway-empty" style="font-size:13px;color:#888;display:none;text-align:center;padding:20px;">No active giveaways right now.</div>
         </div>
 
+        <div id="view-passes" class="card" style="display:none;">
+          <div id="pass-header-banner" style="border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;">
+            <div id="pass-theme-name" style="font-family:'Titan One',system-ui;font-size:22px;"></div>
+            <div id="pass-days-left" style="font-size:12px;opacity:.9;margin-top:4px;"></div>
+            <div style="margin-top:12px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.9;margin-bottom:4px;">
+                <span id="pass-level-label"></span><span id="pass-xp-label"></span>
+              </div>
+              <div style="background:rgba(255,255,255,.25);border-radius:20px;height:14px;overflow:hidden;">
+                <div id="pass-xp-bar" style="background:#fff;height:100%;width:0%;border-radius:20px;transition:width .3s;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pass-buy-banner" style="display:none;border-radius:14px;padding:16px;background:linear-gradient(135deg,#fbc02d,#ff8f00);color:#3e2a00;margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:800;">🎫 Unlock the Premium Track!</div>
+            <div style="font-size:12px;margin:6px 0 10px;">Buy the Super Pass to claim every premium reward as you level up this season — custom blooks, bonus chests, badges, and more.</div>
+            <paypal-add-to-cart-button data-id="9F7FADBYJZFGS"></paypal-add-to-cart-button>
+            <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "9F7FADBYJZFGS" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            <button id="superpass-gen-code-btn" style="width:100%;margin-top:8px;background:rgba(0,0,0,.15);color:#3e2a00;font-size:12px;padding:8px;">🔑 Generate My Redeem Code (after paying)</button>
+            <div id="superpass-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
+            <button id="superpass-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Unlock Free (Admin/Owner)</button>
+            <div id="superpass-status" class="err-small"></div>
+          </div>
+
+          <div id="pass-reward-track" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+          <div id="pass-bonus-section" style="display:none;margin-top:16px;">
+            <div class="section-title" style="font-size:16px;">⏳ Final Week Bonus Rewards!</div>
+            <div id="pass-bonus-track" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+
+          <div style="margin-top:20px;border-radius:14px;padding:16px;background:#ede7f6;text-align:center;font-size:13px;color:#5e35b1;font-weight:700;">
+            🔮 More passes coming soon!
+          </div>
+        </div>
+
         <div id="view-clans" class="card" style="display:none;">
           <div class="section-title">🛡️ Clans</div>
 
@@ -1617,7 +1661,7 @@
         </div>
 
   <div id="clan-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:84;">
-    <div style="background:#fff;border-radius:16px;padding:20px;width:360px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:360px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
       <div style="font-family:'Titan One',system-ui;font-size:20px;color:#5e35b1;margin-bottom:12px;">🛡️ Create Your Clan</div>
       <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Name</label>
       <input id="clan-new-name" placeholder="e.g. Shadow Wolves" maxlength="24" style="width:100%;margin-bottom:8px;">
@@ -1696,8 +1740,24 @@
     </div>
   </div>
 
+  <div id="history-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:84;">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:420px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-family:'Titan One',system-ui;font-size:18px;color:#5e35b1;">📜 History</div>
+        <button id="history-close-btn" style="background:#78909c;font-size:12px;padding:5px 12px;">Close</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <button class="history-tab-btn active" data-htab="trades" style="font-size:12px;padding:6px 12px;border-radius:16px;background:#5e35b1;color:#fff;border:none;">Trades</button>
+        <button class="history-tab-btn" data-htab="buys" style="font-size:12px;padding:6px 12px;border-radius:16px;background:#ece5fb;color:#5e35b1;border:none;">Bazaar Buys</button>
+        <button class="history-tab-btn" data-htab="listings" style="font-size:12px;padding:6px 12px;border-radius:16px;background:#ece5fb;color:#5e35b1;border:none;">Bazaar Listings</button>
+      </div>
+      <div id="history-list" style="display:flex;flex-direction:column;gap:6px;min-height:100px;"></div>
+      <div id="history-empty" style="font-size:12px;color:#888;text-align:center;padding:20px;display:none;">Nothing here yet.</div>
+    </div>
+  </div>
+
   <div id="clan-manage-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:85;">
-    <div style="background:#fff;border-radius:16px;padding:20px;width:380px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:380px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
       <div style="font-family:'Titan One',system-ui;font-size:20px;color:#5e35b1;margin-bottom:12px;">🛡️ Edit Clan Settings</div>
 
       <label style="font-size:12px;display:block;margin-bottom:2px;">Clan Name</label>
@@ -1823,6 +1883,7 @@
                 <option value="ultimateBundle">👑 Ultimate Bundle</option>
                 <option value="clanShoutout">📣 Clan Shoutout</option>
                 <option value="clanCodeGiver">🎟️ Clan Code Giver</option>
+                <option value="superPass">🎫 Super Pass</option>
               </select>
               <button id="owner-issue-code-btn" style="background:#1976d2;font-size:12px;padding:6px 12px;">Issue Code</button>
             </div>
@@ -1866,6 +1927,15 @@
               </div>
             </div>
             <div id="subai-apikey-status" class="err-small" style="margin-top:6px;"></div>
+
+            <div style="border-top:1px solid #d1c4e9;margin-top:12px;padding-top:10px;">
+              <strong style="font-size:13px;">🧠 Teach SubAI</strong>
+              <div style="font-size:11px;color:#666;margin:4px 0 8px;">SubAI logs every question it couldn't answer well. Teach it a real answer here and it'll remember — for every player, forever, no API needed.</div>
+              <div id="subai-unanswered-list" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;"></div>
+              <div id="subai-unanswered-empty" style="font-size:12px;color:#888;display:none;">No unanswered questions right now — SubAI's handling everything!</div>
+              <div style="margin-top:10px;font-size:12px;font-weight:700;">Already taught:</div>
+              <div id="subai-learned-list" style="display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;margin-top:4px;"></div>
+            </div>
           </div>
 
           <!-- Game launch date (shown in Settings → About) -->
@@ -2369,7 +2439,7 @@
 
   <!-- Host: Choose Gamemode -->
   <div id="game-mode-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;">
-    <div style="background:#fff;border-radius:20px;padding:28px;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.4);">
+    <div style="background:#fff;border-radius:20px;padding:28px;width:420px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.4);">
       <div style="font-family:'Titan One',system-ui;font-size:22px;color:#e65100;margin-bottom:6px;">🎮 Host a Game</div>
       <div style="font-size:13px;color:#666;margin-bottom:18px;">Choose a gamemode to host.</div>
       <div id="gamemode-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -2458,7 +2528,7 @@
 
   <!-- Giveaway Creation Modal -->
   <div id="giveaway-create-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:85;">
-    <div style="background:#fff;border-radius:16px;padding:20px;width:360px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
+    <div style="background:#fff;border-radius:16px;padding:20px;width:360px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);">
       <div style="font-family:'Titan One',system-ui;font-size:20px;color:#7b1fa2;margin-bottom:12px;">🎉 Create Giveaway</div>
       <label style="font-size:12px;display:block;margin-bottom:2px;">Giveaway Name</label>
       <input id="gw-name" placeholder="e.g. My Big Giveaway" style="width:100%;margin-bottom:8px;">
@@ -2496,7 +2566,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.421 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.601 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -3957,6 +4027,7 @@
       if(hotBonus > 0) userData.coins=(parseInt(userData.coins,10)||0)+hotBonus;
       userData.nextPackId=null;
       userData.totalPacksOpened=(userData.totalPacksOpened||0)+1;
+      awardPassXp(2000);
       // Track per-pack stats
       if(!userData.packStats) userData.packStats={};
       userData.packStats[actualPack.id]=(userData.packStats[actualPack.id]||0)+1;
@@ -4188,6 +4259,10 @@
       await saveUserData();
       renderBlooks(); populateTradeOfferSelect();
       await remove(ref(db,"tradeRequests/"+receiverUid+"/"+req.id));
+      const tradeSummary = (req.offerBlook&&req.offerAmount>0?req.offerAmount+"x "+req.offerBlook:"")+(offerCoins>0?(req.offerBlook?" + ":"")+offerCoins+" coins":"");
+      push(ref(db,"tradeHistory/"+receiverUid), { direction:"received", otherUsername:req.fromName||"Someone", summary:tradeSummary, createdAt:Date.now() }).catch(()=>{});
+      push(ref(db,"tradeHistory/"+giverUid), { direction:"sent", otherUsername:userData.username||"Someone", summary:tradeSummary, createdAt:Date.now() }).catch(()=>{});
+      awardPassXp(3000);
       currentIncomingTrade=null; tradePopup.style.display="none"; alert("Trade completed!");
     });
 
@@ -4680,6 +4755,7 @@
       var reward = isMysteryBox ? 0 : pickWheelReward();
       setTimeout(async()=>{
         userData.lastWheel=Date.now();
+        awardPassXp(1500);
         if(isMysteryBox) {
           var mb = rollMysteryBox();
           if(mb.type==="coins") {
@@ -4959,7 +5035,7 @@
       if(adminMode) adminPanelBtn.style.display="inline-block";
       if(ownerMode) ownerPanelBtn.style.display="inline-block";
       if(ownerMode){
-        ["chest-free-btn","iron-chest-free-btn","gold-chest-free-btn","allblooks-free-btn","allshinys-free-btn","allgolds-free-btn","clanshoutout-free-btn","clancodegiver-free-btn"].forEach(id=>{
+        ["chest-free-btn","iron-chest-free-btn","gold-chest-free-btn","allblooks-free-btn","allshinys-free-btn","allgolds-free-btn","clanshoutout-free-btn","clancodegiver-free-btn","superpass-free-btn"].forEach(id=>{
           const el=document.getElementById(id); if(el) el.style.display="block";
         });
       }
@@ -5481,6 +5557,7 @@
       await saveUserData();
       const listRef=push(bazaarRef());
       await set(listRef,{id:listRef.key,sellerUid:currentUser.uid,sellerName:userData.username||"user",blookName,rarity:info.rarity,price:parseInt(price,10),listedAt:Date.now()});
+      push(ref(db,"bazaarLog/"+currentUser.uid), { type:"listed", blookName, price:parseInt(price,10), createdAt:Date.now() }).catch(()=>{});
       renderBlooks(); populateTradeOfferSelect(); blookModalOverlay.style.display="none";
       alert(`Listed ${blookName} for ${price} coins in the Bazaar!`);
     }
@@ -5517,6 +5594,9 @@
       await saveUserData();
       try{ const sellerSnap=await get(userRef(listing.sellerUid)); if(sellerSnap.exists()){const sellerData=sellerSnap.val();const sellerCoins=(parseInt(sellerData.coins,10)||0)+listing.price;await update(userRef(listing.sellerUid),{coins:sellerCoins});} }catch(e){ console.error("Seller payout failed:",e); }
       await remove(ref(db,"bazaar/"+listing.id)); renderBlooks(); populateTradeOfferSelect();
+      push(ref(db,"bazaarLog/"+currentUser.uid), { type:"bought", blookName:listing.blookName, price:listing.price, otherUsername:listing.sellerName, createdAt:Date.now() }).catch(()=>{});
+      push(ref(db,"bazaarLog/"+listing.sellerUid), { type:"sold", blookName:listing.blookName, price:listing.price, otherUsername:userData.username, createdAt:Date.now() }).catch(()=>{});
+      awardPassXp(1500);
       alert(`Bought ${listing.blookName} for ${listing.price} coins!`); await loadBazaar();
     }
 
@@ -5529,6 +5609,61 @@
     document.getElementById("bazaar-search-btn").addEventListener("click",()=>{bazaarSearchTerm=document.getElementById("bazaar-search").value;loadBazaar(bazaarSearchTerm);});
     document.getElementById("bazaar-search").addEventListener("keydown",e=>{if(e.key==="Enter"){bazaarSearchTerm=e.target.value;loadBazaar(bazaarSearchTerm);}});
     document.getElementById("bazaar-refresh-btn").addEventListener("click",()=>{bazaarSearchTerm="";document.getElementById("bazaar-search").value="";loadBazaar();});
+
+    // ── History: trade history + bazaar buy/list logs ──
+    let _historyTab = "trades";
+    function historyLabelForBazaarType(t){
+      if(t==="listed") return "📤 Listed";
+      if(t==="bought") return "🛒 Bought";
+      if(t==="sold") return "💰 Sold";
+      return t;
+    }
+    async function renderHistoryTab(){
+      const listEl=document.getElementById("history-list"); const emptyEl=document.getElementById("history-empty");
+      if(!currentUser){ listEl.innerHTML=""; emptyEl.style.display="block"; return; }
+      listEl.innerHTML="<div style='font-size:12px;color:#888;'>Loading...</div>"; emptyEl.style.display="none";
+      const path = _historyTab==="trades" ? "tradeHistory/" : "bazaarLog/";
+      try{
+        const snap = await get(ref(db, path+currentUser.uid));
+        listEl.innerHTML="";
+        if(!snap.exists()){ emptyEl.style.display="block"; return; }
+        let entries = Object.values(snap.val());
+        if(_historyTab==="buys") entries = entries.filter(e=>e.type==="bought"||e.type==="sold");
+        if(_historyTab==="listings") entries = entries.filter(e=>e.type==="listed");
+        entries.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        if(!entries.length){ emptyEl.style.display="block"; return; }
+        entries.slice(0,50).forEach(e=>{
+          const row=document.createElement("div");
+          row.style.cssText="background:#f5f5f5;border-radius:8px;padding:8px 10px;font-size:12px;";
+          if(_historyTab==="trades"){
+            row.innerHTML = (e.direction==="sent" ? "📤 Sent to " : "📥 Received from ")+escapeHtml(e.otherUsername||"someone")+": "+escapeHtml(e.summary||"")+
+              '<div style="color:#999;font-size:10px;margin-top:2px;">'+new Date(e.createdAt).toLocaleString()+'</div>';
+          } else {
+            row.innerHTML = historyLabelForBazaarType(e.type)+" "+escapeHtml(e.blookName)+" for "+e.price.toLocaleString()+" coins"+(e.otherUsername?" ("+escapeHtml(e.otherUsername)+")":"")+
+              '<div style="color:#999;font-size:10px;margin-top:2px;">'+new Date(e.createdAt).toLocaleString()+'</div>';
+          }
+          listEl.appendChild(row);
+        });
+      }catch(e){ listEl.innerHTML=""; emptyEl.style.display="block"; emptyEl.textContent="Couldn't load history."; }
+    }
+    document.getElementById("history-open-btn")?.addEventListener("click", ()=>{
+      document.getElementById("history-overlay").style.display="flex";
+      renderHistoryTab();
+    });
+    document.getElementById("history-close-btn")?.addEventListener("click", ()=>{
+      document.getElementById("history-overlay").style.display="none";
+    });
+    document.querySelectorAll(".history-tab-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        _historyTab = btn.dataset.htab;
+        document.querySelectorAll(".history-tab-btn").forEach(b=>{
+          const active = b===btn;
+          b.style.background = active ? "#5e35b1" : "#ece5fb";
+          b.style.color = active ? "#fff" : "#5e35b1";
+        });
+        renderHistoryTab();
+      });
+    });
 
     document.getElementById("blook-modal-list").addEventListener("click",()=>{
       if(!currentModalBlook) return; const{name,info,count}=currentModalBlook;
@@ -8555,6 +8690,7 @@
       userData.coins = (parseInt(userData.coins,10)||0) + bonus;
       userData.totalCoinsCollected = (userData.totalCoinsCollected||0) + bonus;
       await saveUserData();
+      awardPassXp(1000 + Math.min(streak,30)*100);
       // Show streak toast
       showToast("\uD83D\uDD25 " + streak + "-day streak! +" + bonus.toLocaleString() + " coins", "#e65100", 4000);
       updateStreakUI(streak);
@@ -8842,7 +8978,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 3.421', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.601', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -8996,6 +9132,7 @@
       userData.coins = (parseInt(userData.coins, 10) || 0) + def.reward;
       userData.totalCoinsCollected = (userData.totalCoinsCollected || 0) + def.reward;
       await saveUserData();
+      awardPassXp(5000);
       showToast('\uD83C\uDFAF Quest complete: ' + def.label + '! +' + def.reward.toLocaleString() + ' coins', '#1976d2', 4000);
       renderDailyQuests();
     }
@@ -9403,7 +9540,7 @@
       "spaceicemedival": { blook: { name: "Super Rainbow Crab King", rarity: "Supreeme" } },
       "iatemycart": { chest: true }
     };
-    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", allShinys: "✨ Get All Shinys", allGolds: "⭐ Get All Golds", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle", clanShoutout: "📣 Clan Shoutout", clanCodeGiver: "🎟️ Clan Code Giver", randomSmall: "🎲 Mystery Prize" };
+    const PENDING_ITEM_LABELS = { woodenChest: "🪵 Wooden Chest", ironChest: "⚙️ Iron Chest", goldChest: "🏆 Gold Chest", allBlooks: "📖 Get All Blooks", allShinys: "✨ Get All Shinys", allGolds: "⭐ Get All Golds", diamondChest: "💎 Diamond Chest", mvpMembership: "🎖️ MVP Membership", ultimateBundle: "👑 Ultimate Bundle", clanShoutout: "📣 Clan Shoutout", clanCodeGiver: "🎟️ Clan Code Giver", randomSmall: "🎲 Mystery Prize", superPass: "🎫 Super Pass" };
     function logPurchase(label){
       if(!userData) return;
       if(!Array.isArray(userData.purchaseHistory)) userData.purchaseHistory = [];
@@ -9557,6 +9694,63 @@
       try{ await set(ref(db,"subaiConfig"), { provider:"anthropic", apiKey:"", model:"", baseUrl:"" }); if(statusEl) statusEl.textContent="Cleared."; }
       catch(e){ if(statusEl) statusEl.textContent="Failed: "+e.message; }
     });
+
+    // ── SubAI learning: logs unanswered questions, owner teaches real answers, SubAI remembers forever ──
+    let _subaiLearned = {};
+    let _subaiUnanswered = {};
+    onValue(ref(db,"subaiLearned"), snap=>{ _subaiLearned = snap.exists() ? snap.val() : {}; renderSubaiLearnedList(); });
+    onValue(ref(db,"subaiUnanswered"), snap=>{ _subaiUnanswered = snap.exists() ? snap.val() : {}; renderSubaiUnansweredList(); });
+
+    function renderSubaiLearnedList(){
+      const el=document.getElementById("subai-learned-list"); if(!el) return;
+      const entries = Object.entries(_subaiLearned);
+      el.innerHTML = entries.length ? "" : '<div style="font-size:12px;color:#888;">Nothing taught yet.</div>';
+      entries.forEach(([id,e])=>{
+        const row=document.createElement("div");
+        row.style.cssText="background:#fff;border-radius:6px;padding:6px 8px;font-size:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;";
+        row.innerHTML='<span><strong>"'+escapeHtml(e.trigger)+'"</strong> → '+escapeHtml(e.answer)+'</span>';
+        const del=document.createElement("button"); del.textContent="✕"; del.style.cssText="background:#c62828;font-size:11px;padding:3px 8px;flex-shrink:0;";
+        del.addEventListener("click", async ()=>{ await remove(ref(db,"subaiLearned/"+id)); });
+        row.appendChild(del);
+        el.appendChild(row);
+      });
+    }
+    function renderSubaiUnansweredList(){
+      const el=document.getElementById("subai-unanswered-list"); if(!el) return;
+      const empty=document.getElementById("subai-unanswered-empty");
+      const entries = Object.entries(_subaiUnanswered).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0)).slice(0,20);
+      empty.style.display = entries.length ? "none" : "block";
+      el.innerHTML = "";
+      entries.forEach(([id,e])=>{
+        const row=document.createElement("div");
+        row.style.cssText="background:#fff;border-radius:8px;padding:8px;";
+        row.innerHTML='<div style="font-size:12px;font-weight:700;margin-bottom:4px;">❓ '+escapeHtml(e.question)+'</div>'+
+          '<div style="display:flex;gap:4px;">'+
+          '<input data-teach-answer="'+id+'" placeholder="Teach SubAI the answer..." style="flex:1;font-size:12px;padding:5px 7px;border-radius:6px;border:1px solid #ccc;">'+
+          '<button data-teach-save="'+id+'" style="background:#43a047;font-size:11px;padding:5px 10px;">Teach</button>'+
+          '<button data-teach-dismiss="'+id+'" style="background:#757575;font-size:11px;padding:5px 10px;">Dismiss</button>'+
+          '</div>';
+        el.appendChild(row);
+      });
+      el.querySelectorAll("[data-teach-save]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id=btn.dataset.teachSave;
+          const input=el.querySelector('[data-teach-answer="'+id+'"]');
+          const answer=input.value.trim();
+          if(!answer) return;
+          const q = (_subaiUnanswered[id]||{}).question || "";
+          await push(ref(db,"subaiLearned"), { trigger:q.toLowerCase(), answer, createdAt:Date.now() });
+          await remove(ref(db,"subaiUnanswered/"+id));
+        });
+      });
+      el.querySelectorAll("[data-teach-dismiss]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{ await remove(ref(db,"subaiUnanswered/"+btn.dataset.teachDismiss)); });
+      });
+    }
+    async function logSubaiUnanswered(question){
+      try{ await push(ref(db,"subaiUnanswered"), { question, username:(userData&&userData.username)||"?", createdAt:Date.now() }); }
+      catch(e){ console.warn("Couldn't log unanswered SubAI question:", e); }
+    }
 
     document.getElementById("irlbuys-global-toggle")?.addEventListener("change", async e=>{
       if(!ownerMode) return;
@@ -9762,7 +9956,13 @@
         }, i*5000);
       }
     }
+    async function grantSuperPassReward(){
+      ensurePassSeasonCurrent();
+      userData.passPurchased = true;
+      return { coins:0, blooks:[], label:"🎫 Super Pass", customMsg:"🎫 Super Pass unlocked! Head to the Passes tab to claim your premium rewards as you level up." };
+    }
     async function grantSpecialItem(itemKey){
+      awardPassXp(3000);
       if(itemKey==="woodenChest") return await grantWoodenChestReward();
       if(itemKey==="ironChest") return await grantIronChestReward();
       if(itemKey==="goldChest") return await grantGoldChestReward();
@@ -9775,6 +9975,7 @@
       if(itemKey==="clanShoutout") return await grantClanShoutoutReward();
       if(itemKey==="clanCodeGiver") return await grantClanCodeGiverReward();
       if(itemKey==="randomSmall") return await grantRandomSmallReward();
+      if(itemKey==="superPass") return await grantSuperPassReward();
       return null;
     }
     document.getElementById('settings-redeem-btn')?.addEventListener('click', async function() {
@@ -10784,7 +10985,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.421</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.601</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -11516,13 +11717,38 @@
       return true;
     }
 
+    async function fetchTopPlayerAnswer(){
+      try{
+        const snap = await get(usersRef());
+        if(!snap.exists()) return;
+        const all = snap.val();
+        let top=null;
+        for(const uid in all){
+          const u=all[uid];
+          if(u.username==="subzero32715!") continue; // hidden alt account
+          const score=u.subscore||0;
+          if(!top || score>top.score) top={ username:u.username, score };
+        }
+        const text = top ? '🏆 Right now the top player is '+top.username+'!' : "🏆 I couldn't find any players yet!";
+        await push(chatRef(), { username:'🤖 SubAI', text, imageUrl:'', createdAt:Date.now(), isBot:true });
+      }catch(e){ console.warn("fetchTopPlayerAnswer failed:", e); }
+    }
+    async function fetchPlayerCountAnswer(){
+      try{
+        const snap = await get(usersRef());
+        const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+        const text = '📊 There are '+count+' registered players in Sublet right now!';
+        await push(chatRef(), { username:'🤖 SubAI', text, imageUrl:'', createdAt:Date.now(), isBot:true });
+      }catch(e){ console.warn("fetchPlayerCountAnswer failed:", e); }
+    }
+
     function maybeAddClanShoutout(answer){
       const eligible = Object.values(_clansCache||{}).filter(c=>c.shoutoutEnabled);
       if(!eligible.length || Math.random()>=0.2) return answer;
       const c = eligible[Math.floor(Math.random()*eligible.length)];
       return answer + "\n\n📣 Shoutout to clan " + c.name + "!";
     }
-    const SUBAI_SYSTEM_PROMPT = "You are SubAI, the in-game assistant for the browser game Sublet 3.421 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.";
+    const SUBAI_SYSTEM_PROMPT = "You are SubAI, the in-game assistant for the browser game Sublet 3.601 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.";
 
     async function subAIAnswerSmart(q) {
       const cfg = _subaiConfig || {};
@@ -11588,6 +11814,20 @@
 
     function subAIAnswer(q) {
       const lq = q.toLowerCase();
+      // ── Learned answers (taught by the owner from real unanswered questions) — checked first ──
+      for(const id in _subaiLearned){
+        const e = _subaiLearned[id];
+        if(e && e.trigger && lq.includes(e.trigger)) return e.answer;
+      }
+      // ── Live game stats (pulled from the real database, not hardcoded) ──
+      if((lq.includes('top player') || lq.includes('best player') || lq.includes('who is the best')) ){
+        fetchTopPlayerAnswer(q);
+        return '🏆 Let me check the leaderboard...';
+      }
+      if(lq.includes('how many player') || lq.includes('player count') || lq.includes('total player')){
+        fetchPlayerCountAnswer(q);
+        return '📊 Let me check...';
+      }
       // Pack / blook questions
       if(lq.includes('shiny') && lq.includes('chance')) return '✨ Shiny chance is 2% on every pack open. You\'ll get bonus coins equal to 2-5x the pack cost!';
       if(lq.includes('golden') && (lq.includes('blook') || lq.includes('pack'))) return '⭐ Golden blooks require VIP + Golden Mode toggled on for a specific pack. They show up gold in My Blooks!';
@@ -11604,9 +11844,9 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.421 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.421 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.421 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.601 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.601 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.601 was made by Subzero32715! Check the description for rewards.';
       if(lq.includes('youtube') || lq.includes('channel') || lq.includes('subzero')) return '🎬 Go to https://www.youtube.com/@Subzero32715 to see Subzero\'s YT channel!';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
@@ -11621,16 +11861,50 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.421!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.601!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
+      // ── Clans ──
+      if(lq.includes('clan') && (lq.includes('what') || lq.includes('how') && lq.includes('work'))) return '🛡️ Clans are player groups! Browse or create one in the Clans tab. You need VIP to create your own — MVP unlocks extra owner settings.';
+      if(lq.includes('clan') && lq.includes('create')) return '🛡️ To create a clan you need VIP! Hit + Create Clan in the Clans tab, name it, describe it, pick a join type, and choose a color.';
+      if(lq.includes('clan') && lq.includes('join')) return '🛡️ Browse clans in the Clans tab. Free Join clans let you in instantly, Request clans need owner approval, and Invite Only clans need the owner to invite you.';
+      if(lq.includes('clan') && lq.includes('chat')) return '💬 Clan Chat has to be unlocked by your clan\'s owner (requires MVP). Once on, you can chat with clanmates in the Chat tab of your Clan Menu!';
+      if(lq.includes('clan') && lq.includes('achievement')) return '🏆 Clan owners with MVP can set up to 5 custom achievements and manually grant them to members. Check the Achievements tab in your Clan Menu!';
+      if(lq.includes('clan') && (lq.includes('shoutout') || lq.includes('shout out'))) return '📣 SubAI Clan Shoutout is an IRL Buys item — once active for a clan, I have a 20% chance to shout that clan out whenever I answer a question!';
+      if(lq.includes('clan') && lq.includes('code')) return '🎟️ Clan Code Giver is an IRL Buys item — once bought, CODEAI drops 5 redeem codes into your clan chat, 5 seconds apart. First come, first served!';
+      if(lq.includes('clan') && (lq.includes('kick') || lq.includes('leave'))) return '🛡️ Clan owners can kick members from the Members tab. Anyone can leave from the Clan Menu — but if the owner leaves, the whole clan is deleted!';
+      // ── IRL Buys / redeem codes ──
+      if(lq.includes('redeem') || (lq.includes('code') && !lq.includes('clan'))) return '🔑 Got a redeem code? Enter it in Settings → Redeem Code. Codes from IRL Buys purchases are single-use — once someone redeems it, it\'s gone!';
+      if(lq.includes('all shiny')) return '✨ Get All Shinys is an IRL Buys item that unlocks the shiny ✨ version of every blook in the game that you don\'t already have!';
+      if(lq.includes('all gold')) return '⭐ Get All Golds is an IRL Buys item that unlocks the golden ⭐ version of every blook in the game that you don\'t already have!';
+      if(lq.includes('irl') || (lq.includes('real money') || lq.includes('real life'))) return '💳 IRL Buys is in the Bazaar area — real-money items like chests, All Blooks, All Shinys, All Golds, MVP, and Clan perks. After paying, message the owner for your redeem code!';
+      if(lq.includes('mvp') && !lq.includes('clan')) return '🎖️ MVP is a premium membership from IRL Buys — it unlocks advanced clan owner settings (max members, min rank, clan chat, clan events, custom achievements) on top of everything VIP gives!';
+      // ── Game modes ──
+      if(lq.includes('gold rush')) return '⛏️ Gold Rush: dig for gold nuggets before time runs out — the deeper you dig, the rarer the find!';
+      if(lq.includes('fishing frenzy')) return '🎣 Fishing Frenzy: cast your line and reel in fish for coins — rarer fish are worth way more!';
+      if(lq.includes('busy bees')) return '🐝 Busy Bees: collect pollen and bring it back to the hive before the timer runs out!';
+      if(lq.includes('monster brawl')) return '👹 Monster Brawl: battle monsters for rewards — team up or go solo!';
+      if(lq.includes('card duel')) return '🃏 Card Duels: face off against another player or bot using blook-based cards!';
+      if(lq.includes('heist')) return '💰 The Heist: work through a vault-cracking mini-game for a big coin payout!';
+      if(lq.includes('space mine')) return '🚀 Space Mine: mine asteroids in space for rare resources and coins!';
+      if(lq.includes('blook racing') || lq.includes('racing')) return '🏁 Blook Racing: race your blooks against others — speed and luck both matter!';
+      if(lq.includes('food fight')) return '🍕 Food Fight: a chaotic food-throwing mini-game for coins and fun!';
+      // ── Chat / social ──
+      if(lq.includes('badge') || lq.includes('chat color') || lq.includes('name color')) return '🎨 Chat badges and name colors are in the Coin Shop (Settings)! Spend coins to stand out in chat.';
+      if(lq.includes('giveaway')) return '🎉 Giveaways show up in the Giveaways tab — join for a chance to win. Best prizes are shown first!';
+      if(lq.includes('bazaar')) return '🛒 The Bazaar is where you sell blooks for coins and access IRL Buys — real-money items!';
+      if(lq.includes('custom pack')) return '📦 Owners can add custom packs with their own blooks and rarities! Check the Market for anything new.';
+      if(lq.includes('admin') || lq.includes('moderator')) return '🛡️ Admins and the owner keep the game running smoothly. If you see a bug or bad behavior, let them know!';
       // Smarter fallback: try to find the closest topic instead of a fully random reply
       const topics = {
         'pack': 'packs in the Market', 'blook': 'blooks and rarities', 'vip': 'VIP perks',
         'streak': 'daily login streaks', 'wheel': 'the Daily Wheel', 'quest': 'Daily Quests',
         'trade': 'Trading', 'bazaar': 'the Bazaar', 'coin': 'coins and the Coin Shop',
-        'live': 'going Live', 'giveaway': 'Giveaways', 'lore': 'the game\'s Lore'
+        'live': 'going Live', 'giveaway': 'Giveaways', 'lore': 'the game\'s Lore',
+        'clan': 'Clans', 'mvp': 'MVP membership', 'irl': 'IRL Buys',
+        'code': 'redeem codes in Settings', 'pet': 'Pets', 'booster': 'Boosters'
       };
       for(const key in topics){ if(lq.includes(key)) return '💡 I don\'t have an exact answer, but that sounds related to ' + topics[key] + '. Check that tab for more details!'; }
+      logSubaiUnanswered(q);
       const fallbacks = [
         '🤔 Hmm, I\'m not sure about that one. Try asking about packs, blooks, VIP, streaks, pets, or game modes!',
         '💡 Great question! I don\'t have a specific answer, but check the Market, Settings, Pets, or Daily Quests for clues.',
@@ -13320,6 +13594,7 @@
       if(containsBadWord(text)){ input.value=""; return; }
       await push(ref(db,"clans/"+c.id+"/chatMessages"), { username:userData.username, text, createdAt:Date.now() });
       input.value="";
+      awardPassXp(200);
     });
 
     function renderClanAchievementsTab(c){
@@ -13455,6 +13730,203 @@
       await update(clanRef(c.id), { achievements });
       document.getElementById("clan-manage-err").textContent="Achievements saved!";
     });
+
+    // ══════════════════════════════════════════
+    // SUPER PASS (battle pass) SYSTEM
+    // ══════════════════════════════════════════
+    const PASS_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
+    const PASS_SEASON_MS = 3*30*24*60*60*1000; // ~3 months per pass
+    const PASS_LEVEL_XP = 100000;
+    const PASS_MAX_LEVEL = 25;
+    const PASS_TOTAL_SEASONS = 100;
+    const PASS_THEME_ADJ = ["Ember","Frost","Shadow","Golden","Crimson","Azure","Cosmic","Storm","Mystic","Verdant","Solar","Lunar","Radiant","Obsidian","Toxic","Neon","Ancient","Feral","Arcane","Rogue"];
+    const PASS_THEME_NOUN = ["Fox","Dragon","Wolf","Phoenix","Serpent","Titan","Griffin","Raven","Panther","Comet","Golem","Specter","Falcon","Kraken","Hydra","Sphinx","Wyvern","Yeti","Basilisk","Chimera"];
+    const PASS_THEME_COLORS = ["#5e35b1","#00897b","#e64a19","#1976d2","#c62828","#ffb300","#6d4c41","#7cb342","#8e24aa","#00acc1"];
+    const PASS_MILESTONE_LEVELS = [5,10,15,20,25];
+
+    function getPassTheme(seasonIndex){
+      const adj = PASS_THEME_ADJ[seasonIndex % PASS_THEME_ADJ.length];
+      const noun = PASS_THEME_NOUN[Math.floor(seasonIndex/PASS_THEME_ADJ.length) % PASS_THEME_NOUN.length];
+      return { name: adj+" "+noun+" Pass", color: PASS_THEME_COLORS[seasonIndex % PASS_THEME_COLORS.length] };
+    }
+    function getPassSeasonIndex(){ return Math.max(0, Math.min(PASS_TOTAL_SEASONS-1, Math.floor((Date.now()-PASS_EPOCH)/PASS_SEASON_MS))); }
+    function getPassSeasonBounds(seasonIndex){ const start=PASS_EPOCH+seasonIndex*PASS_SEASON_MS; return { start, end:start+PASS_SEASON_MS }; }
+    function getPassDaysLeft(){ const b=getPassSeasonBounds(getPassSeasonIndex()); return Math.max(0,(b.end-Date.now())/86400000); }
+    function isPassBonusUnlocked(){ return getPassDaysLeft() <= 7; }
+
+    function ensurePassSeasonCurrent(){
+      if(!userData) return;
+      const idx = getPassSeasonIndex();
+      if(userData.passSeasonIndex !== idx){
+        userData.passSeasonIndex = idx;
+        userData.passXp = 0;
+        userData.passPurchased = false;
+        userData.passClaimed = {};
+      }
+      if(!userData.passClaimed) userData.passClaimed = {};
+      if(typeof userData.passXp !== "number") userData.passXp = 0;
+    }
+    function getPassLevel(){ ensurePassSeasonCurrent(); return Math.min(PASS_MAX_LEVEL, Math.floor((userData.passXp||0)/PASS_LEVEL_XP)); }
+
+    async function awardPassXp(amount){
+      if(!currentUser||!userData) return;
+      ensurePassSeasonCurrent();
+      const prevLevel = getPassLevel();
+      userData.passXp = (userData.passXp||0) + amount;
+      await saveUserData();
+      const newLevel = getPassLevel();
+      if(newLevel>prevLevel) showToast("🎫 Pass Level Up! You're now level "+newLevel+"!", "#5e35b1", 4000);
+      if(document.getElementById("view-passes") && document.getElementById("view-passes").style.display!=="none") renderPassesView();
+    }
+
+    function generatePassRewards(seasonIndex){
+      const free=[], paid=[];
+      for(let lvl=1; lvl<=PASS_MAX_LEVEL; lvl++){
+        free.push(lvl%5===0 ? { level:lvl, type:"badge" } : { level:lvl, type:"coins", amount:150+lvl*30 });
+        if(PASS_MILESTONE_LEVELS.includes(lvl)){
+          const mi=PASS_MILESTONE_LEVELS.indexOf(lvl);
+          paid.push({ level:lvl, type:["customBlook","ironChest","goldChest","mysteryPrize","customBlook"][mi] });
+        } else if(lvl%5===4){
+          paid.push({ level:lvl, type:"achievement" });
+        } else {
+          paid.push({ level:lvl, type:"coins", amount:400+lvl*120+seasonIndex*10 });
+        }
+      }
+      const bonus=[0,1,2,3,4].map(i=> i===4 ? {index:i,type:"customBlook"} : (i%2===0 ? {index:i,type:"coins",amount:2000+i*500} : {index:i,type:"mysteryPrize"}));
+      return { free, paid, bonus };
+    }
+
+    function passRewardLabel(reward, seasonIndex){
+      const theme=getPassTheme(seasonIndex);
+      switch(reward.type){
+        case "coins": return "🪙 "+reward.amount.toLocaleString()+" Coins";
+        case "badge": return "🎖️ Pass Badge";
+        case "achievement": return "🏅 Pass Achievement";
+        case "customBlook": return "🎫 "+theme.name+" Blook";
+        case "ironChest": return "⚙️ Iron Chest";
+        case "goldChest": return "🏆 Gold Chest";
+        case "mysteryPrize": return "🎲 Mystery Prize";
+        default: return "🎁 Reward";
+      }
+    }
+    async function applyPassReward(reward, seasonIndex){
+      const theme=getPassTheme(seasonIndex);
+      let toastMsg = passRewardLabel(reward, seasonIndex)+" claimed!";
+      switch(reward.type){
+        case "coins":
+          userData.coins=(parseInt(userData.coins,10)||0)+reward.amount;
+          userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+reward.amount;
+          break;
+        case "badge":
+          if(!Array.isArray(userData.badges)) userData.badges=[];
+          userData.badges.push({content:"🎫 "+theme.name+" Lv."+reward.level, rarity:R.RARE});
+          break;
+        case "achievement":
+          if(!Array.isArray(userData.passAchievements)) userData.passAchievements=[];
+          userData.passAchievements.push(theme.name+" — Level "+reward.level);
+          break;
+        case "customBlook": {
+          if(!userData.blooks) userData.blooks={};
+          const name="🎫 "+theme.name;
+          userData.blooks[name]=(userData.blooks[name]||0)+1;
+          if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Pass Rewards",rarity:R.MYS,chance:0};
+          break;
+        }
+        case "ironChest": { const r=await grantIronChestReward(); if(r&&r.customMsg) toastMsg=r.customMsg; break; }
+        case "goldChest": { const r=await grantGoldChestReward(); if(r&&r.customMsg) toastMsg=r.customMsg; break; }
+        case "mysteryPrize": { const r=await grantRandomSmallReward(); if(r&&r.customMsg) toastMsg=r.customMsg; break; }
+      }
+      await saveUserData();
+      refreshBlooksIfVisible(); renderPurchasesList();
+      showToast(toastMsg, "#5e35b1", 4000);
+    }
+
+    function renderPassesView(){
+      if(!currentUser||!userData) return;
+      ensurePassSeasonCurrent();
+      const seasonIndex = userData.passSeasonIndex;
+      const theme = getPassTheme(seasonIndex);
+      const level = getPassLevel();
+      const xpIntoLevel = (userData.passXp||0) - level*PASS_LEVEL_XP;
+      const pct = level>=PASS_MAX_LEVEL ? 100 : Math.min(100, (xpIntoLevel/PASS_LEVEL_XP)*100);
+      document.getElementById("pass-header-banner").style.background = "linear-gradient(135deg,"+theme.color+",rgba(0,0,0,.3))";
+      document.getElementById("pass-theme-name").textContent = "🎫 "+theme.name;
+      document.getElementById("pass-days-left").textContent = Math.ceil(getPassDaysLeft())+" days left this season";
+      document.getElementById("pass-level-label").textContent = "Level "+level+" / "+PASS_MAX_LEVEL;
+      document.getElementById("pass-xp-label").textContent = level>=PASS_MAX_LEVEL ? "MAX LEVEL" : Math.floor(xpIntoLevel).toLocaleString()+" / "+PASS_LEVEL_XP.toLocaleString()+" XP";
+      document.getElementById("pass-xp-bar").style.width = pct+"%";
+      document.getElementById("pass-buy-banner").style.display = userData.passPurchased ? "none" : "block";
+
+      const rewards = generatePassRewards(seasonIndex);
+      const track = document.getElementById("pass-reward-track");
+      track.innerHTML = "";
+      for(let lvl=1; lvl<=PASS_MAX_LEVEL; lvl++){
+        const freeR = rewards.free[lvl-1], paidR = rewards.paid[lvl-1];
+        const unlocked = level>=lvl;
+        const freeClaimed = !!userData.passClaimed["free"+lvl];
+        const paidClaimed = !!userData.passClaimed["paid"+lvl];
+        const row=document.createElement("div");
+        row.style.cssText="display:flex;align-items:center;gap:10px;background:"+(unlocked?"#f5f5f5":"#ececec")+";border-radius:10px;padding:10px;opacity:"+(unlocked?"1":".6")+";";
+        row.innerHTML = '<div style="font-weight:800;min-width:34px;text-align:center;">'+lvl+'</div>'+
+          '<div style="flex:1;font-size:12px;">'+passRewardLabel(freeR,seasonIndex)+'</div>'+
+          (unlocked && !freeClaimed ? '<button data-claim-free="'+lvl+'" style="background:#43a047;font-size:11px;padding:5px 10px;">Claim</button>' : (freeClaimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<span style="font-size:11px;color:#999;">🔒</span>'))+
+          '<div style="flex:1;font-size:12px;">'+passRewardLabel(paidR,seasonIndex)+'</div>'+
+          (!userData.passPurchased ? '<span style="font-size:11px;color:#999;">🔒 Premium</span>' : (unlocked && !paidClaimed ? '<button data-claim-paid="'+lvl+'" style="background:#ff8f00;font-size:11px;padding:5px 10px;">Claim</button>' : (paidClaimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<span style="font-size:11px;color:#999;">🔒</span>')));
+        track.appendChild(row);
+      }
+      track.querySelectorAll("[data-claim-free]").forEach(btn=>btn.addEventListener("click", async ()=>{
+        const lvl=parseInt(btn.dataset.claimFree,10);
+        userData.passClaimed["free"+lvl]=true;
+        await applyPassReward(rewards.free[lvl-1], seasonIndex);
+        renderPassesView();
+      }));
+      track.querySelectorAll("[data-claim-paid]").forEach(btn=>btn.addEventListener("click", async ()=>{
+        const lvl=parseInt(btn.dataset.claimPaid,10);
+        userData.passClaimed["paid"+lvl]=true;
+        await applyPassReward(rewards.paid[lvl-1], seasonIndex);
+        renderPassesView();
+      }));
+
+      const bonusUnlocked = isPassBonusUnlocked();
+      document.getElementById("pass-bonus-section").style.display = bonusUnlocked ? "block" : "none";
+      if(bonusUnlocked){
+        const bTrack=document.getElementById("pass-bonus-track");
+        bTrack.innerHTML="";
+        rewards.bonus.forEach(b=>{
+          const claimed = !!userData.passClaimed["bonus"+b.index];
+          const row=document.createElement("div");
+          row.style.cssText="display:flex;align-items:center;gap:10px;background:#fff8e1;border-radius:10px;padding:10px;";
+          row.innerHTML='<div style="flex:1;font-size:12px;">'+passRewardLabel(b,seasonIndex)+'</div>'+
+            (!userData.passPurchased ? '<span style="font-size:11px;color:#999;">🔒 Premium</span>' : (claimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<button data-claim-bonus="'+b.index+'" style="background:#ff8f00;font-size:11px;padding:5px 10px;">Claim</button>'));
+          bTrack.appendChild(row);
+        });
+        bTrack.querySelectorAll("[data-claim-bonus]").forEach(btn=>btn.addEventListener("click", async ()=>{
+          const idx=parseInt(btn.dataset.claimBonus,10);
+          userData.passClaimed["bonus"+idx]=true;
+          await applyPassReward(rewards.bonus[idx], seasonIndex);
+          renderPassesView();
+        }));
+      }
+    }
+
+    wireGenCodeBtn("superpass-gen-code-btn","superpass-code-display","superPass","🎫 Super Pass");
+    document.getElementById("superpass-free-btn")?.addEventListener("click", async function(){
+      if(!currentUser||!userData||!ownerMode) return;
+      ensurePassSeasonCurrent();
+      userData.passPurchased = true;
+      await saveUserData();
+      logPurchase("🎫 Super Pass (Owner Free)");
+      document.getElementById("superpass-status").textContent="";
+      showToast("🎫 Super Pass unlocked for this season!", "#5e35b1", 4000);
+      renderPassesView();
+    });
+
+    const _origShowViewPatchPasses = showView;
+    showView = function(name){
+      _origShowViewPatchPasses(name);
+      const vPasses=document.getElementById("view-passes"); if(vPasses) vPasses.style.display=name==="passes"?"flex":"none";
+      if(name==="passes") renderPassesView();
+    };
 
     // ── Wire Clans view into navigation ──
     const _origShowViewPatch3 = showView;
