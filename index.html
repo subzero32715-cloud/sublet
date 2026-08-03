@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sublet 3.601</title>
+  <title>Sublet 3.702</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
   <style>
@@ -590,7 +590,7 @@
   </div>
   <div id="start">
     <div class="start-left">
-      <div class="start-title">Sublet 3.601</div>
+      <div class="start-title">Sublet 3.702</div>
       <div class="start-sub">Collect blooks, open packs, trade, chat, spin the wheel, and climb the leaderboard.</div>
       <div class="auth-row">
         <div class="auth-box">
@@ -621,7 +621,7 @@
   <div id="app">
     <div class="shell">
       <div class="sidebar">
-        <div class="sidebar-title">Sublet 3.601</div>
+        <div class="sidebar-title">Sublet 3.702</div>
         <button class="nav" data-view="stats">Stats</button>
         <button class="nav active" data-view="market">Market</button>
         <button class="nav" data-view="boosters">Boosters</button>
@@ -1459,6 +1459,14 @@
           </div>
 
           <div class="settings-box" style="margin-bottom:12px;">
+            <h3>🎫 Pass XP</h3>
+            <label style="font-size:13px;display:flex;align-items:center;gap:6px;">
+              <input type="checkbox" id="setting-show-pass-xp">
+              Show a popup every time I earn Pass XP
+            </label>
+          </div>
+
+          <div class="settings-box" style="margin-bottom:12px;">
             <h3>📧 Email Updates</h3>
             <div style="font-size:12px;color:#555;margin-bottom:8px;">Add your email to get notified about new updates and features.</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -1530,7 +1538,7 @@
 
           <div class="settings-box" style="background:linear-gradient(135deg,#0d0d0d,#1a0030);color:#e0d0ff;margin-bottom:12px;border:1px solid #4a148c;">
             <h3 style="color:#ce93d8;letter-spacing:2px;font-family:'Palatino Linotype','Book Antiqua',Palatino,serif;">&#128221; The Lore</h3>
-            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.601. Something feels wrong.</div>
+            <div style="font-size:11px;color:#b39ddb;margin-bottom:10px;font-style:italic;">Fragments from the world of Sublet 3.702. Something feels wrong.</div>
             <div id="lore-entries" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
           </div>
 
@@ -1599,28 +1607,40 @@
         </div>
 
         <div id="view-passes" class="card" style="display:none;">
-          <div id="pass-header-banner" style="border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;">
-            <div id="pass-theme-name" style="font-family:'Titan One',system-ui;font-size:22px;"></div>
-            <div id="pass-days-left" style="font-size:12px;opacity:.9;margin-top:4px;"></div>
-            <div style="margin-top:12px;">
-              <div style="display:flex;justify-content:space-between;font-size:12px;opacity:.9;margin-bottom:4px;">
-                <span id="pass-level-label"></span><span id="pass-xp-label"></span>
-              </div>
-              <div style="background:rgba(255,255,255,.25);border-radius:20px;height:14px;overflow:hidden;">
-                <div id="pass-xp-bar" style="background:#fff;height:100%;width:0%;border-radius:20px;transition:width .3s;"></div>
-              </div>
+          <div id="pass-header-banner" style="border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+            <svg id="pass-level-circle" width="90" height="90" viewBox="0 0 90 90" style="flex-shrink:0;">
+              <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="8"></circle>
+              <circle id="pass-level-circle-fill" cx="45" cy="45" r="38" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.76" stroke-dashoffset="238.76" transform="rotate(-90 45 45)" style="transition:stroke-dashoffset .5s;"></circle>
+              <text id="pass-level-circle-text" x="45" y="52" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">0</text>
+            </svg>
+            <div style="flex:1;min-width:0;">
+              <div id="pass-theme-name" style="font-family:'Titan One',system-ui;font-size:20px;"></div>
+              <div id="pass-days-left" style="font-size:12px;opacity:.9;margin-top:4px;"></div>
+              <div id="pass-xp-label" style="font-size:12px;opacity:.9;margin-top:6px;"></div>
             </div>
           </div>
 
           <div id="pass-buy-banner" style="display:none;border-radius:14px;padding:16px;background:linear-gradient(135deg,#fbc02d,#ff8f00);color:#3e2a00;margin-bottom:16px;">
             <div style="font-size:16px;font-weight:800;">🎫 Unlock the Premium Track!</div>
             <div style="font-size:12px;margin:6px 0 10px;">Buy the Super Pass to claim every premium reward as you level up this season — custom blooks, bonus chests, badges, and more.</div>
-            <paypal-add-to-cart-button data-id="9F7FADBYJZFGS"></paypal-add-to-cart-button>
-            <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "9F7FADBYJZFGS" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            <div style="transform:scale(0.65);transform-origin:left top;margin-bottom:-14px;">
+              <paypal-add-to-cart-button data-id="9F7FADBYJZFGS"></paypal-add-to-cart-button>
+              <script>(function ppInit(){if(typeof cartPaypal==="undefined"){setTimeout(ppInit,200);return;}try{cartPaypal.AddToCart({ id: "9F7FADBYJZFGS" });}catch(e){console.warn("PayPal AddToCart init failed:",e);}})();</script>
+            </div>
             <button id="superpass-gen-code-btn" style="width:100%;margin-top:8px;background:rgba(0,0,0,.15);color:#3e2a00;font-size:12px;padding:8px;">🔑 Generate My Redeem Code (after paying)</button>
             <div id="superpass-code-display" style="font-size:12px;text-align:center;min-height:16px;"></div>
             <button id="superpass-free-btn" style="display:none;width:100%;margin-top:6px;background:#1976d2;color:#fff;font-size:13px;padding:10px;">🎁 Unlock Free (Admin/Owner)</button>
             <div id="superpass-status" class="err-small"></div>
+          </div>
+
+          <div id="pass-owner-controls" style="display:none;border-radius:12px;padding:12px;background:#eceff1;margin-bottom:16px;">
+            <strong style="font-size:12px;">🛠️ Owner Testing</strong>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+              <input id="pass-set-level-input" type="number" min="0" max="500" placeholder="Level" style="width:70px;padding:5px 7px;border-radius:6px;border:1px solid #ccc;">
+              <button id="pass-set-level-btn" style="background:#1976d2;font-size:11px;padding:5px 10px;">Set Level</button>
+              <button id="pass-complete-btn" style="background:#43a047;font-size:11px;padding:5px 10px;">Complete Pass</button>
+              <button id="pass-skip-btn" style="background:#c62828;font-size:11px;padding:5px 10px;">Skip Current Pass</button>
+            </div>
           </div>
 
           <div id="pass-reward-track" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -2566,7 +2586,7 @@
   <div id="game-info-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:16px;max-width:720px;width:92%;max-height:85vh;overflow-y:auto;padding:24px;position:relative;">
       <button id="game-info-close-btn" style="position:absolute;top:14px;right:14px;background:#c62828;">✕</button>
-      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.601 — Full Info</h2>
+      <h2 style="font-family:'Titan One',system-ui;color:#0d47a1;margin-bottom:12px;">📖 Sublet 3.702 — Full Info</h2>
       <div id="game-info-content" style="font-size:13px;line-height:1.6;color:#234;"></div>
     </div>
   </div>
@@ -3656,6 +3676,11 @@
       ownerMode = userData.isOwner===true;
       ownerPanelBtn.style.display = ownerMode ? "inline-block" : "none";
       adminPanelBtn.style.display = adminMode ? "inline-block" : "none";
+      if(ownerMode){
+        if(!_subaiUnansweredUnsub) _subaiUnansweredUnsub = onValue(ref(db,"subaiUnanswered"), snap=>{ _subaiUnanswered = snap.exists() ? snap.val() : {}; renderSubaiUnansweredList(); });
+      } else if(_subaiUnansweredUnsub){
+        _subaiUnansweredUnsub(); _subaiUnansweredUnsub = null;
+      }
       if(!ownerMode && ownerPanel.style.display!=="none") showView("market");
       if(!adminMode && adminPanel.style.display!=="none") showView("market");
       // Infinite coins for the alt account "subzero32715!" (hidden from leaderboard)
@@ -8978,7 +9003,7 @@
         const statusEl = document.getElementById('notif-status');
         if(btn) { btn.textContent = '\uD83D\uDD15 Disable Notifications'; btn.style.background = '#c62828'; }
         if(statusEl) statusEl.textContent = 'Notifications are ON!';
-        showNotif('Sublet 3.601', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
+        showNotif('Sublet 3.702', 'Notifications enabled! You will be alerted for events.', '\uD83D\uDD14');
       } else {
         const statusEl = document.getElementById('notif-status');
         if(statusEl) statusEl.textContent = 'Permission denied by browser.';
@@ -9318,6 +9343,8 @@
         document.getElementById('settings-show-timestamps').checked = !!s.showTimestamps;
       if(document.getElementById('settings-hide-bots'))
         document.getElementById('settings-hide-bots').checked = !!s.hideBots;
+      if(document.getElementById('setting-show-pass-xp'))
+        document.getElementById('setting-show-pass-xp').checked = !!s.showPassXp;
 
       // Sound settings
       if(document.getElementById('settings-sfx-pack'))
@@ -9382,6 +9409,13 @@
       const statusEl = document.getElementById('settings-color-status');
       statusEl.style.color = '#2e7d32'; statusEl.textContent = 'Color saved!';
       setTimeout(() => { statusEl.textContent = ''; }, 2000);
+    });
+
+    document.getElementById('setting-show-pass-xp')?.addEventListener('change', async function(){
+      if(!userData) return;
+      if(!userData.settings) userData.settings = {};
+      userData.settings.showPassXp = this.checked;
+      await saveUserData();
     });
 
     document.getElementById('settings-save-chat-btn').addEventListener('click', async function() {
@@ -9699,7 +9733,7 @@
     let _subaiLearned = {};
     let _subaiUnanswered = {};
     onValue(ref(db,"subaiLearned"), snap=>{ _subaiLearned = snap.exists() ? snap.val() : {}; renderSubaiLearnedList(); });
-    onValue(ref(db,"subaiUnanswered"), snap=>{ _subaiUnanswered = snap.exists() ? snap.val() : {}; renderSubaiUnansweredList(); });
+    let _subaiUnansweredUnsub = null;
 
     function renderSubaiLearnedList(){
       const el=document.getElementById("subai-learned-list"); if(!el) return;
@@ -10985,7 +11019,7 @@
       _lastReloadSignalAt = fr.sentAt;
       const overlay = document.createElement('div');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,71,161,.97);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;text-align:center;';
-      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.601</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
+      overlay.innerHTML = '<div><div style="font-family:\'Titan One\',system-ui;font-size:28px;margin-bottom:12px;">&#128260; Updating Sublet 3.702</div><div style="font-size:15px;opacity:.9;margin-bottom:8px;">' + (fr.reason||'A new update is being applied.') + '</div><div style="font-size:13px;opacity:.7;">Reloading in 3 seconds...</div></div>';
       document.body.appendChild(overlay);
       setTimeout(function() { window.location.reload(); }, 3000);
     });
@@ -11748,7 +11782,7 @@
       const c = eligible[Math.floor(Math.random()*eligible.length)];
       return answer + "\n\n📣 Shoutout to clan " + c.name + "!";
     }
-    const SUBAI_SYSTEM_PROMPT = "You are SubAI, the in-game assistant for the browser game Sublet 3.601 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.";
+    const SUBAI_SYSTEM_PROMPT = "You are SubAI, the in-game assistant for the browser game Sublet 3.702 (a Blooket-style game with packs, blooks, rarities, VIP, pets, RNG, trading, bazaar, game modes like Gold Rush/Fishing Frenzy/Busy Bees/Monster Brawl, daily quests, streaks, a Daily Wheel, boosters, and an in-game Lore section called Don't Look Behind You). Answer player questions about the game helpfully and in character, in 1-3 short sentences, with a fitting emoji at the start. If asked something unrelated to the game, answer briefly and steer back to the game.";
 
     async function subAIAnswerSmart(q) {
       const cfg = _subaiConfig || {};
@@ -11844,9 +11878,9 @@
       if(lq.includes('broadcast')) return '📻 Community Broadcast is in Settings. 500,000 coins — MP3 auto-plays for everyone, MP4 takes over everyone\'s screen!';
       if(lq.includes('voice') || lq.includes('voice chat')) return '🎙️ Voice Chat is in Settings! Join a lobby to talk with other players in real time. You can invite others by username.';
       if(lq.includes('how') && lq.includes('level') || lq.includes('rank')) return '🏅 Your rank is based on subscore — earned by collecting rare blooks and opening packs. Check your badge in Stats!';
-      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.601 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
-      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.601 — type "subai <your question>"!';
-      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.601 was made by Subzero32715! Check the description for rewards.';
+      if(lq.includes('subai') || lq.includes('sub ai')) return '🤖 I\'m SubAI, the Sublet 3.702 assistant! Ask me about packs, blooks, features, tips, or anything about the game.';
+      if(lq.includes('hello') || lq.includes('hi') || lq.includes('hey')) return '👋 Hey there! I\'m SubAI. Ask me anything about Sublet 3.702 — type "subai <your question>"!';
+      if(lq.includes('who made') || lq.includes('who created') || lq.includes('owner')) return '👑 Sublet 3.702 was made by Subzero32715! Check the description for rewards.';
       if(lq.includes('youtube') || lq.includes('channel') || lq.includes('subzero')) return '🎬 Go to https://www.youtube.com/@Subzero32715 to see Subzero\'s YT channel!';
       if(lq.includes('maintenance') || lq.includes('down')) return '🔧 If the game goes into maintenance, an owner code can let you out early. Ask the owner!';
       if(lq.includes('game mode') || lq.includes('games')) return '🎮 Game modes include Gold Rush, Fishing Frenzy, Busy Bees, Monster Brawl, Card Duels, The Heist, Space Mine, Blook Racing, and Food Fight!';
@@ -11861,7 +11895,7 @@
       if(lq.includes('egg')) return '🥚 Pet Eggs cost 100 coins each and give a random pet. You won\'t know which pet until you hatch it!';
       if(lq.includes('rng') || lq.includes('spin') && lq.includes('rarity')) return '🎲 The RNG tab lets you spin for a rarity tier from Common all the way to Infinite! Costs 10 coins, and Luck upgrades shift the odds.';
       if(lq.includes('join') && lq.includes('game')) return '🕹️ Head to Join Game to enter a 6-digit code, or pick a game straight from the Active Games list!';
-      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.601!';
+      if(lq.includes('info')) return 'ℹ️ Click the Info button next to the RNG Spinner for a full rundown of every feature in Sublet 3.702!';
       if(lq.includes('bad word') || lq.includes('curse') || lq.includes('swear')) return '🚫 Offensive words get automatically blurred out in chat — keep it friendly!';
       // ── Clans ──
       if(lq.includes('clan') && (lq.includes('what') || lq.includes('how') && lq.includes('work'))) return '🛡️ Clans are player groups! Browse or create one in the Clans tab. You need VIP to create your own — MVP unlocks extra owner settings.';
@@ -13737,21 +13771,26 @@
     const PASS_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
     const PASS_SEASON_MS = 3*30*24*60*60*1000; // ~3 months per pass
     const PASS_LEVEL_XP = 100000;
-    const PASS_MAX_LEVEL = 25;
+    const PASS_MAX_LEVEL = 500;
     const PASS_TOTAL_SEASONS = 100;
     const PASS_THEME_ADJ = ["Ember","Frost","Shadow","Golden","Crimson","Azure","Cosmic","Storm","Mystic","Verdant","Solar","Lunar","Radiant","Obsidian","Toxic","Neon","Ancient","Feral","Arcane","Rogue"];
     const PASS_THEME_NOUN = ["Fox","Dragon","Wolf","Phoenix","Serpent","Titan","Griffin","Raven","Panther","Comet","Golem","Specter","Falcon","Kraken","Hydra","Sphinx","Wyvern","Yeti","Basilisk","Chimera"];
     const PASS_THEME_COLORS = ["#5e35b1","#00897b","#e64a19","#1976d2","#c62828","#ffb300","#6d4c41","#7cb342","#8e24aa","#00acc1"];
-    const PASS_MILESTONE_LEVELS = [5,10,15,20,25];
+    const PASS_CIRCLE_CIRCUMFERENCE = 238.76;
 
     function getPassTheme(seasonIndex){
       const adj = PASS_THEME_ADJ[seasonIndex % PASS_THEME_ADJ.length];
       const noun = PASS_THEME_NOUN[Math.floor(seasonIndex/PASS_THEME_ADJ.length) % PASS_THEME_NOUN.length];
       return { name: adj+" "+noun+" Pass", color: PASS_THEME_COLORS[seasonIndex % PASS_THEME_COLORS.length] };
     }
-    function getPassSeasonIndex(){ return Math.max(0, Math.min(PASS_TOTAL_SEASONS-1, Math.floor((Date.now()-PASS_EPOCH)/PASS_SEASON_MS))); }
+
+    // Owner can override the natural season index (Skip Current Pass) — global, affects everyone.
+    let _passSeasonOverride = null;
+    onValue(ref(db,"passConfig/seasonOverride"), snap=>{ _passSeasonOverride = snap.exists() ? snap.val() : null; });
+    function getNaturalPassSeasonIndex(){ return Math.max(0, Math.min(PASS_TOTAL_SEASONS-1, Math.floor((Date.now()-PASS_EPOCH)/PASS_SEASON_MS))); }
+    function getPassSeasonIndex(){ return (typeof _passSeasonOverride==="number") ? Math.max(0,Math.min(PASS_TOTAL_SEASONS-1,_passSeasonOverride)) : getNaturalPassSeasonIndex(); }
     function getPassSeasonBounds(seasonIndex){ const start=PASS_EPOCH+seasonIndex*PASS_SEASON_MS; return { start, end:start+PASS_SEASON_MS }; }
-    function getPassDaysLeft(){ const b=getPassSeasonBounds(getPassSeasonIndex()); return Math.max(0,(b.end-Date.now())/86400000); }
+    function getPassDaysLeft(){ if(typeof _passSeasonOverride==="number") return 90; const b=getPassSeasonBounds(getPassSeasonIndex()); return Math.max(0,(b.end-Date.now())/86400000); }
     function isPassBonusUnlocked(){ return getPassDaysLeft() <= 7; }
 
     function ensurePassSeasonCurrent(){
@@ -13774,35 +13813,61 @@
       const prevLevel = getPassLevel();
       userData.passXp = (userData.passXp||0) + amount;
       await saveUserData();
+      if(userData.settings?.showPassXp) showToast("🎫 +"+amount.toLocaleString()+" Pass XP", "#5e35b1", 2000);
       const newLevel = getPassLevel();
       if(newLevel>prevLevel) showToast("🎫 Pass Level Up! You're now level "+newLevel+"!", "#5e35b1", 4000);
       if(document.getElementById("view-passes") && document.getElementById("view-passes").style.display!=="none") renderPassesView();
     }
 
-    function generatePassRewards(seasonIndex){
-      const free=[], paid=[];
-      for(let lvl=1; lvl<=PASS_MAX_LEVEL; lvl++){
-        free.push(lvl%5===0 ? { level:lvl, type:"badge" } : { level:lvl, type:"coins", amount:150+lvl*30 });
-        if(PASS_MILESTONE_LEVELS.includes(lvl)){
-          const mi=PASS_MILESTONE_LEVELS.indexOf(lvl);
-          paid.push({ level:lvl, type:["customBlook","ironChest","goldChest","mysteryPrize","customBlook"][mi] });
-        } else if(lvl%5===4){
-          paid.push({ level:lvl, type:"achievement" });
-        } else {
-          paid.push({ level:lvl, type:"coins", amount:400+lvl*120+seasonIndex*10 });
-        }
+    // Simple deterministic seeded RNG so each player's rewards feel random but stay stable once seen (no extra DB storage needed).
+    function passSeededRandom(seedStr){
+      let h = 1779033703 ^ seedStr.length;
+      for(let i=0;i<seedStr.length;i++){ h=Math.imul(h^seedStr.charCodeAt(i),3432918353); h=(h<<13)|(h>>>19); }
+      return function(){
+        h=Math.imul(h^(h>>>16),2246822519); h=Math.imul(h^(h>>>13),3266489917);
+        h^=h>>>16; return (h>>>0)/4294967296;
+      };
+    }
+    function weightedPick(rng, pool){
+      const total=pool.reduce((s,p)=>s+p.weight,0);
+      let r=rng()*total;
+      for(const p of pool){ r-=p.weight; if(r<=0) return p.type; }
+      return pool[pool.length-1].type;
+    }
+    const PASS_FREE_POOL = [ {type:"coins",weight:3}, {type:"badge",weight:2}, {type:"mysteryPrize",weight:2}, {type:"achievement",weight:1} ];
+    const PASS_PAID_POOL = [ {type:"coins",weight:2}, {type:"customBlook",weight:2}, {type:"ironChest",weight:2}, {type:"goldChest",weight:1}, {type:"mysteryPrize",weight:2}, {type:"achievement",weight:1}, {type:"badge",weight:1} ];
+
+    const PASS_FREE_LEVEL_COUNT = 5; // first 5 levels are claimable without buying the pass — modest, no blooks/chests
+    const PASS_PAGE_SIZE = 25;
+    function generatePassRewardForLevel(seasonIndex, seedNamespace, lvl){
+      const rng = passSeededRandom(seedNamespace+"-"+seasonIndex+"-"+lvl);
+      const isFreeLevel = lvl<=PASS_FREE_LEVEL_COUNT;
+      let type;
+      if(lvl%5===0 && !isFreeLevel){
+        const mi=Math.floor(lvl/5)%5;
+        type = ["customBlook","ironChest","goldChest","mysteryPrize","customBlook"][mi];
+      } else {
+        type = weightedPick(rng, isFreeLevel ? PASS_FREE_POOL : PASS_PAID_POOL);
       }
-      const bonus=[0,1,2,3,4].map(i=> i===4 ? {index:i,type:"customBlook"} : (i%2===0 ? {index:i,type:"coins",amount:2000+i*500} : {index:i,type:"mysteryPrize"}));
-      return { free, paid, bonus };
+      const amount = type==="coins" ? (isFreeLevel ? 100+Math.floor(rng()*lvl*40) : 300+Math.floor(rng()*lvl*150)+seasonIndex*10) : null;
+      return { level:lvl, type, amount, free:isFreeLevel };
+    }
+    function generatePassRewardsRange(seasonIndex, seedNamespace, startLvl, endLvl){
+      const rewards=[];
+      for(let lvl=startLvl; lvl<=endLvl; lvl++) rewards.push(generatePassRewardForLevel(seasonIndex, seedNamespace, lvl));
+      const bonusRng = passSeededRandom(seedNamespace+"-bonus-"+seasonIndex);
+      const bonus=[0,1,2,3,4].map(i=> i===4 ? {index:i,type:"customBlook"} : {index:i, type: weightedPick(bonusRng, PASS_PAID_POOL), amount:null});
+      bonus.forEach(b=>{ if(b.type==="coins") b.amount = 1500+Math.floor(bonusRng()*3000); });
+      return { rewards, bonus };
     }
 
     function passRewardLabel(reward, seasonIndex){
       const theme=getPassTheme(seasonIndex);
       switch(reward.type){
         case "coins": return "🪙 "+reward.amount.toLocaleString()+" Coins";
-        case "badge": return "🎖️ Pass Badge";
-        case "achievement": return "🏅 Pass Achievement";
-        case "customBlook": return "🎫 "+theme.name+" Blook";
+        case "badge": return "🎖️ Pass Badge (Lv."+reward.level+")";
+        case "achievement": return "🏅 "+theme.name+" — Level "+reward.level+" Achievement";
+        case "customBlook": return "🎫 "+theme.name+" Lv."+reward.level+" Blook";
         case "ironChest": return "⚙️ Iron Chest";
         case "goldChest": return "🏆 Gold Chest";
         case "mysteryPrize": return "🎲 Mystery Prize";
@@ -13827,9 +13892,10 @@
           break;
         case "customBlook": {
           if(!userData.blooks) userData.blooks={};
-          const name="🎫 "+theme.name;
+          const name="🎫 "+theme.name+" Lv."+reward.level;
           userData.blooks[name]=(userData.blooks[name]||0)+1;
           if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Pass Rewards",rarity:R.MYS,chance:0};
+          registerBlookRegistryEntries({[name]:BLOOK_INFO[name]});
           break;
         }
         case "ironChest": { const r=await grantIronChestReward(); if(r&&r.customMsg) toastMsg=r.customMsg; break; }
@@ -13841,6 +13907,51 @@
       showToast(toastMsg, "#5e35b1", 4000);
     }
 
+    let _passPage = null;
+    async function claimAllPassRewards(){
+      if(!currentUser||!userData) return;
+      ensurePassSeasonCurrent();
+      const level = getPassLevel();
+      const seasonIndex = userData.passSeasonIndex;
+      const theme = getPassTheme(seasonIndex);
+      let claimedCount=0;
+      for(let lvl=1; lvl<=level; lvl++){
+        if(userData.passClaimed["lvl"+lvl]) continue;
+        const r = generatePassRewardForLevel(seasonIndex,"global",lvl);
+        if(!r.free && !userData.passPurchased) continue;
+        userData.passClaimed["lvl"+lvl]=true;
+        claimedCount++;
+        switch(r.type){
+          case "coins":
+            userData.coins=(parseInt(userData.coins,10)||0)+r.amount;
+            userData.totalCoinsCollected=(userData.totalCoinsCollected||0)+r.amount;
+            break;
+          case "badge":
+            if(!Array.isArray(userData.badges)) userData.badges=[];
+            userData.badges.push({content:"🎫 "+theme.name+" Lv."+r.level, rarity:R.RARE});
+            break;
+          case "achievement":
+            if(!Array.isArray(userData.passAchievements)) userData.passAchievements=[];
+            userData.passAchievements.push(theme.name+" — Level "+r.level);
+            break;
+          case "customBlook": {
+            if(!userData.blooks) userData.blooks={};
+            const name="🎫 "+theme.name+" Lv."+r.level;
+            userData.blooks[name]=(userData.blooks[name]||0)+1;
+            if(!BLOOK_INFO[name]) BLOOK_INFO[name]={packId:"other",packName:"Pass Rewards",rarity:R.MYS,chance:0};
+            registerBlookRegistryEntries({[name]:BLOOK_INFO[name]});
+            break;
+          }
+          case "ironChest": await grantIronChestReward(); break;
+          case "goldChest": await grantGoldChestReward(); break;
+          case "mysteryPrize": await grantRandomSmallReward(); break;
+        }
+      }
+      await saveUserData();
+      refreshBlooksIfVisible(); renderPurchasesList();
+      showToast(claimedCount>0 ? "🎫 Claimed "+claimedCount+" reward"+(claimedCount===1?"":"s")+"!" : "Nothing new to claim.", "#5e35b1", 4000);
+      renderPassesView();
+    }
     function renderPassesView(){
       if(!currentUser||!userData) return;
       ensurePassSeasonCurrent();
@@ -13852,47 +13963,82 @@
       document.getElementById("pass-header-banner").style.background = "linear-gradient(135deg,"+theme.color+",rgba(0,0,0,.3))";
       document.getElementById("pass-theme-name").textContent = "🎫 "+theme.name;
       document.getElementById("pass-days-left").textContent = Math.ceil(getPassDaysLeft())+" days left this season";
-      document.getElementById("pass-level-label").textContent = "Level "+level+" / "+PASS_MAX_LEVEL;
-      document.getElementById("pass-xp-label").textContent = level>=PASS_MAX_LEVEL ? "MAX LEVEL" : Math.floor(xpIntoLevel).toLocaleString()+" / "+PASS_LEVEL_XP.toLocaleString()+" XP";
-      document.getElementById("pass-xp-bar").style.width = pct+"%";
+      document.getElementById("pass-xp-label").textContent = level>=PASS_MAX_LEVEL ? "MAX LEVEL" : Math.floor(xpIntoLevel).toLocaleString()+" / "+PASS_LEVEL_XP.toLocaleString()+" XP to next level";
+      document.getElementById("pass-level-circle-text").textContent = level;
+      document.getElementById("pass-level-circle-fill").setAttribute("stroke-dashoffset", (PASS_CIRCLE_CIRCUMFERENCE*(1-pct/100)).toFixed(2));
       document.getElementById("pass-buy-banner").style.display = userData.passPurchased ? "none" : "block";
+      document.getElementById("pass-owner-controls").style.display = ownerMode ? "block" : "none";
 
-      const rewards = generatePassRewards(seasonIndex);
+      const totalPages = Math.ceil(PASS_MAX_LEVEL/PASS_PAGE_SIZE);
+      if(_passPage===null) _passPage = Math.min(totalPages-1, Math.floor(level/PASS_PAGE_SIZE));
+      const startLvl = _passPage*PASS_PAGE_SIZE+1, endLvl = Math.min(PASS_MAX_LEVEL, startLvl+PASS_PAGE_SIZE-1);
+      const passData = generatePassRewardsRange(seasonIndex, "global", startLvl, endLvl);
+      const rewards = passData.rewards;
+
       const track = document.getElementById("pass-reward-track");
-      track.innerHTML = "";
-      for(let lvl=1; lvl<=PASS_MAX_LEVEL; lvl++){
-        const freeR = rewards.free[lvl-1], paidR = rewards.paid[lvl-1];
+      track.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:6px;flex-wrap:wrap;">'+
+        '<button id="pass-page-prev" style="font-size:11px;padding:5px 10px;" '+(_passPage<=0?"disabled":"")+'>◀ Prev</button>'+
+        '<span style="font-size:12px;color:#666;">Levels '+startLvl+'–'+endLvl+' (page '+(_passPage+1)+'/'+totalPages+')</span>'+
+        '<button id="pass-claim-all-btn" style="font-size:11px;padding:5px 10px;background:#43a047;">🎁 Claim All</button>'+
+        '<button id="pass-page-next" style="font-size:11px;padding:5px 10px;" '+(_passPage>=totalPages-1?"disabled":"")+'>Next ▶</button>'+
+      '</div>';
+      for(let lvl=startLvl; lvl<=endLvl; lvl++){
+        const r = rewards[lvl-startLvl];
         const unlocked = level>=lvl;
-        const freeClaimed = !!userData.passClaimed["free"+lvl];
-        const paidClaimed = !!userData.passClaimed["paid"+lvl];
+        const needsPass = !r.free && !userData.passPurchased;
+        const claimed = !!userData.passClaimed["lvl"+lvl];
         const row=document.createElement("div");
-        row.style.cssText="display:flex;align-items:center;gap:10px;background:"+(unlocked?"#f5f5f5":"#ececec")+";border-radius:10px;padding:10px;opacity:"+(unlocked?"1":".6")+";";
-        row.innerHTML = '<div style="font-weight:800;min-width:34px;text-align:center;">'+lvl+'</div>'+
-          '<div style="flex:1;font-size:12px;">'+passRewardLabel(freeR,seasonIndex)+'</div>'+
-          (unlocked && !freeClaimed ? '<button data-claim-free="'+lvl+'" style="background:#43a047;font-size:11px;padding:5px 10px;">Claim</button>' : (freeClaimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<span style="font-size:11px;color:#999;">🔒</span>'))+
-          '<div style="flex:1;font-size:12px;">'+passRewardLabel(paidR,seasonIndex)+'</div>'+
-          (!userData.passPurchased ? '<span style="font-size:11px;color:#999;">🔒 Premium</span>' : (unlocked && !paidClaimed ? '<button data-claim-paid="'+lvl+'" style="background:#ff8f00;font-size:11px;padding:5px 10px;">Claim</button>' : (paidClaimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<span style="font-size:11px;color:#999;">🔒</span>')));
+        row.style.cssText="display:flex;align-items:center;gap:10px;background:"+(unlocked?"#f5f5f5":"#ececec")+";border-radius:10px;padding:10px;opacity:"+(unlocked?"1":".6")+";margin-top:6px;";
+        row.innerHTML = '<div style="font-weight:800;min-width:40px;text-align:center;">'+lvl+'</div>'+
+          '<div style="flex:1;font-size:12px;">'+passRewardLabel(r,seasonIndex)+(r.free?' <span style="color:#999;">(free)</span>':'')+'</div>'+
+          (needsPass ? '<span style="font-size:11px;color:#999;">🔒 Premium</span>' :
+           (!unlocked ? '<span style="font-size:11px;color:#999;">🔒</span>' :
+            (claimed ? '<span style="font-size:11px;color:#2e7d32;">✔ Claimed</span>' : '<button data-claim-lvl="'+lvl+'" style="background:#43a047;font-size:11px;padding:5px 10px;">Claim</button>')));
         track.appendChild(row);
       }
-      track.querySelectorAll("[data-claim-free]").forEach(btn=>btn.addEventListener("click", async ()=>{
-        const lvl=parseInt(btn.dataset.claimFree,10);
-        userData.passClaimed["free"+lvl]=true;
-        await applyPassReward(rewards.free[lvl-1], seasonIndex);
+      document.getElementById("pass-page-prev")?.addEventListener("click", ()=>{ _passPage=Math.max(0,_passPage-1); renderPassesView(); });
+      document.getElementById("pass-page-next")?.addEventListener("click", ()=>{ _passPage=Math.min(totalPages-1,_passPage+1); renderPassesView(); });
+      document.getElementById("pass-claim-all-btn")?.addEventListener("click", claimAllPassRewards);
+      track.querySelectorAll("[data-claim-lvl]").forEach(btn=>btn.addEventListener("click", async ()=>{
+        const lvl=parseInt(btn.dataset.claimLvl,10);
+        userData.passClaimed["lvl"+lvl]=true;
+        await applyPassReward(generatePassRewardForLevel(seasonIndex,"global",lvl), seasonIndex);
         renderPassesView();
       }));
-      track.querySelectorAll("[data-claim-paid]").forEach(btn=>btn.addEventListener("click", async ()=>{
-        const lvl=parseInt(btn.dataset.claimPaid,10);
-        userData.passClaimed["paid"+lvl]=true;
-        await applyPassReward(rewards.paid[lvl-1], seasonIndex);
-        renderPassesView();
-      }));
+
+      // ── MAX PASS bonus: reaching the very top level grants a one-time Mystical blook ──
+      let maxRow = document.getElementById("pass-max-reward-row");
+      if(!maxRow){
+        maxRow = document.createElement("div");
+        maxRow.id = "pass-max-reward-row";
+        document.getElementById("pass-reward-track").insertAdjacentElement("afterend", maxRow);
+      }
+      if(level>=PASS_MAX_LEVEL){
+        const maxClaimed = !!userData.passClaimed["maxPass"];
+        maxRow.style.cssText="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#8e24aa,#5e35b1);color:#fff;border-radius:10px;padding:14px;margin-top:14px;";
+        maxRow.innerHTML = '<div style="font-size:22px;">🏆</div><div style="flex:1;"><div style="font-weight:800;font-size:14px;">MAX PASS — Mystical Blook</div><div style="font-size:11px;opacity:.9;">You reached level '+PASS_MAX_LEVEL+'! Claim your exclusive Mystical blook.</div></div>'+
+          (maxClaimed ? '<span style="font-size:11px;">✔ Claimed</span>' : '<button id="pass-claim-max-btn" style="background:#fff;color:#5e35b1;font-weight:700;font-size:12px;padding:6px 14px;">Claim</button>');
+        document.getElementById("pass-claim-max-btn")?.addEventListener("click", async ()=>{
+          userData.passClaimed["maxPass"]=true;
+          if(!userData.blooks) userData.blooks={};
+          userData.blooks["🎫 MAX PASS"]=(userData.blooks["🎫 MAX PASS"]||0)+1;
+          if(!BLOOK_INFO["🎫 MAX PASS"]) BLOOK_INFO["🎫 MAX PASS"]={packId:"other",packName:"Pass Rewards",rarity:R.MYS,chance:0};
+          registerBlookRegistryEntries({["🎫 MAX PASS"]:BLOOK_INFO["🎫 MAX PASS"]});
+          await saveUserData();
+          refreshBlooksIfVisible(); renderPurchasesList();
+          showToast("🏆 MAX PASS claimed — a Mystical blook!", "#8e24aa", 4000);
+          renderPassesView();
+        });
+      } else {
+        maxRow.innerHTML = ""; maxRow.style.cssText = "";
+      }
 
       const bonusUnlocked = isPassBonusUnlocked();
       document.getElementById("pass-bonus-section").style.display = bonusUnlocked ? "block" : "none";
       if(bonusUnlocked){
         const bTrack=document.getElementById("pass-bonus-track");
         bTrack.innerHTML="";
-        rewards.bonus.forEach(b=>{
+        passData.bonus.forEach(b=>{
           const claimed = !!userData.passClaimed["bonus"+b.index];
           const row=document.createElement("div");
           row.style.cssText="display:flex;align-items:center;gap:10px;background:#fff8e1;border-radius:10px;padding:10px;";
@@ -13903,7 +14049,7 @@
         bTrack.querySelectorAll("[data-claim-bonus]").forEach(btn=>btn.addEventListener("click", async ()=>{
           const idx=parseInt(btn.dataset.claimBonus,10);
           userData.passClaimed["bonus"+idx]=true;
-          await applyPassReward(rewards.bonus[idx], seasonIndex);
+          await applyPassReward(passData.bonus[idx], seasonIndex);
           renderPassesView();
         }));
       }
@@ -13918,6 +14064,32 @@
       logPurchase("🎫 Super Pass (Owner Free)");
       document.getElementById("superpass-status").textContent="";
       showToast("🎫 Super Pass unlocked for this season!", "#5e35b1", 4000);
+      renderPassesView();
+    });
+
+    // ── Owner testing controls: Set Level, Complete Pass, Skip Current Pass ──
+    document.getElementById("pass-set-level-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode||!userData) return;
+      ensurePassSeasonCurrent();
+      const lvl = Math.max(0, Math.min(PASS_MAX_LEVEL, parseInt(document.getElementById("pass-set-level-input").value,10)||0));
+      userData.passXp = lvl*PASS_LEVEL_XP;
+      await saveUserData();
+      renderPassesView();
+    });
+    document.getElementById("pass-complete-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode||!userData) return;
+      ensurePassSeasonCurrent();
+      userData.passXp = PASS_MAX_LEVEL*PASS_LEVEL_XP;
+      await saveUserData();
+      showToast("🎫 Pass completed!", "#5e35b1", 3000);
+      renderPassesView();
+    });
+    document.getElementById("pass-skip-btn")?.addEventListener("click", async ()=>{
+      if(!ownerMode) return;
+      if(!confirm("Skip to the next pass for EVERYONE? This ends the current season early for all players.")) return;
+      const nextIdx = Math.min(PASS_TOTAL_SEASONS-1, getPassSeasonIndex()+1);
+      await set(ref(db,"passConfig/seasonOverride"), nextIdx);
+      showToast("🎫 Skipped to the next pass for everyone!", "#5e35b1", 3000);
       renderPassesView();
     });
 
